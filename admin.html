@@ -3,60 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Team Tracker — Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>The Back Office — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #f8f8fa;
+  --bg: #f5f7f7;
   --surface: #ffffff;
-  --surface2: #f2f2f5;
-  --border: #e4e4ea;
-  --border2: #d0d0da;
-  --text: #111118;
-  --muted: #6b6b80;
-  --accent: #5b50e8;
-  --accent-soft: rgba(91,80,232,0.08);
-  --accent-border: rgba(91,80,232,0.25);
-  --danger: #e03f3f;
-  --danger-soft: rgba(224,63,63,0.08);
-  --success: #1a9e5f;
-  --success-soft: rgba(26,158,95,0.08);
+  --surface2: #eef2f2;
+  --border: #dde5e5;
+  --border2: #c8d5d5;
+  --text: #0e1a1a;
+  --muted: #5a7070;
+  --accent: #0d9488;
+  --accent-dark: #0f766e;
+  --accent-soft: rgba(13,148,136,0.08);
+  --accent-border: rgba(13,148,136,0.25);
+  --danger: #dc2626;
+  --danger-soft: rgba(220,38,38,0.08);
+  --success: #059669;
+  --success-soft: rgba(5,150,105,0.08);
   --warning: #d97706;
   --warning-soft: rgba(217,119,6,0.08);
   --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --font: 'Inter', sans-serif;
+  --font: 'DM Sans', sans-serif;
   --radius: 10px;
   --radius-sm: 6px;
 }
 
 [data-theme="dark"] {
-  --bg: #0f0f12;
-  --surface: #18181e;
-  --surface2: #202028;
-  --border: #2a2a36;
-  --border2: #38384a;
-  --text: #eeeef5;
-  --muted: #7878a0;
-  --accent: #7c6af7;
-  --accent-soft: rgba(124,106,247,0.1);
-  --accent-border: rgba(124,106,247,0.3);
-  --danger: #f26060;
-  --danger-soft: rgba(242,96,96,0.1);
-  --success: #4ecb8e;
-  --success-soft: rgba(78,203,142,0.1);
-  --warning: #f5a623;
-  --warning-soft: rgba(245,166,35,0.1);
-  --shadow: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --bg: #0a1212;
+  --surface: #111c1c;
+  --surface2: #172222;
+  --border: #1e2e2e;
+  --border2: #2a3e3e;
+  --text: #e8f0f0;
+  --muted: #6b9090;
+  --accent: #14b8a6;
+  --accent-dark: #0d9488;
+  --accent-soft: rgba(20,184,166,0.1);
+  --accent-border: rgba(20,184,166,0.3);
+  --danger: #f87171;
+  --danger-soft: rgba(248,113,113,0.1);
+  --success: #34d399;
+  --success-soft: rgba(52,211,153,0.1);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251,191,36,0.1);
+  --shadow: 0 1px 3px rgba(0,0,0,0.35);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.45);
 }
 
 body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; font-size: 14px; transition: background 0.2s, color 0.2s; }
 
 header { border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); height: 56px; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
-.logo { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; }
+.logo { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
 .logo span { color: var(--accent); }
 .header-right { display: flex; align-items: center; gap: 10px; }
 .week-nav { display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
@@ -71,8 +73,8 @@ header { border-bottom: 1px solid var(--border); padding: 0 28px; display: flex;
 
 main { padding: 24px 28px; }
 
-.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
-.tab-btn { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-family: var(--font); font-size: 13px; font-weight: 500; padding: 10px 18px; cursor: pointer; margin-bottom: -1px; transition: color 0.15s; }
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; gap: 2px; }
+.tab-btn { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-family: var(--font); font-size: 13px; font-weight: 500; padding: 10px 16px; cursor: pointer; margin-bottom: -1px; transition: color 0.15s; }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 .tab-btn:hover:not(.active) { color: var(--text); }
 .tab-panel { display: none; }
@@ -91,10 +93,13 @@ main { padding: 24px 28px; }
 .team-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
 .team-card:hover { border-color: var(--border2); box-shadow: var(--shadow-md); }
 .team-card.no-sub { opacity: 0.55; }
-.card-head { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.card-head { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.card-head-left { display: flex; align-items: center; gap: 10px; }
+.mgr-avatar { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+.mgr-avatar-init { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--accent-dark), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
 .mgr-name { font-weight: 600; font-size: 14px; text-transform: capitalize; }
 .mgr-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.open-link { font-size: 11px; font-weight: 500; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); padding: 4px 10px; border-radius: 20px; text-decoration: none; transition: opacity 0.15s; white-space: nowrap; }
+.open-link { font-size: 11px; font-weight: 500; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); padding: 4px 10px; border-radius: 20px; text-decoration: none; transition: opacity 0.15s; white-space: nowrap; flex-shrink: 0; }
 .open-link:hover { opacity: 0.7; }
 .card-members { padding: 8px 16px; }
 .mem-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); gap: 8px; }
@@ -104,10 +109,10 @@ main { padding: 24px 28px; }
 .mem-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mem-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .pos-tag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
-.pos-Trainee { color: #7c3aed; background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2); }
-.pos-Solo { color: #1d6fcd; background: rgba(29,111,205,0.1); border: 1px solid rgba(29,111,205,0.2); }
+.pos-Trainee { color: #0369a1; background: rgba(3,105,161,0.1); border: 1px solid rgba(3,105,161,0.2); }
+.pos-Solo { color: #7c3aed; background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2); }
 .pos-Leader { color: #b45309; background: rgba(180,83,9,0.1); border: 1px solid rgba(180,83,9,0.2); }
-.pos-Core { color: #1a9e5f; background: rgba(26,158,95,0.1); border: 1px solid rgba(26,158,95,0.2); }
+.pos-Core { color: #059669; background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.2); }
 .pos-Junior { color: #be185d; background: rgba(190,24,93,0.1); border: 1px solid rgba(190,24,93,0.2); }
 .leaver-tag { font-size: 10px; font-weight: 600; color: var(--warning); background: var(--warning-soft); border: 1px solid rgba(217,119,6,0.2); padding: 2px 6px; border-radius: 20px; }
 .no-data { background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius); padding: 48px; text-align: center; color: var(--muted); font-size: 14px; line-height: 1.7; }
@@ -121,7 +126,7 @@ td { padding: 10px 18px; border-bottom: 1px solid var(--border); color: var(--te
 tr:last-child td { border-bottom: none; }
 tbody tr:hover td { background: var(--surface2); }
 .badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 20px; }
-.badge-active { color: var(--success); background: var(--success-soft); border: 1px solid rgba(26,158,95,0.2); }
+.badge-active { color: var(--success); background: var(--success-soft); border: 1px solid rgba(5,150,105,0.2); }
 .badge-leaver { color: var(--warning); background: var(--warning-soft); border: 1px solid rgba(217,119,6,0.2); }
 
 .search-input { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--font); font-size: 13px; padding: 7px 12px; border-radius: var(--radius-sm); width: 220px; outline: none; transition: border-color 0.15s; }
@@ -146,9 +151,6 @@ tbody tr:hover td { background: var(--surface2); }
 .copy-btn:hover { color: var(--text); background: var(--surface2); }
 pre { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; font-family: monospace; font-size: 11px; color: var(--muted); overflow-x: auto; line-height: 1.6; white-space: pre; }
 .link-list { display: flex; flex-direction: column; gap: 8px; }
-.link-row { display: grid; grid-template-columns: 90px 1fr auto auto auto; gap: 8px; align-items: center; }
-.link-row .mgr-label { font-weight: 600; font-size: 13px; text-transform: capitalize; }
-.link-row input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: monospace; font-size: 11px; padding: 7px 11px; border-radius: var(--radius-sm); outline: none; width: 100%; }
 .open-btn { font-size: 12px; font-weight: 500; padding: 7px 11px; border-radius: var(--radius-sm); cursor: pointer; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-border); text-decoration: none; transition: opacity 0.15s; white-space: nowrap; }
 .open-btn:hover { opacity: 0.75; }
 .del-btn { background: none; border: 1px solid var(--border2); color: var(--muted); font-size: 13px; padding: 6px 10px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
@@ -160,7 +162,7 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
 .add-btn { background: var(--accent); border: none; color: #fff; font-family: var(--font); font-size: 13px; font-weight: 500; padding: 9px 18px; border-radius: var(--radius-sm); cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
 .add-btn:hover { opacity: 0.85; }
 
-.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(91,80,232,0.25); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--accent-soft); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-state { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; }
 
@@ -171,17 +173,61 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
 .toast.error { background: var(--danger); color: #fff; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-[data-theme="dark"] .pos-Trainee { color: #a78bfa; background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.2); }
-[data-theme="dark"] .pos-Solo { color: #60a5fa; background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.2); }
+/* Recurrence badge */
+.recur-tag { font-size: 10px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); padding: 2px 7px; border-radius: 20px; margin-left: 6px; }
+
+/* Profile pic uploader */
+.pic-upload-zone { border: 2px dashed var(--border2); border-radius: var(--radius); padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.pic-upload-zone:hover { border-color: var(--accent); background: var(--accent-soft); }
+.pic-preview { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; border: 2px solid var(--border); }
+
+/* Event list edit */
+.event-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; }
+.event-item-body { flex: 1; min-width: 0; }
+.event-item-title { font-size: 13px; font-weight: 600; }
+.event-item-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.event-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.edit-btn { background: none; border: 1px solid var(--border2); color: var(--muted); font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; font-family: var(--font); }
+.edit-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+/* Review viewer */
+.review-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 10px; box-shadow: var(--shadow); cursor: pointer; transition: border-color 0.15s; }
+.review-card:hover { border-color: var(--accent-border); }
+.review-card-head { display: flex; align-items: center; justify-content: space-between; }
+.review-card-title { font-size: 13px; font-weight: 600; }
+.review-card-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.review-body { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; display: none; font-size: 13px; line-height: 1.7; }
+.review-body.open { display: block; }
+.review-section { margin-bottom: 14px; }
+.review-section-lbl { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+
+/* Modal overlay */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+.modal-cancel { background: none; border: 1px solid var(--border2); color: var(--muted); font-family: var(--font); font-size: 13px; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; }
+.modal-save { background: var(--accent); border: none; color: #fff; font-family: var(--font); font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; }
+
+.form-row { margin-bottom: 12px; }
+.form-lbl { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 5px; display: block; }
+.form-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: var(--font); font-size: 13px; padding: 8px 12px; border-radius: var(--radius-sm); width: 100%; outline: none; transition: border-color 0.15s; }
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--muted); }
+select.form-input { cursor: pointer; }
+
+[data-theme="dark"] .pos-Trainee { color: #38bdf8; background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.2); }
+[data-theme="dark"] .pos-Solo { color: #a78bfa; background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.2); }
 [data-theme="dark"] .pos-Leader { color: #fbbf24; background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.2); }
-[data-theme="dark"] .pos-Core { color: #4ecb8e; background: rgba(78,203,142,0.1); border-color: rgba(78,203,142,0.2); }
+[data-theme="dark"] .pos-Core { color: #34d399; background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.2); }
 [data-theme="dark"] .pos-Junior { color: #f472b6; background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.2); }
 </style>
 </head>
 <body>
 
 <header>
-  <span class="logo">TEAM TRACKER <span>/ ADMIN</span></span>
+  <span class="logo">THE BACK OFFICE <span>/ ADMIN</span></span>
   <div class="header-right">
     <div class="week-nav">
       <button class="nav-btn" id="prev-week" onclick="changeWeek(-1)">‹</button>
@@ -199,6 +245,7 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
     <button class="tab-btn" onclick="switchTab('people')">All People</button>
     <button class="tab-btn" onclick="switchTab('upload')">Upload Reports</button>
     <button class="tab-btn" onclick="switchTab('calendar')">Calendar</button>
+    <button class="tab-btn" onclick="switchTab('reviews')">Weekly Reviews</button>
     <button class="tab-btn" onclick="switchTab('setup')">Setup</button>
   </div>
 
@@ -263,7 +310,6 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
       <button onclick="uploadReport()" style="margin-top:16px;background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Save report link</button>
       <div id="ul-status" style="font-size:12px;color:var(--muted);margin-top:8px;font-family:monospace;"></div>
     </div>
-
     <div class="setup-card">
       <h3>Uploaded reports</h3>
       <p>All links you've uploaded. Click × to remove.</p>
@@ -278,27 +324,48 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
 
     <div class="setup-card">
       <h3>Push a calendar event</h3>
-      <p>Create an event and push it to one or more managers' calendars. It will appear on their dashboard immediately.</p>
+      <p>Create an event and push it to one or more managers' calendars. Enable recurring to repeat it automatically — you can edit or remove individual occurrences any time.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
         <div style="grid-column:span 2;">
-          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Event title</div>
-          <input type="text" id="cal-title" class="search-input" style="width:100%;" placeholder="e.g. Team catch-up, Deadline: SP Venues&hellip;" />
+          <div class="form-lbl">Event title</div>
+          <input type="text" id="cal-title" class="search-input" style="width:100%;" placeholder="e.g. Team catch-up, Deadline: SP Venues…" />
         </div>
         <div>
-          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Date</div>
+          <div class="form-lbl">Date</div>
           <input type="date" id="cal-date" class="search-input" style="width:100%;" />
         </div>
         <div>
-          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Time (optional)</div>
+          <div class="form-lbl">Time (optional)</div>
           <input type="time" id="cal-time" class="search-input" style="width:100%;" />
         </div>
         <div style="grid-column:span 2;">
-          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Notes (optional)</div>
-          <input type="text" id="cal-notes" class="search-input" style="width:100%;" placeholder="Any extra detail&hellip;" />
+          <div class="form-lbl">Notes (optional)</div>
+          <input type="text" id="cal-notes" class="search-input" style="width:100%;" placeholder="Any extra detail…" />
+        </div>
+        <!-- Recurrence -->
+        <div style="grid-column:span 2;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <input type="checkbox" id="cal-recurring" onchange="toggleRecurrence()" style="cursor:pointer;accent-color:var(--accent);" />
+            <label for="cal-recurring" style="font-size:13px;font-weight:500;cursor:pointer;">Recurring event</label>
+          </div>
+          <div id="recurrence-options" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <div class="form-lbl">Repeat every</div>
+              <select id="cal-recur-freq" class="form-input">
+                <option value="weekly">Week</option>
+                <option value="biweekly">2 Weeks</option>
+                <option value="monthly">Month</option>
+              </select>
+            </div>
+            <div>
+              <div class="form-lbl">End after (occurrences)</div>
+              <input type="number" id="cal-recur-count" class="form-input" value="10" min="1" max="52" />
+            </div>
+          </div>
         </div>
       </div>
       <div style="margin-top:14px;">
-        <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Push to managers</div>
+        <div class="form-lbl" style="margin-bottom:8px;">Push to managers</div>
         <div style="margin-bottom:8px;display:flex;gap:8px;">
           <button onclick="calSelectAll()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;">Select all</button>
           <button onclick="calSelectNone()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;">Clear</button>
@@ -312,13 +379,48 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
     </div>
 
     <div class="setup-card">
-      <h3>Pushed events</h3>
-      <p>Events you've pushed to managers. These are live on their calendars now.</p>
-      <div id="cal-history" style="display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <h3 style="margin-bottom:0;">Pushed events</h3>
+        <div style="display:flex;gap:8px;">
+          <button onclick="filterCalHistory('all')" id="cal-filter-all" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:11px;padding:4px 12px;border-radius:20px;cursor:pointer;">All</button>
+          <button onclick="filterCalHistory('recurring')" id="cal-filter-recurring" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:4px 12px;border-radius:20px;cursor:pointer;">Recurring</button>
+          <button onclick="filterCalHistory('once')" id="cal-filter-once" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:4px 12px;border-radius:20px;cursor:pointer;">One-off</button>
+        </div>
+      </div>
+      <p>All events pushed to managers. Click Edit to adjust details or Remove to delete.</p>
+      <div id="cal-history" style="display:flex;flex-direction:column;gap:8px;">
         <div style="color:var(--muted);font-size:13px;">No events pushed yet.</div>
       </div>
     </div>
+  </div>
 
+  <!-- WEEKLY REVIEWS -->
+  <div class="tab-panel" id="tab-reviews">
+    <div class="setup-card" style="margin-bottom:16px;">
+      <h3>Review email recipients</h3>
+      <p>When a manager submits their weekly review, a PDF is emailed to these addresses. Add one per line or comma-separated.</p>
+      <textarea id="review-emails" class="form-input" style="min-height:80px;resize:vertical;" placeholder="admin@company.com&#10;director@company.com"></textarea>
+      <button onclick="saveReviewEmails()" style="margin-top:10px;background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:9px 18px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Save emails</button>
+      <span id="review-emails-status" style="font-size:12px;color:var(--muted);margin-left:10px;font-family:monospace;"></span>
+    </div>
+
+    <div class="setup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <h3 style="margin-bottom:0;">Submitted reviews</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="review-filter-manager" class="search-input" style="width:160px;" onchange="filterReviews()">
+            <option value="">All managers</option>
+          </select>
+          <select id="review-filter-week" class="search-input" style="width:180px;" onchange="filterReviews()">
+            <option value="">All weeks</option>
+          </select>
+        </div>
+      </div>
+      <p style="margin-bottom:14px;">Click a review to expand and read it.</p>
+      <div id="reviews-list">
+        <div style="color:var(--muted);font-size:13px;">No reviews stored yet.</div>
+      </div>
+    </div>
   </div>
 
   <!-- SETUP -->
@@ -328,7 +430,7 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
       <h3>1. Connect Google Sheets</h3>
       <p>All data saves to a Google Sheet via Apps Script. One-time setup — takes about 5 minutes.</p>
       <div class="steps">
-        <div class="step"><span>Create a new <strong>Google Sheet</strong> (name it anything, e.g. "Team Tracker")</span></div>
+        <div class="step"><span>Create a new <strong>Google Sheet</strong> (name it anything, e.g. "The Back Office")</span></div>
         <div class="step"><span>In the sheet go to <strong>Extensions → Apps Script</strong></span></div>
         <div class="step"><span>Delete existing code, paste in the <strong>Apps Script below</strong> (copy button top-right), and save</span></div>
         <div class="step"><span>Click <strong>Deploy → New deployment → Web app</strong> · Set "Who has access" to <strong>Anyone</strong> · Deploy · copy the URL</span></div>
@@ -364,8 +466,8 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
     </div>
 
     <div class="setup-card">
-      <h3>2. Manager links</h3>
-      <p>Add a manager's first name to generate their unique link. Share the link — they use it every week.</p>
+      <h3>2. Manager links & settings</h3>
+      <p>Add a manager's first name to generate their unique link. You can also set passwords and upload profile pictures here.</p>
       <div class="link-list" id="link-list"><div style="color:var(--muted);font-size:13px;">No managers added yet.</div></div>
       <div class="add-row">
         <input class="add-input" id="new-mgr" type="text" placeholder="First name (e.g. sarah)" onkeydown="if(event.key==='Enter')addManager()" />
@@ -378,9 +480,39 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
 
 <div class="toast" id="toast"></div>
 
+<!-- Edit event modal -->
+<div class="modal-overlay" id="edit-event-modal">
+  <div class="modal">
+    <h3>Edit event</h3>
+    <input type="hidden" id="edit-event-id" />
+    <div class="form-row">
+      <label class="form-lbl">Title</label>
+      <input type="text" id="edit-event-title" class="form-input" />
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-row">
+        <label class="form-lbl">Date</label>
+        <input type="date" id="edit-event-date" class="form-input" />
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">Time</label>
+        <input type="time" id="edit-event-time" class="form-input" />
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-lbl">Notes</label>
+      <input type="text" id="edit-event-notes" class="form-input" />
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="modal-save" onclick="saveEditedEvent()">Save changes</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── Apps Script source ─────────────────────────────────
-const APPS_SCRIPT = `// Team Tracker — Google Apps Script
+const APPS_SCRIPT = `// The Back Office — Google Apps Script
 // Extensions > Apps Script > paste > Deploy as Web App (Anyone)
 
 const SS = SpreadsheetApp.getActiveSpreadsheet();
@@ -547,7 +679,6 @@ function doPost(e) {
 
   } else if (data.action === 'saveAnnouncement') {
     const ah = getOrCreate('announcements', ['id','title','message','active','createdAt']);
-    // Deactivate all existing
     const rows = ah.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) ah.getRange(i+1,4).setValue('no');
     if (data.title) ah.appendRow(['ann'+Date.now(), data.title, data.message||'', 'yes', new Date().toISOString()]);
@@ -577,6 +708,59 @@ function doPost(e) {
     const prevWeek = y+'-'+m+'-'+d;
     const rows = sh.getDataRange().getValues().slice(1);
     result = { count: rows.filter(r => r[1]===data.manager && r[2]===prevWeek && r[6]!=='yes').length };
+
+  } else if (data.action === 'saveWeeklyReview') {
+    const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
+    const rows = rh.getDataRange().getValues();
+    // Remove existing review for same manager+week
+    for (let i = rows.length-1; i >= 1; i--) {
+      if (rows[i][1]===data.manager && rows[i][2]===data.week) rh.deleteRow(i+1);
+    }
+    rh.appendRow([data.id||('wr'+Date.now()), data.manager, data.week, JSON.stringify(data.reviewData), new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getAllWeeklyReviews') {
+    const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
+    result = { reviews: rh.getDataRange().getValues().slice(1).map(r => ({
+      id:r[0], manager:r[1], week:r[2],
+      reviewData: (() => { try { return JSON.parse(r[3]); } catch(e) { return {}; } })(),
+      submittedAt:r[4]
+    })) };
+
+  } else if (data.action === 'saveReviewEmails') {
+    const sh = getOrCreate('settings', ['key','value','updatedAt']);
+    const rows = sh.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]==='reviewEmails') { sh.getRange(i+1,2,1,2).setValues([[data.emails, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) sh.appendRow(['reviewEmails', data.emails, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getReviewEmails') {
+    const sh = getOrCreate('settings', ['key','value','updatedAt']);
+    const row = sh.getDataRange().getValues().slice(1).find(r => r[0]==='reviewEmails');
+    result = { emails: row ? row[1] : '' };
+
+  } else if (data.action === 'saveProfilePic') {
+    const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
+    const rows = ph.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager) { ph.getRange(i+1,2,1,2).setValues([[data.picData, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) ph.appendRow([data.manager, data.picData, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getProfilePic') {
+    const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
+    const row = ph.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
+    result = { picData: row ? row[1] : null };
+
+  } else if (data.action === 'getAllProfilePics') {
+    const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
+    const rows = ph.getDataRange().getValues().slice(1);
+    result = { pics: rows.map(r => ({ manager:r[0], picData:r[1] })) };
   }
 
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
@@ -602,6 +786,9 @@ initTheme();
 // ── State ──────────────────────────────────────────────
 let scriptUrl = localStorage.getItem('teamtracker_script_url')||'';
 let managers=[], allSubs=[], allPeople=[], allWeeks=[], viewWeekKey='', allRoster=[], managerPasswords={};
+let allProfilePics = {}; // manager -> base64 data
+let pushedCalEvents = [];
+let allWeeklyReviews = [];
 const MGR_BASE = window.location.href.replace('admin.html','manager.html');
 
 function getWeekKey(date) {
@@ -628,29 +815,70 @@ window.onload = () => {
     loadAll();
   } else { showEmpty(); }
   renderLinks();
+  // Init calendar date
+  const calInp=document.getElementById('cal-date');
+  if(calInp){ const t=new Date(); calInp.value=t.toISOString().split('T')[0]; }
+  // Init upload week
+  const d=new Date(); d.setHours(0,0,0,0);
+  d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
+  const inp=document.getElementById('ul-week');
+  if(inp) inp.value=d.toISOString().split('T')[0];
 };
 
 async function loadAll() {
   if (!scriptUrl) { showEmpty(); return; }
   document.getElementById('teams-grid').innerHTML = '<div class="loading-state"><span class="spinner"></span>Loading…</div>';
   try {
-    const [data, reportsData] = await Promise.all([
+    const [data, reportsData, picsData] = await Promise.all([
       api({action:'getAllData'}),
-      api({action:'getAllReports'})
+      api({action:'getAllReports'}),
+      api({action:'getAllProfilePics'})
     ]);
     managers=data.managers||[]; allSubs=data.subs||[]; allPeople=data.people||[]; allRoster=data.roster||[];
     allUploadedReports=reportsData.reports||[];
-    // Load passwords from managers sheet (row[1])
+    // Build profile pic map
+    (picsData.pics||[]).forEach(p => { if(p.picData) allProfilePics[p.manager] = p.picData; });
     if (data.managerPasswords) managerPasswords=data.managerPasswords;
     const ws=new Set([currentWeek]);
     allSubs.forEach(s=>ws.add(s.week));
     allWeeks=Array.from(ws).sort();
     if (!viewWeekKey||!allWeeks.includes(viewWeekKey)) viewWeekKey=currentWeek;
     renderOverview(); renderPeople(); renderLinks();
+    // Load reviews
+    loadWeeklyReviews();
+    // Load review emails
+    loadReviewEmails();
   } catch(e) {
     showToast('Failed to load — check script URL','error',5000);
     document.getElementById('teams-grid').innerHTML='<div class="no-data"><strong>Could not load data</strong>Check your Apps Script URL in the Setup tab.</div>';
   }
+}
+
+async function loadWeeklyReviews() {
+  try {
+    const res = await api({action:'getAllWeeklyReviews'});
+    allWeeklyReviews = res.reviews||[];
+    populateReviewFilters();
+    renderReviews();
+  } catch(e) {}
+}
+
+async function loadReviewEmails() {
+  try {
+    const res = await api({action:'getReviewEmails'});
+    if (res.emails) document.getElementById('review-emails').value = res.emails;
+  } catch(e) {}
+}
+
+async function saveReviewEmails() {
+  const emails = document.getElementById('review-emails').value.trim();
+  const status = document.getElementById('review-emails-status');
+  try {
+    await api({action:'saveReviewEmails', emails});
+    status.textContent = '✓ Saved';
+    showToast('Email list saved ✓','success');
+    setTimeout(()=>status.textContent='',3000);
+  } catch(e) { showToast('Failed to save emails','error'); }
 }
 
 // ── Week nav ───────────────────────────────────────────
@@ -678,37 +906,32 @@ function renderOverview() {
   updateWeekNav();
   const ws=allSubs.filter(s=>s.week===viewWeekKey);
   const submittedSet=new Set(ws.map(s=>s.manager));
-
-  // Stats: use roster for total headcount, subs for weekly submission count
   const rosterActive=allRoster.filter(r=>!r.leaver);
   const rosterLeavers=allRoster.filter(r=>r.leaver);
   const everyName=new Set([
     ...allPeople.map(p=>p.name.toLowerCase()),
     ...allRoster.map(r=>r.name.toLowerCase())
   ]);
-
   document.getElementById('s-submitted').textContent=`${submittedSet.size}/${managers.length||'—'}`;
   document.getElementById('s-headcount').textContent=rosterActive.length||ws.filter(s=>!s.leaver).length;
   document.getElementById('s-ever').textContent=everyName.size;
   document.getElementById('s-leavers').textContent=rosterLeavers.length||ws.filter(s=>s.leaver).length;
-
   if (!managers.length) { showEmpty(); return; }
-
   document.getElementById('teams-grid').innerHTML = managers.map(m=>{
     const dn=m.charAt(0).toUpperCase()+m.slice(1);
     const url=`${MGR_BASE}?name=${encodeURIComponent(m)}`;
-
-    // Use roster as primary source, fall back to latest submission
     const rosterReps=allRoster.filter(r=>r.manager===m);
     const weekSubs=ws.filter(s=>s.manager===m);
     const useRoster=rosterReps.length>0;
-
     const reps = useRoster ? rosterReps : weekSubs.map(s=>({...s,leaver:s.leaver}));
     const activeReps=reps.filter(r=>!r.leaver);
     const leaverReps=reps.filter(r=>r.leaver);
     const hasData=reps.length>0;
     const hasWeekSub=weekSubs.length>0;
-
+    const picSrc = allProfilePics[m];
+    const avatarHtml = picSrc
+      ? `<img class="mgr-avatar" src="${picSrc}" alt="${esc(dn)}" />`
+      : `<div class="mgr-avatar-init">${dn.charAt(0)}</div>`;
     const memberHtml = hasData
       ? [...activeReps,...leaverReps].map(r=>`
           <div class="mem-row">
@@ -722,16 +945,17 @@ function renderOverview() {
             </div>
           </div>`).join('')
       : `<div style="padding:12px 0;color:var(--muted);font-size:13px;">No data yet.</div>`;
-
     const metaText = hasData
       ? `${activeReps.length} active${leaverReps.length?' · '+leaverReps.length+' leaver'+(leaverReps.length>1?'s':''):''}${hasWeekSub?' · ✓ submitted':' · not submitted this week'}`
       : 'no data yet';
-
     return `<div class="team-card ${hasData?'':'no-sub'}">
       <div class="card-head">
-        <div>
-          <div class="mgr-name">${esc(dn)}</div>
-          <div class="mgr-meta">${metaText}</div>
+        <div class="card-head-left">
+          ${avatarHtml}
+          <div>
+            <div class="mgr-name">${esc(dn)}</div>
+            <div class="mgr-meta">${metaText}</div>
+          </div>
         </div>
         <a class="open-link" href="${url}" target="_blank">open ↗</a>
       </div>
@@ -743,11 +967,7 @@ function renderOverview() {
 // ── People ─────────────────────────────────────────────
 function renderPeople() {
   const thisWeek=new Set(allSubs.filter(s=>s.week===currentWeek&&!s.leaver).map(s=>s.name.toLowerCase()));
-
-  // Merge roster + people tab, roster takes priority
   const seen=new Map();
-
-  // Add roster entries first (most up to date)
   allRoster.forEach(r=>{
     seen.set(r.name.toLowerCase()+r.manager, {
       name:r.name, email:r.email||'', manager:r.manager,
@@ -756,8 +976,6 @@ function renderPeople() {
       leaver:r.leaver
     });
   });
-
-  // Fill in anyone from people tab not in roster
   allPeople.forEach(p=>{
     const k=p.name.toLowerCase()+p.manager;
     if(!seen.has(k)){
@@ -768,7 +986,6 @@ function renderPeople() {
       });
     }
   });
-
   window._peopleRows=[...seen.values()].sort((a,b)=>a.name.localeCompare(b.name));
   renderPeopleTable(window._peopleRows);
 }
@@ -803,16 +1020,35 @@ function renderLinks() {
     const url=`${MGR_BASE}?name=${encodeURIComponent(m)}`;
     const dn=m.charAt(0).toUpperCase()+m.slice(1);
     const pw=managerPasswords[m]||'';
-    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-        <span style="font-weight:600;font-size:14px;text-transform:capitalize;">${esc(dn)}</span>
-        <div style="display:flex;gap:6px;">
-          <button class="copy-btn" onclick="copyLink('${esc(url)}',this)">Copy link</button>
+    const picSrc = allProfilePics[m];
+    const picHtml = picSrc
+      ? `<img src="${picSrc}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;border:2px solid var(--border);flex-shrink:0;" />`
+      : `<div style="width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent-dark),var(--accent));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;">${dn.charAt(0)}</div>`;
+    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        ${picHtml}
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:14px;text-transform:capitalize;margin-bottom:2px;">${esc(dn)}</div>
+          <input type="text" value="${esc(url)}" readonly onclick="this.select()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:monospace;font-size:11px;padding:5px 9px;border-radius:6px;outline:none;width:100%;" />
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button class="copy-btn" onclick="copyLink('${esc(url)}',this)">Copy</button>
           <a class="open-btn" href="${esc(url)}" target="_blank">Open ↗</a>
           <button class="del-btn" onclick="removeManager('${esc(m)}')">×</button>
         </div>
       </div>
-      <input type="text" value="${esc(url)}" readonly onclick="this.select()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:monospace;font-size:11px;padding:7px 11px;border-radius:8px;outline:none;width:100%;" />
+      <!-- Profile pic upload -->
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Profile picture</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="cursor:pointer;background:var(--surface);border:1px dashed var(--border2);color:var(--muted);font-size:12px;font-weight:500;padding:7px 14px;border-radius:var(--radius-sm);transition:all .15s;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'">
+            📷 Upload photo
+            <input type="file" accept="image/*" onchange="uploadProfilePic('${esc(m)}',this)" style="display:none;" />
+          </label>
+          ${picSrc?`<button onclick="removeProfilePic('${esc(m)}')" style="background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:7px 12px;border-radius:var(--radius-sm);cursor:pointer;font-family:var(--font);" onmouseover="this.style.color='var(--danger)';this.style.borderColor='var(--danger)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border2)'">Remove</button>`:''}
+        </div>
+      </div>
+      <!-- Password -->
       <div style="display:flex;gap:8px;align-items:center;">
         <label style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;">Password</label>
         <input type="text" id="pw-${m}" value="${esc(pw)}" placeholder="Set a password…" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:7px 11px;border-radius:8px;outline:none;" />
@@ -820,6 +1056,34 @@ function renderLinks() {
       </div>
     </div>`;
   }).join('');
+}
+
+async function uploadProfilePic(manager, input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2*1024*1024) { showToast('Image too large — max 2MB','error'); return; }
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const picData = e.target.result;
+    try {
+      await api({action:'saveProfilePic', manager, picData});
+      allProfilePics[manager] = picData;
+      renderLinks();
+      renderOverview();
+      showToast(`Profile picture updated for ${manager} ✓`,'success');
+    } catch(err) { showToast('Failed to save picture','error'); }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function removeProfilePic(manager) {
+  try {
+    await api({action:'saveProfilePic', manager, picData:''});
+    delete allProfilePics[manager];
+    renderLinks();
+    renderOverview();
+    showToast('Picture removed ✓','success');
+  } catch(e) { showToast('Failed to remove picture','error'); }
 }
 
 async function addManager() {
@@ -856,13 +1120,12 @@ function copyLink(url,btn) {
 
 // ── Tabs ───────────────────────────────────────────────
 function switchTab(tab) {
-  const tabNames = ['overview','people','upload','calendar','setup'];
+  const tabNames = ['overview','people','upload','calendar','reviews','setup'];
   document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', tabNames[i] === tab));
-  document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', tabNames[i] === tab ? true : false, `tab-${tabNames[i]}` === `tab-${tab}`));
-  // simpler: match by id
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`));
   if(tab==='upload'){renderUploadHistory();renderManagerCheckboxes();}
   if(tab==='calendar'){renderCalManagerCheckboxes();renderCalHistory();}
+  if(tab==='reviews'){populateReviewFilters();renderReviews();}
 }
 
 function showEmpty() {
@@ -884,10 +1147,8 @@ let allUploadedReports = [];
 function getUploadWeekKey() {
   const val = document.getElementById('ul-week').value;
   if (!val) return null;
-  // val is YYYY-MM-DD from date input — parse as local time
   const parts = val.split('-');
   const d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-  // Snap to Monday
   d.setDate(d.getDate() - (d.getDay() === 0 ? 6 : d.getDay() - 1));
   const y = d.getFullYear();
   const m = String(d.getMonth()+1).padStart(2,'0');
@@ -907,16 +1168,13 @@ function renderManagerCheckboxes() {
   wrap.innerHTML = managers.map(m => {
     const dn = m.charAt(0).toUpperCase() + m.slice(1);
     return `<label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">
-      <input type="checkbox" id="ulm-${m}" value="${esc(m)}" style="cursor:pointer;" /> ${esc(dn)}
+      <input type="checkbox" id="ulm-${m}" value="${esc(m)}" style="cursor:pointer;accent-color:var(--accent);" /> ${esc(dn)}
     </label>`;
   }).join('');
 }
 
 function getCheckedManagers() {
-  return managers.filter(m => {
-    const cb = document.getElementById(`ulm-${m}`);
-    return cb && cb.checked;
-  });
+  return managers.filter(m => { const cb = document.getElementById(`ulm-${m}`); return cb && cb.checked; });
 }
 
 async function uploadReport() {
@@ -925,54 +1183,42 @@ async function uploadReport() {
   const campaign = document.getElementById('ul-campaign').value.trim();
   const weekVal = document.getElementById('ul-week').value;
   const selectedMgrs = getCheckedManagers();
-
   if (!url) { showToast('Paste a URL first', 'error'); return; }
   if (!weekVal) { showToast('Select a week', 'error'); return; }
   if (!selectedMgrs.length) { showToast('Select at least one manager', 'error'); return; }
   if (type !== 'Pay Report' && !campaign) { showToast('Add a campaign/label', 'error'); return; }
-
   const weekKey = getUploadWeekKey();
   const id = 'rep' + Date.now();
   const status = document.getElementById('ul-status');
   status.textContent = 'Saving…';
-
   try {
     await api({ action: 'saveReport', report: { id, type, url, campaign, week: weekKey, managers: selectedMgrs, uploadedAt: new Date().toISOString() } });
     status.textContent = '✓ Saved';
     showToast('Report uploaded ✓', 'success');
-    // Reset form
     document.getElementById('ul-url').value = '';
     document.getElementById('ul-campaign').value = '';
     managers.forEach(m => { const cb = document.getElementById(`ulm-${m}`); if (cb) cb.checked = false; });
     await loadUploadHistory();
     renderUploadHistory();
-    // Refresh campaign suggestions
     updateCampaignSuggestions();
     setTimeout(() => status.textContent = '', 3000);
-  } catch(e) {
-    status.textContent = 'Save failed';
-    showToast('Upload failed', 'error');
-  }
+  } catch(e) { status.textContent = 'Save failed'; showToast('Upload failed', 'error'); }
 }
 
 async function loadUploadHistory() {
   if (!scriptUrl) return;
-  try {
-    const res = await api({ action: 'getAllReports' });
-    allUploadedReports = res.reports || [];
-  } catch(e) {}
+  try { const res = await api({ action: 'getAllReports' }); allUploadedReports = res.reports || []; } catch(e) {}
 }
 
 function renderUploadHistory() {
   const el = document.getElementById('ul-history');
   if (!allUploadedReports.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;">No reports uploaded yet.</div>'; return; }
   const sorted = [...allUploadedReports].sort((a,b) => b.week.localeCompare(a.week));
-  const typeClass = {'Pay Report':'type-pay','Pro-log':'type-prolog','Daily Planner':'type-planner'};
+  const typeClass = {'Pay Report':'badge-active','Pro-log':'','Daily Planner':''};
   el.innerHTML = sorted.map(r => {
-    const tc = typeClass[r.type] || 'type-pay';
     const mgrList = (r.managers||[]).map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join(', ');
     return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
-      <span class="badge ${tc}" style="font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500;white-space:nowrap;">${esc(r.type)}</span>
+      <span style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);padding:3px 8px;border-radius:20px;white-space:nowrap;">${esc(r.type)}</span>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:500;">${r.campaign?esc(r.campaign)+' — ':''}${formatWeek(r.week)}</div>
         <div style="font-size:11px;color:var(--muted);">→ ${esc(mgrList)}</div>
@@ -985,12 +1231,7 @@ function renderUploadHistory() {
 
 async function deleteReport(id) {
   if (!confirm('Remove this report?')) return;
-  try {
-    await api({ action: 'deleteReport', id });
-    await loadUploadHistory();
-    renderUploadHistory();
-    showToast('Removed', 'success');
-  } catch(e) { showToast('Failed to remove', 'error'); }
+  try { await api({ action: 'deleteReport', id }); await loadUploadHistory(); renderUploadHistory(); showToast('Removed', 'success'); } catch(e) { showToast('Failed to remove', 'error'); }
 }
 
 function updateCampaignSuggestions() {
@@ -999,40 +1240,280 @@ function updateCampaignSuggestions() {
   if (dl) dl.innerHTML = campaigns.map(c=>`<option value="${esc(c)}">`).join('');
 }
 
-// Init upload tab date to this week's Monday
-(function(){
-  const d=new Date(); d.setHours(0,0,0,0);
-  d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
-  const inp=document.getElementById('ul-week');
-  if(inp) inp.value=d.toISOString().split('T')[0];
-  // Init calendar event date to today
-  const calInp=document.getElementById('cal-date');
-  if(calInp){ const t=new Date(); calInp.value=t.toISOString().split('T')[0]; }
-})();
-function showToast(msg,type,duration) {
-  const t=document.getElementById('toast'); t.textContent=msg; t.className=`toast ${type} show`;
-  setTimeout(()=>t.className='toast',duration||3000);
-}
-async function setPassword(manager) {
-  const inp = document.getElementById('pw-'+manager);
-  if (!inp) return;
-  const pw = inp.value.trim();
-  if (!pw) { showToast('Enter a password first', 'error'); return; }
-  try {
-    await api({ action: 'setPassword', manager, password: pw });
-    managerPasswords[manager] = pw;
-    showToast(`Password set for ${manager} ✓`, 'success');
-  } catch(e) { showToast('Failed to save password', 'error'); }
+// ── Calendar ──────────────────────────────────────────
+let calHistoryFilter = 'all';
+
+function toggleRecurrence() {
+  const cb = document.getElementById('cal-recurring');
+  const opts = document.getElementById('recurrence-options');
+  opts.style.display = cb.checked ? 'grid' : 'none';
 }
 
+function renderCalManagerCheckboxes() {
+  const wrap = document.getElementById('cal-manager-checkboxes');
+  if (!wrap) return;
+  if (!managers.length) { wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;">No managers added yet — add them in Setup first.</div>'; return; }
+  wrap.innerHTML = managers.map(m => {
+    const dn = m.charAt(0).toUpperCase() + m.slice(1);
+    return `<label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">
+      <input type="checkbox" id="calm-${m}" value="${esc(m)}" style="cursor:pointer;accent-color:var(--accent);" /> ${esc(dn)}
+    </label>`;
+  }).join('');
+}
+
+function calSelectAll() {
+  managers.forEach(m => { const cb = document.getElementById(`calm-${m}`); if (cb) cb.checked = true; });
+}
+function calSelectNone() {
+  managers.forEach(m => { const cb = document.getElementById(`calm-${m}`); if (cb) cb.checked = false; });
+}
+function getCalCheckedManagers() {
+  return managers.filter(m => { const cb = document.getElementById(`calm-${m}`); return cb && cb.checked; });
+}
+
+function generateRecurringDates(startDate, freq, count) {
+  const dates = [];
+  const d = new Date(startDate + 'T12:00:00');
+  for (let i = 0; i < count; i++) {
+    dates.push(d.toISOString().split('T')[0]);
+    if (freq === 'weekly') d.setDate(d.getDate()+7);
+    else if (freq === 'biweekly') d.setDate(d.getDate()+14);
+    else if (freq === 'monthly') d.setMonth(d.getMonth()+1);
+  }
+  return dates;
+}
+
+async function pushCalendarEvent() {
+  const title = document.getElementById('cal-title').value.trim();
+  const date = document.getElementById('cal-date').value;
+  const time = document.getElementById('cal-time').value;
+  const notes = document.getElementById('cal-notes').value.trim();
+  const isRecurring = document.getElementById('cal-recurring').checked;
+  const selectedMgrs = getCalCheckedManagers();
+  const status = document.getElementById('cal-status');
+
+  if (!title) { showToast('Add an event title', 'error'); return; }
+  if (!date) { showToast('Pick a date', 'error'); return; }
+  if (!selectedMgrs.length) { showToast('Select at least one manager', 'error'); return; }
+
+  const freq = document.getElementById('cal-recur-freq').value;
+  const count = isRecurring ? Math.max(1, parseInt(document.getElementById('cal-recur-count').value)||10) : 1;
+  const dates = isRecurring ? generateRecurringDates(date, freq, count) : [date];
+
+  const groupId = isRecurring ? 'rg'+Date.now() : null;
+  const newEvents = dates.map((d,i) => ({
+    id: 'ev'+Date.now()+i,
+    title, date:d, time:time||'', notes:notes||'',
+    pushedAt: new Date().toISOString(),
+    recurring: isRecurring,
+    recurringGroupId: groupId,
+    recurringFreq: isRecurring ? freq : null
+  }));
+
+  status.textContent = 'Pushing…';
+  let successCount = 0;
+  const errors = [];
+
+  for (const mgr of selectedMgrs) {
+    try {
+      const res = await api({ action: 'getCalEvents', manager: mgr });
+      const existing = res.events || [];
+      const updated = [...existing, ...newEvents];
+      await api({ action: 'saveCalEvents', manager: mgr, events: updated });
+      successCount++;
+    } catch(e) { errors.push(mgr); }
+  }
+
+  if (errors.length === 0) {
+    status.textContent = `✓ Pushed to ${successCount} manager${successCount!==1?'s':''}`;
+    showToast(`Event${isRecurring?' series':''} pushed to ${successCount} manager${successCount!==1?'s':''} ✓`, 'success');
+    newEvents.forEach(ev => pushedCalEvents.unshift({ ...ev, managers: selectedMgrs }));
+    renderCalHistory();
+    document.getElementById('cal-title').value = '';
+    document.getElementById('cal-time').value = '';
+    document.getElementById('cal-notes').value = '';
+    document.getElementById('cal-recurring').checked = false;
+    document.getElementById('recurrence-options').style.display = 'none';
+    calSelectNone();
+    setTimeout(() => status.textContent = '', 4000);
+  } else {
+    status.textContent = `Pushed to ${successCount}, failed for: ${errors.join(', ')}`;
+    showToast(`Some pushes failed: ${errors.join(', ')}`, 'error', 5000);
+  }
+}
+
+function filterCalHistory(filter) {
+  calHistoryFilter = filter;
+  ['all','recurring','once'].forEach(f => {
+    const btn = document.getElementById(`cal-filter-${f}`);
+    if (btn) {
+      btn.style.background = f===filter ? 'var(--accent)' : 'none';
+      btn.style.color = f===filter ? '#fff' : 'var(--muted)';
+      btn.style.border = f===filter ? 'none' : '1px solid var(--border2)';
+    }
+  });
+  renderCalHistory();
+}
+
+function renderCalHistory() {
+  const el = document.getElementById('cal-history');
+  if (!el) return;
+  let events = [...pushedCalEvents];
+  if (calHistoryFilter === 'recurring') events = events.filter(e=>e.recurring);
+  if (calHistoryFilter === 'once') events = events.filter(e=>!e.recurring);
+  if (!events.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;">No events pushed yet.</div>'; return; }
+  // Group recurring events
+  const seen = new Set();
+  el.innerHTML = events.map(e => {
+    const mgrList = (e.managers || []).map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(', ');
+    const dateStr = e.date ? new Date(e.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
+    const recurringBadge = e.recurring ? `<span class="recur-tag">↻ ${e.recurringFreq||'recurring'}</span>` : '';
+    return `<div class="event-item">
+      <div class="event-item-body">
+        <div class="event-item-title">${esc(e.title)}${e.time?' · '+esc(e.time):''}${recurringBadge}</div>
+        <div class="event-item-meta">${dateStr}${e.notes?' — '+esc(e.notes):''}</div>
+        <div style="font-size:11px;color:var(--accent);margin-top:3px;">→ ${esc(mgrList)}</div>
+      </div>
+      <div class="event-item-actions">
+        <button class="edit-btn" onclick="openEditModal('${esc(e.id)}','${esc(e.title)}','${esc(e.date)}','${esc(e.time||'')}','${esc(e.notes||'')}')">Edit</button>
+        <button class="edit-btn" onclick="deleteCalEvent('${esc(e.id)}')" style="color:var(--danger);border-color:var(--danger);" onmouseover="this.style.background='var(--danger-soft)'" onmouseout="this.style.background='none'">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Edit event modal
+let _editingEventId = null;
+function openEditModal(id, title, date, time, notes) {
+  _editingEventId = id;
+  document.getElementById('edit-event-id').value = id;
+  document.getElementById('edit-event-title').value = title;
+  document.getElementById('edit-event-date').value = date;
+  document.getElementById('edit-event-time').value = time;
+  document.getElementById('edit-event-notes').value = notes;
+  document.getElementById('edit-event-modal').classList.add('open');
+}
+function closeEditModal() {
+  document.getElementById('edit-event-modal').classList.remove('open');
+  _editingEventId = null;
+}
+document.getElementById('edit-event-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('edit-event-modal')) closeEditModal();
+});
+
+async function saveEditedEvent() {
+  const id = _editingEventId;
+  const newTitle = document.getElementById('edit-event-title').value.trim();
+  const newDate = document.getElementById('edit-event-date').value;
+  const newTime = document.getElementById('edit-event-time').value;
+  const newNotes = document.getElementById('edit-event-notes').value.trim();
+  if (!newTitle || !newDate) { showToast('Title and date required','error'); return; }
+
+  // Update in local pushedCalEvents
+  const ev = pushedCalEvents.find(e => e.id === id);
+  if (!ev) { showToast('Event not found','error'); return; }
+  ev.title = newTitle; ev.date = newDate; ev.time = newTime; ev.notes = newNotes;
+
+  // Update in all affected managers' calendars
+  const mgrList = ev.managers || [];
+  for (const mgr of mgrList) {
+    try {
+      const res = await api({action:'getCalEvents', manager:mgr});
+      const updated = (res.events||[]).map(e => e.id===id ? {...e,title:newTitle,date:newDate,time:newTime,notes:newNotes} : e);
+      await api({action:'saveCalEvents', manager:mgr, events:updated});
+    } catch(e){}
+  }
+
+  closeEditModal();
+  renderCalHistory();
+  showToast('Event updated ✓','success');
+}
+
+async function deleteCalEvent(id) {
+  if (!confirm('Remove this event from all managers?')) return;
+  const ev = pushedCalEvents.find(e => e.id === id);
+  pushedCalEvents = pushedCalEvents.filter(e => e.id !== id);
+  renderCalHistory();
+  if (ev) {
+    for (const mgr of (ev.managers||[])) {
+      try {
+        const res = await api({action:'getCalEvents', manager:mgr});
+        const updated = (res.events||[]).filter(e => e.id !== id);
+        await api({action:'saveCalEvents', manager:mgr, events:updated});
+      } catch(e){}
+    }
+  }
+  showToast('Event removed ✓','success');
+}
+
+// ── Weekly Reviews ────────────────────────────────────
+function populateReviewFilters() {
+  const mgrSel = document.getElementById('review-filter-manager');
+  const wkSel = document.getElementById('review-filter-week');
+  if (!mgrSel || !wkSel) return;
+
+  const mgrVal = mgrSel.value;
+  const wkVal = wkSel.value;
+
+  const uniqueMgrs = [...new Set(allWeeklyReviews.map(r=>r.manager))].sort();
+  const uniqueWeeks = [...new Set(allWeeklyReviews.map(r=>r.week))].sort().reverse();
+
+  mgrSel.innerHTML = '<option value="">All managers</option>' + uniqueMgrs.map(m=>`<option value="${esc(m)}" ${m===mgrVal?'selected':''}>${esc(m.charAt(0).toUpperCase()+m.slice(1))}</option>`).join('');
+  wkSel.innerHTML = '<option value="">All weeks</option>' + uniqueWeeks.map(w=>`<option value="${esc(w)}" ${w===wkVal?'selected':''}>${formatWeek(w)}</option>`).join('');
+}
+
+function filterReviews() {
+  renderReviews();
+}
+
+function renderReviews() {
+  const el = document.getElementById('reviews-list');
+  if (!el) return;
+  const mgrFilter = document.getElementById('review-filter-manager')?.value||'';
+  const wkFilter = document.getElementById('review-filter-week')?.value||'';
+  let reviews = [...allWeeklyReviews];
+  if (mgrFilter) reviews = reviews.filter(r=>r.manager===mgrFilter);
+  if (wkFilter) reviews = reviews.filter(r=>r.week===wkFilter);
+  reviews.sort((a,b)=>b.week.localeCompare(a.week)||a.manager.localeCompare(b.manager));
+  if (!reviews.length) { el.innerHTML='<div style="color:var(--muted);font-size:13px;">No reviews match the current filter.</div>'; return; }
+  el.innerHTML = reviews.map(r => {
+    const dn = r.manager.charAt(0).toUpperCase()+r.manager.slice(1);
+    const d = r.reviewData||{};
+    const submittedDate = r.submittedAt ? new Date(r.submittedAt).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}) : '';
+    // Build expanded content from reviewData keys
+    const sections = Object.entries(d).map(([key,val])=>{
+      if (!val || (Array.isArray(val) && !val.length)) return '';
+      const lbl = key.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase());
+      const content = Array.isArray(val) ? val.map(v=>typeof v==='object'?JSON.stringify(v):String(v)).join(', ') : String(val);
+      return `<div class="review-section"><div class="review-section-lbl">${esc(lbl)}</div><div style="color:var(--text);">${esc(content)}</div></div>`;
+    }).filter(Boolean).join('');
+    return `<div class="review-card" id="rev-${esc(r.id)}" onclick="toggleReview('${esc(r.id)}')">
+      <div class="review-card-head">
+        <div>
+          <div class="review-card-title">${esc(dn)} — ${formatWeek(r.week)}</div>
+          <div class="review-card-meta">Submitted ${submittedDate}</div>
+        </div>
+        <span style="font-size:18px;color:var(--muted);transition:transform .2s;" id="rev-arrow-${esc(r.id)}">›</span>
+      </div>
+      <div class="review-body" id="rev-body-${esc(r.id)}">${sections||'<div style="color:var(--muted);">No data in this review.</div>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleReview(id) {
+  const body = document.getElementById(`rev-body-${id}`);
+  const arrow = document.getElementById(`rev-arrow-${id}`);
+  if (!body) return;
+  const open = body.classList.toggle('open');
+  if (arrow) arrow.style.transform = open ? 'rotate(90deg)' : '';
+}
+
+// ── Announcements ─────────────────────────────────────
 async function postAnnouncement() {
   const title = document.getElementById('ann-title').value.trim();
   const message = document.getElementById('ann-message').value.trim();
   if (!title) { showToast('Add a title', 'error'); return; }
-  try {
-    await api({ action: 'saveAnnouncement', title, message });
-    showToast('Announcement posted ✓', 'success');
-  } catch(e) { showToast('Failed to post', 'error'); }
+  try { await api({ action: 'saveAnnouncement', title, message }); showToast('Announcement posted ✓', 'success'); } catch(e) { showToast('Failed to post', 'error'); }
 }
 
 async function clearAnnouncement() {
@@ -1044,107 +1525,22 @@ async function clearAnnouncement() {
   } catch(e) { showToast('Failed to clear', 'error'); }
 }
 
-
-// ── Calendar push ─────────────────────────────────────
-let pushedCalEvents = [];
-
-function renderCalManagerCheckboxes() {
-  const wrap = document.getElementById('cal-manager-checkboxes');
-  if (!wrap) return;
-  if (!managers.length) { wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;">No managers added yet — add them in Setup first.</div>'; return; }
-  wrap.innerHTML = managers.map(m => {
-    const dn = m.charAt(0).toUpperCase() + m.slice(1);
-    return `<label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">
-      <input type="checkbox" id="calm-${m}" value="${esc(m)}" style="cursor:pointer;" /> ${esc(dn)}
-    </label>`;
-  }).join('');
+// ── Toast & utils ─────────────────────────────────────
+function showToast(msg,type,duration) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.className='toast',duration||3000);
 }
 
-function calSelectAll() {
-  managers.forEach(m => { const cb = document.getElementById(`calm-${m}`); if (cb) cb.checked = true; });
-}
-
-function calSelectNone() {
-  managers.forEach(m => { const cb = document.getElementById(`calm-${m}`); if (cb) cb.checked = false; });
-}
-
-function getCalCheckedManagers() {
-  return managers.filter(m => { const cb = document.getElementById(`calm-${m}`); return cb && cb.checked; });
-}
-
-async function pushCalendarEvent() {
-  const title = document.getElementById('cal-title').value.trim();
-  const date = document.getElementById('cal-date').value;
-  const time = document.getElementById('cal-time').value;
-  const notes = document.getElementById('cal-notes').value.trim();
-  const selectedMgrs = getCalCheckedManagers();
-  const status = document.getElementById('cal-status');
-
-  if (!title) { showToast('Add an event title', 'error'); return; }
-  if (!date) { showToast('Pick a date', 'error'); return; }
-  if (!selectedMgrs.length) { showToast('Select at least one manager', 'error'); return; }
-
-  status.textContent = 'Pushing…';
-
-  const newEvent = {
-    id: 'ev' + Date.now(),
-    title,
-    date,
-    time: time || '',
-    notes: notes || '',
-    pushedAt: new Date().toISOString()
-  };
-
-  let successCount = 0;
-  const errors = [];
-
-  for (const mgr of selectedMgrs) {
-    try {
-      // Load existing events for this manager first
-      const res = await api({ action: 'getCalEvents', manager: mgr });
-      const existing = res.events || [];
-      // Append the new event
-      const updated = [...existing, newEvent];
-      await api({ action: 'saveCalEvents', manager: mgr, events: updated });
-      successCount++;
-    } catch(e) {
-      errors.push(mgr);
-    }
-  }
-
-  if (errors.length === 0) {
-    status.textContent = `✓ Pushed to ${successCount} manager${successCount !== 1 ? 's' : ''}`;
-    showToast(`Event pushed to ${successCount} manager${successCount !== 1 ? 's' : ''} ✓`, 'success');
-    // Save to local history
-    pushedCalEvents.unshift({ ...newEvent, managers: selectedMgrs });
-    renderCalHistory();
-    // Reset form
-    document.getElementById('cal-title').value = '';
-    document.getElementById('cal-time').value = '';
-    document.getElementById('cal-notes').value = '';
-    calSelectNone();
-    setTimeout(() => status.textContent = '', 4000);
-  } else {
-    status.textContent = `Pushed to ${successCount}, failed for: ${errors.join(', ')}`;
-    showToast(`Some pushes failed: ${errors.join(', ')}`, 'error', 5000);
-  }
-}
-
-function renderCalHistory() {
-  const el = document.getElementById('cal-history');
-  if (!el) return;
-  if (!pushedCalEvents.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;">No events pushed yet.</div>'; return; }
-  el.innerHTML = pushedCalEvents.map(e => {
-    const mgrList = (e.managers || []).map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(', ');
-    const dateStr = e.date ? new Date(e.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
-    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:500;">${esc(e.title)}${e.time ? ' · ' + esc(e.time) : ''}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${dateStr}${e.notes ? ' — ' + esc(e.notes) : ''}</div>
-        <div style="font-size:11px;color:var(--accent);margin-top:2px;">→ ${esc(mgrList)}</div>
-      </div>
-    </div>`;
-  }).join('');
+async function setPassword(manager) {
+  const inp = document.getElementById('pw-'+manager);
+  if (!inp) return;
+  const pw = inp.value.trim();
+  if (!pw) { showToast('Enter a password first', 'error'); return; }
+  try {
+    await api({ action: 'setPassword', manager, password: pw });
+    managerPasswords[manager] = pw;
+    showToast(`Password set for ${manager} ✓`, 'success');
+  } catch(e) { showToast('Failed to save password', 'error'); }
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
