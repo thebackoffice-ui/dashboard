@@ -414,233 +414,6 @@ select.wr-input{cursor:pointer;appearance:none;}
 .profile-upload-wrap{position:relative;display:inline-block;}
 .profile-upload-btn{position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:var(--accent);border:2px solid var(--sidebar);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s;}
 .profile-upload-btn:hover{opacity:.85;}
-
-/* ── AESTHETIC REFRESH: soft SaaS dashboard inspired by supplied mockup ── */
-:root{
-  --bg:#edf3f3;
-  --surface:#ffffff;
-  --surface2:#f5f8f8;
-  --border:#e5eeee;
-  --border2:#d4e3e3;
-  --text:#0d1717;
-  --muted:#718787;
-  --subtle:#a0afaf;
-  --accent:#21b7a3;
-  --accent-soft:rgba(33,183,163,.12);
-  --accent-border:rgba(33,183,163,.25);
-  --accent2:#c6fa4b;
-  --sidebar:#ffffff;
-  --sidebar-active:#c6fa4b;
-  --sidebar-text:#465858;
-  --sidebar-hover:#f1f6f6;
-  --r:14px;
-  --rsm:11px;
-  --rlg:22px;
-  --s1:0 8px 24px rgba(28,45,45,.045);
-  --s2:0 14px 36px rgba(28,45,45,.08);
-  --s3:0 22px 60px rgba(28,45,45,.14);
-}
-body{background:linear-gradient(180deg,#e9eeee 0%,#f4f7f7 100%);}
-.sidebar{background:#fff;border-right:1px solid #eef3f3;width:238px;padding:18px 14px;}
-.sidebar-header{padding:18px 18px 30px;}
-.sidebar-logo{font-size:21px;letter-spacing:-.04em;text-transform:none;color:#111;font-weight:800;}
-.sidebar-logo span{color:#111;}
-.sidebar-mgr{margin-top:auto;order:2;border-bottom:0;border-top:0;padding:18px 16px;}
-.sidebar-name{color:#111;font-weight:800;font-size:15px;}
-.sidebar-week{color:#8a9999;}
-.sidebar-nav{gap:10px;padding:0 10px;overflow:visible;}
-.nav-item{color:#424d4d;border-radius:14px;padding:12px 14px;font-weight:700;}
-.nav-item:hover{background:#f1f6f6;color:#111;}
-.nav-item.active{background:#c8fb45;color:#172020;box-shadow:none;}
-.nav-icon{filter:grayscale(1);opacity:.8;}
-.sidebar-footer{border-top:0;padding:10px;}
-.theme-toggle{color:#526363;background:#f6f9f9;border-radius:14px;}
-.topbar{height:96px;background:transparent;border-bottom:0;box-shadow:none;padding:0 34px;align-items:flex-end;padding-bottom:18px;}
-.topbar-title{font-size:31px;font-weight:850;letter-spacing:-.045em;}
-.week-pill{background:#fff;color:#7b8e8e;border:1px solid #e8eeee;padding:9px 15px;border-radius:16px;box-shadow:var(--s1);}
-.home-scroll,.page-scroll{padding:0 34px 34px;}
-.card,.neo-card,.stat-card,.report-card,.rep-card,.wr-section,.lb-stat-card,.lb-row,.week-row{border:0;background:#fff;border-radius:22px;box-shadow:var(--s1);}
-.dash-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-bottom:26px;}
-.dash-metric{border-radius:18px;padding:22px 24px;min-height:132px;box-shadow:var(--s1);position:relative;overflow:hidden;}
-.dash-metric:after{content:"";position:absolute;right:-34px;top:-34px;width:116px;height:116px;border-radius:50%;background:rgba(255,255,255,.25);}
-.metric-purple{background:linear-gradient(135deg,#c9b8ff,#b7a5ff);}
-.metric-blue{background:linear-gradient(135deg,#a9c9ff,#8fb9ff);}
-.metric-green{background:linear-gradient(135deg,#8ee6b4,#71dba5);}
-.dash-metric-kicker{font-size:13px;font-weight:800;color:rgba(9,18,18,.72);}
-.dash-metric-value{font-size:31px;line-height:1;font-weight:900;color:#142020;margin-top:22px;letter-spacing:-.04em;}
-.dash-metric-sub{font-size:12px;color:rgba(9,18,18,.62);font-weight:650;margin-top:10px;}
-.dashboard-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:start;}
-.dashboard-main,.dashboard-side{display:flex;flex-direction:column;gap:26px;}
-.neo-card{padding:26px;}
-.neo-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;}
-.neo-card-head.compact{margin-bottom:14px;}
-.neo-card h2{font-size:24px;font-weight:900;letter-spacing:-.04em;margin:0;}
-.neo-card p{font-size:13px;color:#a0a9a9;margin-top:2px;}
-.pill-action{background:#c8fb45;color:#1e2929;border:0;border-radius:12px;font-family:var(--font);font-weight:850;font-size:12px;padding:9px 14px;cursor:pointer;}
-.link-list{display:flex;flex-direction:column;gap:14px;}
-.link-row{min-height:58px;border-radius:16px;background:#fff;box-shadow:0 8px 22px rgba(36,54,54,.06);display:flex;align-items:center;gap:14px;padding:12px 16px;text-decoration:none;color:var(--text);border:1px solid #eef4f4;transition:.15s ease;}
-.link-row:hover{transform:translateY(-1px);box-shadow:var(--s2);}
-.link-icon{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.pay-link .link-icon{background:#efeaff;color:#7557e7;}
-.planner-link .link-icon{background:#e8f2ff;color:#3f7fe0;}
-.prolog-link .link-icon{background:#e7fbef;color:#1e9f62;}
-.muted-row .link-icon{background:#f1f5f5;color:#90a0a0;}
-.link-copy{flex:1;min-width:0;display:flex;flex-direction:column;}
-.link-copy strong{font-size:14px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.link-copy em{font-style:normal;font-size:12px;color:#96a4a4;margin-top:2px;}
-.link-arrow{font-size:30px;line-height:1;color:#142020;}
-.soft-warning{margin-top:16px;background:#fff8e8;color:#9a620b;border:1px solid #ffe2a9;border-radius:16px;padding:12px 14px;font-size:12px;font-weight:650;}
-.ack-inline{margin-left:8px;border:0;border-radius:10px;background:#111;color:#fff;padding:7px 10px;font-family:var(--font);font-size:11px;font-weight:800;cursor:pointer;}
-.ack-inline.done{background:#22a267;}
-.team-table{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;padding-right:2px;}
-.team-row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:#f8fbfb;}
-.team-person{flex:1;min-width:0;display:flex;flex-direction:column;}
-.team-person strong{font-size:14px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.team-person span{font-size:12px;color:#849494;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.team-flag{font-size:11px;font-weight:850;border:1px solid;border-radius:999px;padding:5px 9px;white-space:nowrap;}
-.team-flag.quiet{color:#6e7f7f;background:#fff;border-color:#edf2f2;}
-.mini-panel .mini-cal-grid{margin-top:4px;}
-.side-label{font-size:11px;font-weight:900;color:#9ba8a8;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;}
-.agents-panel{padding:22px;}
-.agent-list{display:flex;flex-direction:column;gap:10px;}
-.agent-pill{display:flex;align-items:center;gap:10px;background:#f5f8f8;border-radius:14px;padding:9px 10px;}
-.agent-pill div:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column;}
-.agent-pill strong{font-size:12px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.agent-pill span{font-size:10px;color:#879494;}
-.agent-pill b{font-size:20px;color:#596767;}
-.notes-panel .notes-area{min-height:150px;background:#f7fafafa;border:0;border-radius:16px;}
-.report-tabs{background:#fff;padding:8px;border-radius:18px;border:0;box-shadow:var(--s1);gap:8px;margin-bottom:20px;}
-.rtab-btn{border:0;border-radius:13px;margin:0;padding:11px 16px;font-weight:850;}
-.rtab-btn.active{background:#c8fb45;color:#172020;border:0;}
-.wk-hdr{font-size:12px;color:#7c8b8b;margin:22px 0 10px;}
-.rh-row{border:0;border-radius:17px;background:#fff;box-shadow:var(--s1);padding:15px 16px;margin-bottom:10px;}
-.view-btn,.submit-btn,.add-btn,.save-btn-sm,.wr-submit-btn,.modal-btn.primary{background:#111;border-radius:12px;}
-.view-btn.ghost{background:#f5f8f8;border:0;color:#111;}
-.card-hd{border-bottom:1px solid #eef4f4;}
-@media(max-width:1050px){
-  .dashboard-layout{grid-template-columns:1fr;}
-  .dashboard-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
-  .notes-panel{grid-column:1/-1;}
-}
-@media(max-width:760px){
-  .sidebar{width:76px;padding:12px 8px;}
-  .sidebar-logo,.sidebar-mgr,.nav-item:not(.active) .nav-icon+*,.nav-item.active .nav-icon+*,.theme-toggle span:last-child{display:none;}
-  .nav-item{justify-content:center;padding:13px 8px;}
-  .topbar{height:auto;padding:22px 18px;}
-  .home-scroll,.page-scroll{padding:0 18px 24px;}
-  .dash-stat-grid,.dashboard-side{grid-template-columns:1fr;}
-  .dash-stat-grid{gap:12px;}
-}
-
-
-
-/* ── SLEEK DENSITY OVERRIDE
-   Keeps the new dashboard layout, but makes it tighter, sharper and closer
-   to the original app sizing. No data/functionality changes. ── */
-:root{
-  --r:8px;
-  --rsm:5px;
-  --rlg:12px;
-  --s1:0 3px 12px rgba(28,45,45,.045);
-  --s2:0 8px 22px rgba(28,45,45,.075);
-  --s3:0 16px 42px rgba(28,45,45,.12);
-}
-body{font-size:13px;line-height:1.38;background:#eef3f3;}
-.sidebar{width:218px;padding:14px 10px;border-right:1px solid #edf2f2;}
-.sidebar-header{padding:14px 16px 22px;}
-.sidebar-logo{font-size:18px;font-weight:800;letter-spacing:-.035em;}
-.sidebar-mgr{padding:14px 14px;}
-.sidebar-name{font-size:13px;font-weight:750;}
-.sidebar-week{font-size:10px;}
-.sidebar-nav{gap:4px;padding:0 6px;}
-.nav-item{border-radius:9px;padding:9px 11px;font-size:12px;font-weight:650;gap:9px;}
-.nav-icon{font-size:14px;width:18px;}
-.theme-toggle{border-radius:9px;padding:8px 10px;font-size:11px;}
-.topbar{height:74px;padding:0 26px 14px;}
-.topbar-title{font-size:24px;font-weight:800;letter-spacing:-.035em;}
-.week-pill{font-size:10px;padding:6px 10px;border-radius:10px;}
-.home-scroll,.page-scroll{padding:0 26px 26px;}
-.card,.neo-card,.stat-card,.report-card,.rep-card,.wr-section,.lb-stat-card,.lb-row,.week-row{border-radius:12px;box-shadow:var(--s1);}
-.card-hd{padding:13px 15px 10px;}
-.card-bd{padding:13px 15px;}
-.dash-stat-grid{gap:16px;margin-bottom:18px;}
-.dash-metric{border-radius:11px;padding:15px 17px;min-height:96px;}
-.dash-metric:after{width:82px;height:82px;right:-26px;top:-26px;}
-.dash-metric-kicker{font-size:11px;font-weight:800;}
-.dash-metric-value{font-size:24px;margin-top:14px;font-weight:850;letter-spacing:-.035em;}
-.dash-metric-sub{font-size:10.5px;margin-top:7px;font-weight:600;}
-.dashboard-layout{grid-template-columns:minmax(0,1fr) 270px;gap:18px;}
-.dashboard-main,.dashboard-side{gap:18px;}
-.neo-card{padding:18px;}
-.neo-card-head{gap:12px;margin-bottom:14px;}
-.neo-card-head.compact{margin-bottom:10px;}
-.neo-card h2{font-size:18px;font-weight:800;letter-spacing:-.03em;}
-.neo-card p{font-size:11px;margin-top:1px;}
-.pill-action{border-radius:8px;font-size:10.5px;font-weight:800;padding:6px 10px;}
-.link-list{gap:9px;}
-.link-row{min-height:46px;border-radius:9px;padding:8px 11px;gap:10px;box-shadow:0 3px 12px rgba(36,54,54,.045);}
-.link-icon{width:28px;height:28px;border-radius:8px;}
-.link-icon svg{width:14px;height:14px;}
-.link-copy strong{font-size:12px;font-weight:800;}
-.link-copy em{font-size:10.5px;margin-top:1px;}
-.link-arrow{font-size:22px;}
-.soft-warning{margin-top:11px;border-radius:9px;padding:9px 10px;font-size:11px;}
-.ack-inline{border-radius:7px;padding:5px 8px;font-size:10px;}
-.team-table{gap:6px;max-height:350px;}
-.team-row{gap:9px;padding:9px;border-radius:9px;}
-.team-person strong{font-size:12px;font-weight:750;}
-.team-person span{font-size:10.5px;}
-.team-flag{font-size:10px;padding:3px 7px;}
-.av34{width:30px;height:30px;font-size:10px;}
-.av28{width:24px;height:24px;font-size:9px;}
-.side-label{font-size:10px;margin:12px 0 6px;}
-.agents-panel{padding:17px;}
-.agent-list{gap:7px;}
-.agent-pill{border-radius:9px;padding:7px 8px;gap:8px;}
-.agent-pill strong{font-size:11px;font-weight:750;}
-.agent-pill span{font-size:9.5px;}
-.agent-pill b{font-size:16px;}
-.notes-panel .notes-area{min-height:110px;border-radius:9px;font-size:12px;padding:10px 11px;}
-.report-tabs{padding:5px;border-radius:11px;gap:5px;margin-bottom:16px;}
-.rtab-btn{border-radius:8px;padding:8px 12px;font-size:12px;font-weight:750;}
-.wk-hdr{font-size:10.5px;margin:16px 0 8px;}
-.rh-row{border-radius:9px;padding:10px 12px;margin-bottom:7px;gap:8px;}
-.view-btn,.submit-btn,.add-btn,.save-btn-sm,.wr-submit-btn,.modal-btn.primary{border-radius:8px;}
-.view-btn{font-size:11px;padding:6px 10px;}
-.stat-card{padding:14px 16px;gap:10px;}
-.stat-icon{width:32px;height:32px;border-radius:8px;font-size:15px;}
-.stat-val{font-size:22px;}
-.stat-lbl{font-size:11px;}
-.page-wrap{max-width:720px;}
-.rep-card-head{padding:9px 12px;gap:9px;}
-.rep-name{font-size:12px;}
-.rep-meta{font-size:10px;}
-.rep-fields{gap:8px;margin-top:10px;}
-.field-input,.add-input,.wr-input,.modal-input{font-size:12px;padding:7px 9px;border-radius:6px;}
-.field-lbl,.modal-label,.wr-label,.sec-lbl,.card-title{font-size:10px;}
-.add-row{gap:7px;}
-.add-btn{font-size:12px;padding:8px 13px;}
-.week-row{padding:8px 11px;gap:8px;}
-.week-row-name{font-size:12px;}
-.week-row-sub{font-size:10.5px;}
-.wr-section-hdr{padding:11px 14px;}
-.wr-section-body{padding:14px;}
-.lb-stat-card{padding:11px 13px;}
-.lb-stat-val{font-size:22px;}
-.lb-row{padding:9px 12px;grid-template-columns:44px 1fr auto;}
-.lb-rank{width:32px;height:32px;border-radius:7px;font-size:12px;}
-.lb-row-name{font-size:12px;}
-.lb-score{font-size:20px;}
-.login-box{border-radius:14px;padding:32px 36px;}
-.login-title{font-size:20px;}
-@media(max-width:760px){
-  .sidebar{width:70px;padding:10px 7px;}
-  .nav-item{padding:10px 7px;}
-  .topbar{padding:18px 16px 12px;height:auto;}
-  .topbar-title{font-size:22px;}
-  .home-scroll,.page-scroll{padding:0 16px 22px;}
-}
-
 </style>
 </head>
 <body>
@@ -1061,91 +834,80 @@ function renderHome(){
     :`<div style="font-size:12px;color:var(--subtle);padding:8px 0;">No upcoming events</div>`;
 
   document.getElementById('home-grid').innerHTML=`
-    <div class="dash-stat-grid">
-      <div class="dash-metric metric-purple">
-        <div class="dash-metric-kicker">Active Team</div>
-        <div class="dash-metric-value">${active.length}</div>
-        <div class="dash-metric-sub">Current active reps · ${active.length+leavers.length} total</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--accent-soft);color:var(--accent);">${SVG.users}</div>
+        <div><div class="stat-val">${active.length}</div><div class="stat-lbl">Active reps</div>${deltaHtml}</div>
       </div>
-      <div class="dash-metric metric-blue">
-        <div class="dash-metric-kicker">Weekly Update</div>
-        <div class="dash-metric-value">${weekSubmitted?'Done':'Pending'}</div>
-        <div class="dash-metric-sub">${weekSubmitted?'Team submitted for this week':'Tap weekly update to submit'}</div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--warning-soft);color:var(--warning);">${SVG.warning}</div>
+        <div><div class="stat-val">${leavers.length}</div><div class="stat-lbl">Leavers</div><span class="stat-delta delta-same" style="display:flex;align-items:center;gap:3px;">${SVG.dash} ${flagged.length} flagged</span></div>
       </div>
-      <div class="dash-metric metric-green">
-        <div class="dash-metric-kicker">Team Movement</div>
-        <div class="dash-metric-value">${delta>0?'+'+delta:delta}</div>
-        <div class="dash-metric-sub">${flagged.length} flagged · ${leavers.length} leavers</div>
+      <div class="stat-card" style="cursor:${weekSubmitted?'default':'pointer'};" onclick="${weekSubmitted?'':"switchTab('weekly')"}">
+        <div class="stat-icon" style="background:${weekSubmitted?'var(--success-soft)':'var(--warning-soft)'};color:${weekSubmitted?'var(--success)':'var(--warning)'};">${weekSubmitted?SVG.check:SVG.clock}</div>
+        <div><div class="stat-val" style="font-size:16px;font-weight:600;margin-top:2px;">${weekSubmitted?'Submitted':'Pending'}</div><div class="stat-lbl">Weekly update</div>
+        <span class="stat-delta ${weekSubmitted?'delta-up':'delta-dn'}" style="display:flex;align-items:center;gap:3px;">${weekSubmitted?SVG.check:SVG.clock} ${weekSubmitted?'Done':'Tap to submit'}</span></div>
       </div>
     </div>
 
-    <div class="dashboard-layout">
-      <main class="dashboard-main">
-        <section class="neo-card links-panel">
-          <div class="neo-card-head">
-            <div>
-              <h2>This Week's Links</h2>
-              <p>Updated weekly</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 300px;gap:14px;margin-bottom:14px;">
+      <!-- Links section -->
+      <div style="grid-column:1/4;background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);box-shadow:var(--s1);overflow:hidden;">
+        <div style="padding:14px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;">This week's links</span>
+          <button onclick="switchTab('reports')" style="background:none;border:none;color:var(--accent);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;">View all →</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
+          <div style="padding:16px 18px;border-right:1px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="width:30px;height:30px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.chart}</div>
+              <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Pay Report</span>
             </div>
-            <button onclick="switchTab('reports')" class="pill-action">View all</button>
+            ${latestPay?`<div style="font-size:13px;font-weight:500;margin-bottom:2px;">${isThisWeekPay?'This week':'Latest'}</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${formatWeek(latestPay.week)}</div>${isThisWeekPay?`<div class="friday-warn" style="margin-bottom:10px;">Review &amp; let Elle know changes before 11am Friday</div>`:''}<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><a href="${esc(latestPay.url)}" target="_blank" class="view-btn">${SVG.link} View</a><button class="ack-btn ${ackDone?'done':''}" onclick="acknowledgeReport()" id="ack-btn">${ackDone?'Acknowledged ✓':'Mark reviewed'}</button></div>`:`<div style="font-size:13px;color:var(--subtle);">Not uploaded yet</div>`}
           </div>
-          <div class="link-list">
-            ${latestPay?`<a class="link-row pay-link" href="${esc(latestPay.url)}" target="_blank">
-              <span class="link-icon">${SVG.chart}</span>
-              <span class="link-copy"><strong>Pay Report${latestPay.campaign?` · ${esc(latestPay.campaign)}`:''}</strong><em>${formatWeek(latestPay.week)}${isThisWeekPay?' · Review before 11am Friday':''}</em></span>
-              <span class="link-arrow">›</span>
-            </a>`:`<div class="link-row muted-row"><span class="link-icon">${SVG.chart}</span><span class="link-copy"><strong>Pay Report</strong><em>Not uploaded yet</em></span></div>`}
-            ${latestPlanner?`<a class="link-row planner-link" href="${esc(latestPlanner.url)}" target="_blank">
-              <span class="link-icon">${SVG.calendar}</span>
-              <span class="link-copy"><strong>Daily Planner${latestPlanner.campaign?` · ${esc(latestPlanner.campaign)}`:''}</strong><em>${formatWeek(latestPlanner.week)}</em></span>
-              <span class="link-arrow">›</span>
-            </a>`:`<div class="link-row muted-row"><span class="link-icon">${SVG.calendar}</span><span class="link-copy"><strong>Daily Planner</strong><em>Not uploaded yet</em></span></div>`}
-            ${latestProlog?`<a class="link-row prolog-link" href="${esc(latestProlog.url)}" target="_blank">
-              <span class="link-icon">${SVG.doc}</span>
-              <span class="link-copy"><strong>Pro-log${latestProlog.campaign?` · ${esc(latestProlog.campaign)}`:''}</strong><em>${formatWeek(latestProlog.week)}</em></span>
-              <span class="link-arrow">›</span>
-            </a>`:`<div class="link-row muted-row"><span class="link-icon">${SVG.doc}</span><span class="link-copy"><strong>Pro-log and Gauges</strong><em>Not uploaded yet</em></span></div>`}
-          </div>
-          ${latestPay&&isThisWeekPay?`<div class="soft-warning">Please review this week’s pay report and let Elle know any changes before 11am Friday. <button class="ack-inline ${ackDone?'done':''}" onclick="acknowledgeReport()" id="ack-btn">${ackDone?'Acknowledged ✓':'Mark reviewed'}</button></div>`:''}
-        </section>
-
-        <section class="neo-card">
-          <div class="neo-card-head">
-            <div>
-              <h2>Team Snapshot</h2>
-              <p>Your current roster and quick status overview</p>
+          <div style="padding:16px 18px;border-right:1px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="width:30px;height:30px;border-radius:8px;background:var(--warning-soft);color:var(--warning);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.calendar}</div>
+              <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Daily Planner</span>
             </div>
-            <button onclick="switchTab('reps')" class="pill-action">Manage</button>
+            ${latestPlanner?`<div style="font-size:13px;font-weight:500;margin-bottom:2px;">${esc(latestPlanner.campaign||'Daily Planner')}</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${formatWeek(latestPlanner.week)}</div><a href="${esc(latestPlanner.url)}" target="_blank" class="view-btn">${SVG.link} View</a>`:`<div style="font-size:13px;color:var(--subtle);">Not uploaded yet</div>`}
           </div>
-          <div class="team-table">
-            ${active.length?active.map(r=>{const c=pc(r.position||'default');const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);const ldr=r.leader==='__mgr__'?getMgrDisplay():(roster.find(x=>x.id===r.leader)||null);const flagInfo=r.flag?FLAGS.find(f=>f.id===r.flag):null;return`<div class="team-row"><div class="av av34" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div><div class="team-person"><strong>${esc(r.name)}</strong><span>${r.position||'—'}${ldr?` · reports to ${esc(typeof ldr==='string'?ldr:ldr.name)}`:''}</span></div>${flagInfo?`<span class="team-flag" style="color:${flagInfo.color};background:${flagInfo.color}18;border-color:${flagInfo.color}33;">${esc(flagInfo.label)}</span>`:'<span class="team-flag quiet">Active</span>'}</div>`;}).join(''):`<div class="empty-state"><strong>No reps yet</strong>Add reps on My Reps first.</div>`}
+          <div style="padding:16px 18px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="width:30px;height:30px;border-radius:8px;background:var(--success-soft);color:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.doc}</div>
+              <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Pro-log</span>
+            </div>
+            ${latestProlog?`<div style="font-size:13px;font-weight:500;margin-bottom:2px;">${esc(latestProlog.campaign||'Pro-log')}</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${formatWeek(latestProlog.week)}</div><a href="${esc(latestProlog.url)}" target="_blank" class="view-btn">${SVG.link} View</a>`:`<div style="font-size:13px;color:var(--subtle);">Not uploaded yet</div>`}
           </div>
-        </section>
-      </main>
+        </div>
+      </div>
 
-      <aside class="dashboard-side">
-        <section class="neo-card mini-panel">
-          <div class="neo-card-head compact">
-            <div><h2>${months[miniMonth]} ${miniYear}</h2><p>Calendar</p></div>
-            <button class="pill-action" onclick="switchTab('calendar')">Open</button>
-          </div>
+      <!-- Mini calendar -->
+      <div class="card" style="grid-column:4;">
+        <div class="card-hd">
+          <span class="card-title">${months[miniMonth]} ${miniYear}</span>
+          <button class="card-action" onclick="switchTab('calendar')">Full calendar →</button>
+        </div>
+        <div class="card-bd" style="padding:10px 14px;">
           <div class="mini-cal-grid">${miniGridHtml}</div>
-          <div class="side-label">Upcoming</div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 6px;">Upcoming</div>
           <div class="home-events-list">${upcomingHtml}</div>
-        </section>
+        </div>
+      </div>
+    </div>
 
-        <section class="neo-card agents-panel">
-          <div class="neo-card-head compact"><div><h2>Agents</h2><p>${active.length} active</p></div></div>
-          <div class="agent-list">
-            ${active.slice(0,5).map(r=>{const c=pc(r.position||'default');const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);return`<div class="agent-pill"><div class="av av28" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div><div><strong>${esc(r.name)}</strong><span>${esc(r.position||'Rep')}</span></div><b>›</b></div>`;}).join('') || `<div style="font-size:13px;color:var(--subtle);">No agents yet</div>`}
-          </div>
-        </section>
-
-        <section class="neo-card notes-panel">
-          <div class="neo-card-head compact"><div><h2>Quick Notes</h2><p>Private manager notes</p></div><button class="pill-action" onclick="saveNotes()">Save</button></div>
-          <textarea class="notes-area" id="notes-area" placeholder="Jot anything down…">${esc(notes)}</textarea>
-        </section>
-      </aside>
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:14px;">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Team snapshot</span><button class="card-action" onclick="switchTab('reps')">Manage →</button></div>
+        <div class="card-bd" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;max-height:220px;overflow-y:auto;">
+          ${active.length?active.map(r=>{const c=pc(r.position||'default');const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);const ldr=r.leader==='__mgr__'?getMgrDisplay():(roster.find(x=>x.id===r.leader)||null);const flagInfo=r.flag?FLAGS.find(f=>f.id===r.flag):null;return`<div class="roster-item"><div class="av av28" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div><div class="ri-info"><div class="ri-name">${esc(r.name)}</div><div class="ri-sub">${r.position||'—'}${ldr?` · →${esc(typeof ldr==='string'?ldr:ldr.name)}`:''}</div></div>${flagInfo?`<div class="flag-dot" style="background:${flagInfo.color};" title="${esc(flagInfo.label)}"></div>`:''}</div>`;}).join(''):`<div style="color:var(--subtle);font-size:13px;padding:4px 0;">No reps yet.</div>`}
+          ${leavers.length?`<div style="font-size:11px;color:var(--subtle);padding:6px 2px;grid-column:1/-1;">${leavers.length} leaver${leavers.length>1?'s':''} not shown</div>`:''}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Quick notes</span><button class="card-action" onclick="saveNotes()">Save</button></div>
+        <div class="card-bd"><textarea class="notes-area" id="notes-area" placeholder="Jot anything down…">${esc(notes)}</textarea></div>
+      </div>
     </div>
   `;
 }
