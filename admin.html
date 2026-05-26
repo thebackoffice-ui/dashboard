@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Tracker — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f8f8fa;
+  --surface: #ffffff;
+  --surface2: #f2f2f5;
+  --border: #e4e4ea;
+  --border2: #d0d0da;
+  --text: #111118;
+  --muted: #6b6b80;
+  --accent: #5b50e8;
+  --accent-soft: rgba(91,80,232,0.08);
+  --accent-border: rgba(91,80,232,0.25);
+  --danger: #e03f3f;
+  --danger-soft: rgba(224,63,63,0.08);
+  --success: #1a9e5f;
+  --success-soft: rgba(26,158,95,0.08);
+  --warning: #d97706;
+  --warning-soft: rgba(217,119,6,0.08);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --font: 'Inter', sans-serif;
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+[data-theme="dark"] {
+  --bg: #0f0f12;
+  --surface: #18181e;
+  --surface2: #202028;
+  --border: #2a2a36;
+  --border2: #38384a;
+  --text: #eeeef5;
+  --muted: #7878a0;
+  --accent: #7c6af7;
+  --accent-soft: rgba(124,106,247,0.1);
+  --accent-border: rgba(124,106,247,0.3);
+  --danger: #f26060;
+  --danger-soft: rgba(242,96,96,0.1);
+  --success: #4ecb8e;
+  --success-soft: rgba(78,203,142,0.1);
+  --warning: #f5a623;
+  --warning-soft: rgba(245,166,35,0.1);
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; font-size: 14px; transition: background 0.2s, color 0.2s; }
+
+header { border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); height: 56px; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
+.logo { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; }
+.logo span { color: var(--accent); }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.week-nav { display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.nav-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 6px 12px; font-size: 16px; line-height: 1; transition: all 0.15s; }
+.nav-btn:hover:not(:disabled) { color: var(--text); background: var(--border); }
+.nav-btn:disabled { opacity: 0.25; cursor: default; }
+.week-label { font-size: 12px; font-weight: 500; color: var(--text); padding: 0 10px; min-width: 210px; text-align: center; }
+.icon-btn { background: none; border: 1px solid var(--border2); color: var(--muted); font-family: var(--font); font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
+.icon-btn:hover { color: var(--text); border-color: var(--border2); background: var(--surface2); }
+.theme-btn { background: none; border: 1px solid var(--border2); color: var(--muted); cursor: pointer; padding: 5px 10px; border-radius: var(--radius-sm); font-size: 13px; transition: all 0.15s; }
+.theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+main { padding: 24px 28px; }
+
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.tab-btn { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-family: var(--font); font-size: 13px; font-weight: 500; padding: 10px 18px; cursor: pointer; margin-bottom: -1px; transition: color 0.15s; }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.stats-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+.stat-lbl { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.stat-val { font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+.stat-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.sec-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.sec-lbl { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+.teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px,1fr)); gap: 14px; }
+.team-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
+.team-card:hover { border-color: var(--border2); box-shadow: var(--shadow-md); }
+.team-card.no-sub { opacity: 0.55; }
+.card-head { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.mgr-name { font-weight: 600; font-size: 14px; text-transform: capitalize; }
+.mgr-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.open-link { font-size: 11px; font-weight: 500; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); padding: 4px 10px; border-radius: 20px; text-decoration: none; transition: opacity 0.15s; white-space: nowrap; }
+.open-link:hover { opacity: 0.7; }
+.card-members { padding: 8px 16px; }
+.mem-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); gap: 8px; }
+.mem-row:last-child { border-bottom: none; }
+.mem-left { display: flex; flex-direction: column; min-width: 0; }
+.mem-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mem-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mem-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.pos-tag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.pos-Trainee { color: #7c3aed; background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2); }
+.pos-Solo { color: #1d6fcd; background: rgba(29,111,205,0.1); border: 1px solid rgba(29,111,205,0.2); }
+.pos-Leader { color: #b45309; background: rgba(180,83,9,0.1); border: 1px solid rgba(180,83,9,0.2); }
+.pos-Core { color: #1a9e5f; background: rgba(26,158,95,0.1); border: 1px solid rgba(26,158,95,0.2); }
+.pos-Junior { color: #be185d; background: rgba(190,24,93,0.1); border: 1px solid rgba(190,24,93,0.2); }
+.leaver-tag { font-size: 10px; font-weight: 600; color: var(--warning); background: var(--warning-soft); border: 1px solid rgba(217,119,6,0.2); padding: 2px 6px; border-radius: 20px; }
+.no-data { background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius); padding: 48px; text-align: center; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.no-data strong { color: var(--text); display: block; font-size: 16px; margin-bottom: 6px; font-weight: 500; }
+
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { background: var(--surface2); border-bottom: 1px solid var(--border); }
+th { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; padding: 10px 18px; text-align: left; }
+td { padding: 10px 18px; border-bottom: 1px solid var(--border); color: var(--text); }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--surface2); }
+.badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 20px; }
+.badge-active { color: var(--success); background: var(--success-soft); border: 1px solid rgba(26,158,95,0.2); }
+.badge-leaver { color: var(--warning); background: var(--warning-soft); border: 1px solid rgba(217,119,6,0.2); }
+
+.search-input { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--font); font-size: 13px; padding: 7px 12px; border-radius: var(--radius-sm); width: 220px; outline: none; transition: border-color 0.15s; }
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--muted); }
+
+.setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
+.setup-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.setup-card p { font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
+.setup-card code { font-family: monospace; font-size: 12px; background: var(--surface2); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+.steps { display: flex; flex-direction: column; gap: 8px; counter-reset: steps; margin: 10px 0 16px; }
+.step { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.step::before { counter-increment: steps; content: counter(steps); min-width: 22px; height: 22px; background: var(--accent-soft); color: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; margin-top: 1px; }
+.step strong { color: var(--text); }
+.url-row { display: flex; gap: 8px; }
+.url-row input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: monospace; font-size: 12px; padding: 9px 13px; border-radius: var(--radius-sm); outline: none; transition: border-color 0.15s; }
+.url-row input:focus { border-color: var(--accent); }
+.url-row input::placeholder { color: var(--muted); }
+.save-btn { background: var(--accent); border: none; color: #fff; font-family: var(--font); font-size: 13px; font-weight: 500; padding: 9px 18px; border-radius: var(--radius-sm); cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+.save-btn:hover { opacity: 0.85; }
+.copy-btn { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 7px 12px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--muted); transition: all 0.15s; white-space: nowrap; }
+.copy-btn:hover { color: var(--text); background: var(--surface2); }
+pre { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; font-family: monospace; font-size: 11px; color: var(--muted); overflow-x: auto; line-height: 1.6; white-space: pre; }
+.link-list { display: flex; flex-direction: column; gap: 8px; }
+.link-row { display: grid; grid-template-columns: 90px 1fr auto auto auto; gap: 8px; align-items: center; }
+.link-row .mgr-label { font-weight: 600; font-size: 13px; text-transform: capitalize; }
+.link-row input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: monospace; font-size: 11px; padding: 7px 11px; border-radius: var(--radius-sm); outline: none; width: 100%; }
+.open-btn { font-size: 12px; font-weight: 500; padding: 7px 11px; border-radius: var(--radius-sm); cursor: pointer; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-border); text-decoration: none; transition: opacity 0.15s; white-space: nowrap; }
+.open-btn:hover { opacity: 0.75; }
+.del-btn { background: none; border: 1px solid var(--border2); color: var(--muted); font-size: 13px; padding: 6px 10px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
+.del-btn:hover { color: var(--danger); border-color: var(--danger); background: var(--danger-soft); }
+.add-row { display: flex; gap: 8px; margin-top: 12px; }
+.add-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: var(--font); font-size: 13px; padding: 9px 13px; border-radius: var(--radius-sm); outline: none; transition: border-color 0.15s; }
+.add-input:focus { border-color: var(--accent); }
+.add-input::placeholder { color: var(--muted); }
+.add-btn { background: var(--accent); border: none; color: #fff; font-family: var(--font); font-size: 13px; font-weight: 500; padding: 9px 18px; border-radius: var(--radius-sm); cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+.add-btn:hover { opacity: 0.85; }
+
+.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(91,80,232,0.25); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-state { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; }
+
+.now-badge { font-size: 10px; font-weight: 600; background: var(--warning-soft); color: var(--warning); border: 1px solid rgba(217,119,6,0.2); padding: 2px 6px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
+
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(12px); font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: 24px; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; z-index: 999; }
+.toast.success { background: var(--success); color: #fff; }
+.toast.error { background: var(--danger); color: #fff; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+[data-theme="dark"] .pos-Trainee { color: #a78bfa; background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.2); }
+[data-theme="dark"] .pos-Solo { color: #60a5fa; background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.2); }
+[data-theme="dark"] .pos-Leader { color: #fbbf24; background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.2); }
+[data-theme="dark"] .pos-Core { color: #4ecb8e; background: rgba(78,203,142,0.1); border-color: rgba(78,203,142,0.2); }
+[data-theme="dark"] .pos-Junior { color: #f472b6; background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.2); }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">TEAM TRACKER <span>/ ADMIN</span></span>
+  <div class="header-right">
+    <div class="week-nav">
+      <button class="nav-btn" id="prev-week" onclick="changeWeek(-1)">‹</button>
+      <span class="week-label" id="week-display">—</span>
+      <button class="nav-btn" id="next-week" onclick="changeWeek(1)">›</button>
+    </div>
+    <button class="icon-btn" onclick="loadAll()">↻ Refresh</button>
+    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙 Dark</button>
+  </div>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+    <button class="tab-btn" onclick="switchTab('people')">All People</button>
+    <button class="tab-btn" onclick="switchTab('upload')">Upload Reports</button>
+    <button class="tab-btn" onclick="switchTab('calendar')">Calendar</button>
+    <button class="tab-btn" onclick="switchTab('setup')">Setup</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="tab-panel active" id="tab-overview">
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-lbl">Managers submitted</div><div class="stat-val" id="s-submitted">—</div><div class="stat-sub">this week</div></div>
+      <div class="stat-card"><div class="stat-lbl">Total headcount</div><div class="stat-val" id="s-headcount">—</div><div class="stat-sub">active this week</div></div>
+      <div class="stat-card"><div class="stat-lbl">Ever tracked</div><div class="stat-val" id="s-ever">—</div><div class="stat-sub">unique people</div></div>
+      <div class="stat-card"><div class="stat-lbl">Leavers</div><div class="stat-val" id="s-leavers">—</div><div class="stat-sub">marked this week</div></div>
+    </div>
+    <div class="sec-hdr"><span class="sec-lbl">Teams this week</span></div>
+    <div class="teams-grid" id="teams-grid"><div class="loading-state"><span class="spinner"></span>Loading…</div></div>
+  </div>
+
+  <!-- ALL PEOPLE -->
+  <div class="tab-panel" id="tab-people">
+    <div class="sec-hdr">
+      <span class="sec-lbl">All people ever tracked</span>
+      <input class="search-input" id="people-search" type="text" placeholder="Search name, manager, email…" oninput="filterPeople()" />
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Manager</th><th>Position</th><th>First seen</th><th>Status</th></tr></thead>
+        <tbody id="people-tbody"><tr><td colspan="6" class="loading-state"><span class="spinner"></span>Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="tab-panel" id="tab-upload">
+    <div class="setup-card">
+      <h3>Upload a report or link</h3>
+      <p>Paste a Google Sheets link, choose the type and week, then select which managers should see it. Saves to the sheet immediately.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Type</div>
+          <select id="ul-type" class="search-input" style="width:100%;" onchange="handleTypeChange()">
+            <option value="Pay Report">Pay Report</option>
+            <option value="Pro-log">Pro-log</option>
+            <option value="Daily Planner">Daily Planner</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Week (Monday date)</div>
+          <input type="date" id="ul-week" class="search-input" style="width:100%;" />
+        </div>
+        <div id="ul-campaign-wrap">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Campaign / Label</div>
+          <input type="text" id="ul-campaign" class="search-input" style="width:100%;" placeholder="e.g. SP Venues, SP Doors…" list="campaign-suggestions" />
+          <datalist id="campaign-suggestions"></datalist>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Google Sheets URL</div>
+          <input type="url" id="ul-url" class="search-input" style="width:100%;" placeholder="https://docs.google.com/spreadsheets/…" />
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Visible to managers</div>
+        <div id="ul-manager-checkboxes" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+      <button onclick="uploadReport()" style="margin-top:16px;background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Save report link</button>
+      <div id="ul-status" style="font-size:12px;color:var(--muted);margin-top:8px;font-family:monospace;"></div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Uploaded reports</h3>
+      <p>All links you've uploaded. Click × to remove.</p>
+      <div id="ul-history" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="color:var(--muted);font-size:13px;">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="tab-panel" id="tab-calendar">
+
+    <div class="setup-card">
+      <h3>Push a calendar event</h3>
+      <p>Create an event and push it to one or more managers' calendars. It will appear on their dashboard immediately.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+        <div style="grid-column:span 2;">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Event title</div>
+          <input type="text" id="cal-title" class="search-input" style="width:100%;" placeholder="e.g. Team catch-up, Deadline: SP Venues&hellip;" />
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Date</div>
+          <input type="date" id="cal-date" class="search-input" style="width:100%;" />
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Time (optional)</div>
+          <input type="time" id="cal-time" class="search-input" style="width:100%;" />
+        </div>
+        <div style="grid-column:span 2;">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Notes (optional)</div>
+          <input type="text" id="cal-notes" class="search-input" style="width:100%;" placeholder="Any extra detail&hellip;" />
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Push to managers</div>
+        <div style="margin-bottom:8px;display:flex;gap:8px;">
+          <button onclick="calSelectAll()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;">Select all</button>
+          <button onclick="calSelectNone()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;">Clear</button>
+        </div>
+        <div id="cal-manager-checkboxes" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
+        <button onclick="pushCalendarEvent()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Push event</button>
+        <div id="cal-status" style="font-size:12px;color:var(--muted);font-family:monospace;"></div>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Pushed events</h3>
+      <p>Events you've pushed to managers. These are live on their calendars now.</p>
+      <div id="cal-history" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="color:var(--muted);font-size:13px;">No events pushed yet.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SETUP -->
+  <div class="tab-panel" id="tab-setup">
+
+    <div class="setup-card">
+      <h3>1. Connect Google Sheets</h3>
+      <p>All data saves to a Google Sheet via Apps Script. One-time setup — takes about 5 minutes.</p>
+      <div class="steps">
+        <div class="step"><span>Create a new <strong>Google Sheet</strong> (name it anything, e.g. "Team Tracker")</span></div>
+        <div class="step"><span>In the sheet go to <strong>Extensions → Apps Script</strong></span></div>
+        <div class="step"><span>Delete existing code, paste in the <strong>Apps Script below</strong> (copy button top-right), and save</span></div>
+        <div class="step"><span>Click <strong>Deploy → New deployment → Web app</strong> · Set "Who has access" to <strong>Anyone</strong> · Deploy · copy the URL</span></div>
+        <div class="step"><span>Paste that URL here and also inside <code>manager.html</code> where it says <code>PASTE_YOUR_APPS_SCRIPT_URL_HERE</code></span></div>
+      </div>
+      <div class="url-row">
+        <input type="text" id="script-url-input" placeholder="https://script.google.com/macros/s/…/exec" />
+        <button class="save-btn" onclick="saveScriptUrl()">Save URL</button>
+      </div>
+      <div id="url-status" style="font-size:12px;color:var(--muted);margin-top:8px;font-family:monospace;"></div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Apps Script code</h3>
+      <p>Copy this and paste into the Apps Script editor:</p>
+      <div style="position:relative;">
+        <pre id="apps-script-pre"></pre>
+        <button class="copy-btn" style="position:absolute;top:10px;right:10px;" onclick="copyScript(this)">Copy</button>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Team announcement</h3>
+      <p>Post a message that appears as a banner on every manager's home screen. Clear it when done.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input type="text" id="ann-title" class="search-input" style="width:100%;" placeholder="Title (e.g. Important update)" />
+        <textarea id="ann-message" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 13px;border-radius:8px;outline:none;width:100%;min-height:70px;resize:vertical;" placeholder="Message…"></textarea>
+        <div style="display:flex;gap:8px;">
+          <button onclick="postAnnouncement()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:9px 18px;border-radius:8px;cursor:pointer;">Post announcement</button>
+          <button onclick="clearAnnouncement()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:13px;padding:9px 18px;border-radius:8px;cursor:pointer;">Clear announcement</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <h3>2. Manager links</h3>
+      <p>Add a manager's first name to generate their unique link. Share the link — they use it every week.</p>
+      <div class="link-list" id="link-list"><div style="color:var(--muted);font-size:13px;">No managers added yet.</div></div>
+      <div class="add-row">
+        <input class="add-input" id="new-mgr" type="text" placeholder="First name (e.g. sarah)" onkeydown="if(event.key==='Enter')addManager()" />
+        <button class="add-btn" onclick="addManager()">Add manager</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Apps Script source ─────────────────────────────────
+const APPS_SCRIPT = `// Team Tracker — Google Apps Script
+// Extensions > Apps Script > paste > Deploy as Web App (Anyone)
+
+const SS = SpreadsheetApp.getActiveSpreadsheet();
+
+function getOrCreate(name, headers) {
+  let sh = SS.getSheetByName(name);
+  if (!sh) { sh = SS.insertSheet(name); sh.appendRow(headers); }
+  return sh;
+}
+
+function doPost(e) {
+  const data = JSON.parse(e.postData.contents);
+  let result = {};
+
+  if (data.action === 'checkPassword') {
+    const mh = getOrCreate('managers', ['name']);
+    const rows = mh.getDataRange().getValues().slice(1);
+    const row = rows.find(r => r[0] === data.manager);
+    const storedPw = row && row.length > 1 ? String(row[1]) : '';
+    result = { ok: storedPw !== '' && storedPw === String(data.password) };
+
+  } else if (data.action === 'submit') {
+    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
+    const rows = sh.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) {
+      if (rows[i][1] === data.manager && rows[i][2] === data.week) sh.deleteRow(i+1);
+    }
+    const ts = new Date().toISOString();
+    data.rows.forEach(r => sh.appendRow([ts, data.manager, data.week, r.name, r.email||'', r.position||'', r.leaver?'yes':'no']));
+    const ph = getOrCreate('people', ['name','email','manager','firstSeen']);
+    const pRows = ph.getDataRange().getValues();
+    data.rows.forEach(r => {
+      if (!pRows.some(p => p[0].toLowerCase()===r.name.toLowerCase() && p[2]===data.manager))
+        ph.appendRow([r.name, r.email||'', data.manager, data.week]);
+    });
+    result = { ok: true };
+
+  } else if (data.action === 'getSubmission') {
+    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
+    const ah = getOrCreate('acks', ['manager','week','ackedAt']);
+    const rows = sh.getDataRange().getValues().slice(1);
+    const ackRows = ah.getDataRange().getValues().slice(1);
+    result.rows = rows.filter(r => r[1]===data.manager && r[2]===data.week)
+      .map(r => ({ name:r[3], email:r[4], position:r[5], leaver:r[6]==='yes' }));
+    result.acked = ackRows.some(r => r[0]===data.manager && r[1]===data.week);
+
+  } else if (data.action === 'getRoster') {
+    const rh = getOrCreate('roster', ['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt']);
+    result.roster = rh.getDataRange().getValues().slice(1)
+      .filter(r => r[1] === data.manager)
+      .map(r => ({ id:r[0], name:r[2], email:r[3], position:r[4], leader:r[5], notes:r[6], flag:r[7], leaver:r[8]==='yes', addedOn:r[9] }));
+
+  } else if (data.action === 'saveRep') {
+    const rh = getOrCreate('roster', ['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt']);
+    const r = data.rep;
+    const row = [r.id, data.manager, r.name||'', r.email||'', r.position||'', r.leader||'', r.notes||'', r.flag||'', r.leaver?'yes':'no', r.addedOn||'', new Date().toISOString()];
+    const rows = rh.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===r.id && rows[i][1]===data.manager) { rh.getRange(i+1,1,1,row.length).setValues([row]); found=true; break; }
+    }
+    if (!found) rh.appendRow(row);
+    result = { ok: true };
+
+  } else if (data.action === 'getAllData') {
+    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
+    const ph = getOrCreate('people', ['name','email','manager','firstSeen']);
+    const mh = getOrCreate('managers', ['name']);
+    const rh = getOrCreate('roster', ['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt']);
+    result = {
+      subs: sh.getDataRange().getValues().slice(1).map(r => ({ manager:r[1],week:r[2],name:r[3],email:r[4],position:r[5],leaver:r[6]==='yes' })),
+      people: ph.getDataRange().getValues().slice(1).map(r => ({ name:r[0],email:r[1],manager:r[2],firstSeen:r[3] })),
+      managers: mh.getDataRange().getValues().slice(1).map(r => r[0]).filter(Boolean),
+      roster: rh.getDataRange().getValues().slice(1).map(r => ({ id:r[0],manager:r[1],name:r[2],email:r[3],position:r[4],leader:r[5],notes:r[6],flag:r[7],leaver:r[8]==='yes',addedOn:r[9] }))
+    };
+
+  } else if (data.action === 'addManager') {
+    const mh = getOrCreate('managers', ['name','password']);
+    const existing = mh.getDataRange().getValues().slice(1).map(r => r[0]);
+    if (!existing.includes(data.name)) mh.appendRow([data.name, data.password||'']);
+    result = { ok: true };
+
+  } else if (data.action === 'setPassword') {
+    const mh = getOrCreate('managers', ['name','password']);
+    const rows = mh.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0] === data.manager) { mh.getRange(i+1,2).setValue(data.password); result = { ok:true }; break; }
+    }
+
+  } else if (data.action === 'removeManager') {
+    const mh = getOrCreate('managers', ['name','password']);
+    const rows = mh.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) { if (rows[i][0]===data.name) mh.deleteRow(i+1); }
+    result = { ok: true };
+
+  } else if (data.action === 'saveMap') {
+    const mh = getOrCreate('maps', ['manager','mapData','updatedAt']);
+    const rows = mh.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager) { mh.getRange(i+1,2,1,2).setValues([[data.mapData, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) mh.appendRow([data.manager, data.mapData, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'loadMap') {
+    const mh = getOrCreate('maps', ['manager','mapData','updatedAt']);
+    const row = mh.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
+    result = { mapData: row ? row[1] : null };
+
+  } else if (data.action === 'saveReport') {
+    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt']);
+    const r = data.report;
+    rh.appendRow([r.id, r.type, r.url, r.campaign||'', r.week, (r.managers||[]).join(','), r.uploadedAt||'']);
+    result = { ok: true };
+
+  } else if (data.action === 'getAllReports') {
+    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt']);
+    result = { reports: rh.getDataRange().getValues().slice(1).map(r => ({ id:r[0],type:r[1],url:r[2],campaign:r[3],week:r[4],managers:r[5]?r[5].split(','):[],uploadedAt:r[6] })) };
+
+  } else if (data.action === 'getReports') {
+    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt']);
+    result = { reports: rh.getDataRange().getValues().slice(1)
+      .filter(r => r[5] && r[5].split(',').map(m=>m.trim()).includes(data.manager))
+      .map(r => ({ id:r[0],type:r[1],url:r[2],campaign:r[3],week:r[4],managers:r[5].split(','),uploadedAt:r[6] })) };
+
+  } else if (data.action === 'deleteReport') {
+    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt']);
+    const rows = rh.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) { if (rows[i][0]===data.id) { rh.deleteRow(i+1); break; } }
+    result = { ok: true };
+
+  } else if (data.action === 'ackReport') {
+    const ah = getOrCreate('acks', ['manager','week','ackedAt']);
+    const rows = ah.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager && rows[i][1]===data.week) { ah.getRange(i+1,3).setValue(new Date().toISOString()); found=true; break; }
+    }
+    if (!found) ah.appendRow([data.manager, data.week, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getCalEvents') {
+    const ch = getOrCreate('cal_events', ['manager','events','updatedAt']);
+    const row = ch.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
+    try { result = { events: row ? JSON.parse(row[1]) : [] }; } catch(e) { result = { events: [] }; }
+
+  } else if (data.action === 'saveCalEvents') {
+    const ch = getOrCreate('cal_events', ['manager','events','updatedAt']);
+    const rows = ch.getDataRange().getValues();
+    const evJson = JSON.stringify(data.events||[]);
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager) { ch.getRange(i+1,2,1,2).setValues([[evJson, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) ch.appendRow([data.manager, evJson, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getAnnouncement') {
+    const ah = getOrCreate('announcements', ['id','title','message','active','createdAt']);
+    const rows = ah.getDataRange().getValues().slice(1);
+    const active = rows.filter(r => r[3]==='yes').sort((a,b) => b[4].localeCompare(a[4]));
+    result = { announcement: active.length ? { id:active[0][0], title:active[0][1], message:active[0][2] } : null };
+
+  } else if (data.action === 'saveAnnouncement') {
+    const ah = getOrCreate('announcements', ['id','title','message','active','createdAt']);
+    // Deactivate all existing
+    const rows = ah.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) ah.getRange(i+1,4).setValue('no');
+    if (data.title) ah.appendRow(['ann'+Date.now(), data.title, data.message||'', 'yes', new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getNotes') {
+    const nh = getOrCreate('notes', ['manager','notes','updatedAt']);
+    const row = nh.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
+    result = { notes: row ? row[1] : '' };
+
+  } else if (data.action === 'saveNotes') {
+    const nh = getOrCreate('notes', ['manager','notes','updatedAt']);
+    const rows = nh.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager) { nh.getRange(i+1,2,1,2).setValues([[data.notes, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) nh.appendRow([data.manager, data.notes, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getLastWeekCount') {
+    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
+    const parts = data.currentWeek.split('-');
+    const cur = new Date(+parts[0],+parts[1]-1,+parts[2]);
+    cur.setDate(cur.getDate()-7);
+    const y=cur.getFullYear(),m=String(cur.getMonth()+1).padStart(2,'0'),d=String(cur.getDate()).padStart(2,'0');
+    const prevWeek = y+'-'+m+'-'+d;
+    const rows = sh.getDataRange().getValues().slice(1);
+    result = { count: rows.filter(r => r[1]===data.manager && r[2]===prevWeek && r[6]!=='yes').length };
+  }
+
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}`;
+
+document.getElementById('apps-script-pre').textContent = APPS_SCRIPT;
+
+// ── Theme ──────────────────────────────────────────────
+function initTheme() {
+  const saved = localStorage.getItem('tt_theme')||'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('theme-btn').textContent = saved==='dark'?'☀️ Light':'🌙 Dark';
+}
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('tt_theme',next);
+  document.getElementById('theme-btn').textContent = next==='dark'?'☀️ Light':'🌙 Dark';
+}
+initTheme();
+
+// ── State ──────────────────────────────────────────────
+let scriptUrl = localStorage.getItem('teamtracker_script_url')||'';
+let managers=[], allSubs=[], allPeople=[], allWeeks=[], viewWeekKey='', allRoster=[], managerPasswords={};
+const MGR_BASE = window.location.href.replace('admin.html','manager.html');
+
+function getWeekKey(date) {
+  const d=new Date(date); d.setHours(0,0,0,0);
+  d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
+  return d.toISOString().split('T')[0];
+}
+function formatWeek(key) {
+  if(!key||typeof key!=='string')return'—';
+  const parts=key.split('-');
+  if(parts.length!==3)return key;
+  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  if(isNaN(d))return key;
+  const end=new Date(d);end.setDate(end.getDate()+6);
+  const f=dt=>dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  return `w/c ${f(d)} – ${f(end)}`;
+}
+const currentWeek = getWeekKey(new Date());
+
+window.onload = () => {
+  if (scriptUrl) {
+    document.getElementById('script-url-input').value = scriptUrl;
+    document.getElementById('url-status').textContent = '✓ Script URL saved';
+    loadAll();
+  } else { showEmpty(); }
+  renderLinks();
+};
+
+async function loadAll() {
+  if (!scriptUrl) { showEmpty(); return; }
+  document.getElementById('teams-grid').innerHTML = '<div class="loading-state"><span class="spinner"></span>Loading…</div>';
+  try {
+    const [data, reportsData] = await Promise.all([
+      api({action:'getAllData'}),
+      api({action:'getAllReports'})
+    ]);
+    managers=data.managers||[]; allSubs=data.subs||[]; allPeople=data.people||[]; allRoster=data.roster||[];
+    allUploadedReports=reportsData.reports||[];
+    // Load passwords from managers sheet (row[1])
+    if (data.managerPasswords) managerPasswords=data.managerPasswords;
+    const ws=new Set([currentWeek]);
+    allSubs.forEach(s=>ws.add(s.week));
+    allWeeks=Array.from(ws).sort();
+    if (!viewWeekKey||!allWeeks.includes(viewWeekKey)) viewWeekKey=currentWeek;
+    renderOverview(); renderPeople(); renderLinks();
+  } catch(e) {
+    showToast('Failed to load — check script URL','error',5000);
+    document.getElementById('teams-grid').innerHTML='<div class="no-data"><strong>Could not load data</strong>Check your Apps Script URL in the Setup tab.</div>';
+  }
+}
+
+// ── Week nav ───────────────────────────────────────────
+function updateWeekNav() {
+  const idx=allWeeks.indexOf(viewWeekKey);
+  document.getElementById('prev-week').disabled=idx<=0;
+  document.getElementById('next-week').disabled=idx>=allWeeks.length-1;
+  const isNow=viewWeekKey===currentWeek;
+  document.getElementById('week-display').innerHTML=
+    `w/c ${formatWeek(viewWeekKey)}`+(isNow?' <span class="now-badge">NOW</span>':'');
+}
+function changeWeek(dir) {
+  const idx=allWeeks.indexOf(viewWeekKey), ni=idx+dir;
+  if (ni>=0&&ni<allWeeks.length) { viewWeekKey=allWeeks[ni]; renderOverview(); }
+}
+
+// ── Overview ───────────────────────────────────────────
+function posClass(pos) {
+  if (!pos) return '';
+  const k=pos.replace(/[^a-zA-Z]/g,'');
+  return 'pos-'+k.charAt(0).toUpperCase()+k.slice(1);
+}
+
+function renderOverview() {
+  updateWeekNav();
+  const ws=allSubs.filter(s=>s.week===viewWeekKey);
+  const submittedSet=new Set(ws.map(s=>s.manager));
+
+  // Stats: use roster for total headcount, subs for weekly submission count
+  const rosterActive=allRoster.filter(r=>!r.leaver);
+  const rosterLeavers=allRoster.filter(r=>r.leaver);
+  const everyName=new Set([
+    ...allPeople.map(p=>p.name.toLowerCase()),
+    ...allRoster.map(r=>r.name.toLowerCase())
+  ]);
+
+  document.getElementById('s-submitted').textContent=`${submittedSet.size}/${managers.length||'—'}`;
+  document.getElementById('s-headcount').textContent=rosterActive.length||ws.filter(s=>!s.leaver).length;
+  document.getElementById('s-ever').textContent=everyName.size;
+  document.getElementById('s-leavers').textContent=rosterLeavers.length||ws.filter(s=>s.leaver).length;
+
+  if (!managers.length) { showEmpty(); return; }
+
+  document.getElementById('teams-grid').innerHTML = managers.map(m=>{
+    const dn=m.charAt(0).toUpperCase()+m.slice(1);
+    const url=`${MGR_BASE}?name=${encodeURIComponent(m)}`;
+
+    // Use roster as primary source, fall back to latest submission
+    const rosterReps=allRoster.filter(r=>r.manager===m);
+    const weekSubs=ws.filter(s=>s.manager===m);
+    const useRoster=rosterReps.length>0;
+
+    const reps = useRoster ? rosterReps : weekSubs.map(s=>({...s,leaver:s.leaver}));
+    const activeReps=reps.filter(r=>!r.leaver);
+    const leaverReps=reps.filter(r=>r.leaver);
+    const hasData=reps.length>0;
+    const hasWeekSub=weekSubs.length>0;
+
+    const memberHtml = hasData
+      ? [...activeReps,...leaverReps].map(r=>`
+          <div class="mem-row">
+            <div class="mem-left">
+              <span class="mem-name" style="${r.leaver?'text-decoration:line-through;color:var(--muted);':''}">${esc(r.name)}</span>
+              ${r.email?`<span class="mem-email">${esc(r.email)}</span>`:''}
+            </div>
+            <div class="mem-right">
+              ${r.position?`<span class="pos-tag ${posClass(r.position)}">${esc(r.position)}</span>`:''}
+              ${r.leaver?'<span class="leaver-tag">Leaver</span>':''}
+            </div>
+          </div>`).join('')
+      : `<div style="padding:12px 0;color:var(--muted);font-size:13px;">No data yet.</div>`;
+
+    const metaText = hasData
+      ? `${activeReps.length} active${leaverReps.length?' · '+leaverReps.length+' leaver'+(leaverReps.length>1?'s':''):''}${hasWeekSub?' · ✓ submitted':' · not submitted this week'}`
+      : 'no data yet';
+
+    return `<div class="team-card ${hasData?'':'no-sub'}">
+      <div class="card-head">
+        <div>
+          <div class="mgr-name">${esc(dn)}</div>
+          <div class="mgr-meta">${metaText}</div>
+        </div>
+        <a class="open-link" href="${url}" target="_blank">open ↗</a>
+      </div>
+      <div class="card-members">${memberHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── People ─────────────────────────────────────────────
+function renderPeople() {
+  const thisWeek=new Set(allSubs.filter(s=>s.week===currentWeek&&!s.leaver).map(s=>s.name.toLowerCase()));
+
+  // Merge roster + people tab, roster takes priority
+  const seen=new Map();
+
+  // Add roster entries first (most up to date)
+  allRoster.forEach(r=>{
+    seen.set(r.name.toLowerCase()+r.manager, {
+      name:r.name, email:r.email||'', manager:r.manager,
+      position:r.position||'—', firstSeen:r.addedOn||'',
+      active:!r.leaver&&thisWeek.has(r.name.toLowerCase()),
+      leaver:r.leaver
+    });
+  });
+
+  // Fill in anyone from people tab not in roster
+  allPeople.forEach(p=>{
+    const k=p.name.toLowerCase()+p.manager;
+    if(!seen.has(k)){
+      seen.set(k,{
+        name:p.name, email:p.email||'', manager:p.manager,
+        position:'—', firstSeen:p.firstSeen,
+        active:thisWeek.has(p.name.toLowerCase()), leaver:false
+      });
+    }
+  });
+
+  window._peopleRows=[...seen.values()].sort((a,b)=>a.name.localeCompare(b.name));
+  renderPeopleTable(window._peopleRows);
+}
+
+function renderPeopleTable(rows) {
+  const tbody=document.getElementById('people-tbody');
+  if (!rows.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px;">No people tracked yet.</td></tr>'; return; }
+  tbody.innerHTML=rows.map(r=>`
+    <tr>
+      <td style="font-weight:500;">${esc(r.name)}</td>
+      <td style="color:var(--muted);font-size:12px;">${r.email?`<a href="mailto:${esc(r.email)}" style="color:var(--accent);text-decoration:none;">${esc(r.email)}</a>`:'—'}</td>
+      <td style="text-transform:capitalize;color:var(--muted);">${esc(r.manager)}</td>
+      <td>${r.position!=='—'?`<span class="pos-tag ${posClass(r.position)}">${esc(r.position)}</span>`:'<span style="color:var(--muted);">—</span>'}</td>
+      <td style="font-size:12px;color:var(--muted);font-family:monospace;">${r.firstSeen}</td>
+      <td><span class="badge ${r.active?'badge-active':'badge-leaver'}">${r.active?'Active':'Leaver'}</span></td>
+    </tr>`).join('');
+}
+
+function filterPeople() {
+  const q=document.getElementById('people-search').value.toLowerCase();
+  if (!window._peopleRows) return;
+  renderPeopleTable(q?window._peopleRows.filter(r=>
+    r.name.toLowerCase().includes(q)||r.manager.toLowerCase().includes(q)||(r.email||'').toLowerCase().includes(q)
+  ):window._peopleRows);
+}
+
+// ── Links / setup ──────────────────────────────────────
+function renderLinks() {
+  const list=document.getElementById('link-list');
+  if (!managers.length) { list.innerHTML='<div style="color:var(--muted);font-size:13px;">No managers added yet.</div>'; return; }
+  list.innerHTML=managers.map(m=>{
+    const url=`${MGR_BASE}?name=${encodeURIComponent(m)}`;
+    const dn=m.charAt(0).toUpperCase()+m.slice(1);
+    const pw=managerPasswords[m]||'';
+    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <span style="font-weight:600;font-size:14px;text-transform:capitalize;">${esc(dn)}</span>
+        <div style="display:flex;gap:6px;">
+          <button class="copy-btn" onclick="copyLink('${esc(url)}',this)">Copy link</button>
+          <a class="open-btn" href="${esc(url)}" target="_blank">Open ↗</a>
+          <button class="del-btn" onclick="removeManager('${esc(m)}')">×</button>
+        </div>
+      </div>
+      <input type="text" value="${esc(url)}" readonly onclick="this.select()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:monospace;font-size:11px;padding:7px 11px;border-radius:8px;outline:none;width:100%;" />
+      <div style="display:flex;gap:8px;align-items:center;">
+        <label style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;">Password</label>
+        <input type="text" id="pw-${m}" value="${esc(pw)}" placeholder="Set a password…" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:7px 11px;border-radius:8px;outline:none;" />
+        <button onclick="setPassword('${esc(m)}')" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:500;padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;">Save</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function addManager() {
+  const input=document.getElementById('new-mgr');
+  const raw=input.value.trim(); if (!raw) return;
+  const name=raw.toLowerCase().replace(/[^a-z0-9_-]/g,'');
+  if (!name) { showToast('Use letters/numbers/hyphens only','error'); return; }
+  if (managers.includes(name)) { showToast('Already added','error'); return; }
+  if (!scriptUrl) { showToast('Save script URL first','error'); return; }
+  managers.push(name); renderLinks(); input.value='';
+  try { await api({action:'addManager',name}); } catch(e) { showToast('Added locally but sheet sync failed','error'); }
+}
+
+async function removeManager(name) {
+  if (!confirm(`Remove ${name}? Historical data stays in the sheet.`)) return;
+  managers=managers.filter(m=>m!==name); renderLinks();
+  try { await api({action:'removeManager',name}); } catch(e){}
+}
+
+function saveScriptUrl() {
+  const v=document.getElementById('script-url-input').value.trim();
+  if (!v) { showToast('Enter a URL first','error'); return; }
+  scriptUrl=v; localStorage.setItem('teamtracker_script_url',v);
+  document.getElementById('url-status').textContent='✓ Saved — loading data…';
+  loadAll();
+}
+
+function copyScript(btn) {
+  navigator.clipboard.writeText(APPS_SCRIPT).then(()=>{ btn.textContent='Copied ✓'; btn.style.color='var(--success)'; setTimeout(()=>{ btn.textContent='Copy'; btn.style.color=''; },2000); });
+}
+function copyLink(url,btn) {
+  navigator.clipboard.writeText(url).then(()=>{ const o=btn.textContent; btn.textContent='✓'; btn.style.color='var(--success)'; setTimeout(()=>{ btn.textContent=o; btn.style.color=''; },2000); });
+}
+
+// ── Tabs ───────────────────────────────────────────────
+function switchTab(tab) {
+  const tabNames = ['overview','people','upload','calendar','setup'];
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', tabNames[i] === tab));
+  document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', tabNames[i] === tab ? true : false, `tab-${tabNames[i]}` === `tab-${tab}`));
+  // simpler: match by id
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`));
+  if(tab==='upload'){renderUploadHistory();renderManagerCheckboxes();}
+  if(tab==='calendar'){renderCalManagerCheckboxes();renderCalHistory();}
+}
+
+function showEmpty() {
+  document.getElementById('teams-grid').innerHTML='<div class="no-data" style="grid-column:1/-1"><strong>No data yet</strong>Go to the <strong>Setup</strong> tab to connect Google Sheets and add manager links.</div>';
+  ['s-submitted','s-headcount','s-ever','s-leavers'].forEach(id=>document.getElementById(id).textContent='—');
+  document.getElementById('week-display').textContent=`w/c ${formatWeek(currentWeek)}`;
+  document.getElementById('prev-week').disabled=true;
+  document.getElementById('next-week').disabled=true;
+}
+
+async function api(payload) {
+  const res=await fetch(scriptUrl,{method:'POST',body:JSON.stringify(payload)});
+  return res.json();
+}
+
+// ── Upload reports ────────────────────────────────────
+let allUploadedReports = [];
+
+function getUploadWeekKey() {
+  const val = document.getElementById('ul-week').value;
+  if (!val) return null;
+  // val is YYYY-MM-DD from date input — parse as local time
+  const parts = val.split('-');
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  // Snap to Monday
+  d.setDate(d.getDate() - (d.getDay() === 0 ? 6 : d.getDay() - 1));
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function handleTypeChange() {
+  const type = document.getElementById('ul-type').value;
+  const wrap = document.getElementById('ul-campaign-wrap');
+  wrap.style.display = (type === 'Pay Report') ? 'none' : '';
+}
+
+function renderManagerCheckboxes() {
+  const wrap = document.getElementById('ul-manager-checkboxes');
+  if (!managers.length) { wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;">No managers added yet — add them in Setup first.</div>'; return; }
+  wrap.innerHTML = managers.map(m => {
+    const dn = m.charAt(0).toUpperCase() + m.slice(1);
+    return `<label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">
+      <input type="checkbox" id="ulm-${m}" value="${esc(m)}" style="cursor:pointer;" /> ${esc(dn)}
+    </label>`;
+  }).join('');
+}
+
+function getCheckedManagers() {
+  return managers.filter(m => {
+    const cb = document.getElementById(`ulm-${m}`);
+    return cb && cb.checked;
+  });
+}
+
+async function uploadReport() {
+  const type = document.getElementById('ul-type').value;
+  const url = document.getElementById('ul-url').value.trim();
+  const campaign = document.getElementById('ul-campaign').value.trim();
+  const weekVal = document.getElementById('ul-week').value;
+  const selectedMgrs = getCheckedManagers();
+
+  if (!url) { showToast('Paste a URL first', 'error'); return; }
+  if (!weekVal) { showToast('Select a week', 'error'); return; }
+  if (!selectedMgrs.length) { showToast('Select at least one manager', 'error'); return; }
+  if (type !== 'Pay Report' && !campaign) { showToast('Add a campaign/label', 'error'); return; }
+
+  const weekKey = getUploadWeekKey();
+  const id = 'rep' + Date.now();
+  const status = document.getElementById('ul-status');
+  status.textContent = 'Saving…';
+
+  try {
+    await api({ action: 'saveReport', report: { id, type, url, campaign, week: weekKey, managers: selectedMgrs, uploadedAt: new Date().toISOString() } });
+    status.textContent = '✓ Saved';
+    showToast('Report uploaded ✓', 'success');
+    // Reset form
+    document.getElementById('ul-url').value = '';
+    document.getElementById('ul-campaign').value = '';
+    managers.forEach(m => { const cb = document.getElementById(`ulm-${m}`); if (cb) cb.checked = false; });
+    await loadUploadHistory();
+    renderUploadHistory();
+    // Refresh campaign suggestions
+    updateCampaignSuggestions();
+    setTimeout(() => status.textContent = '', 3000);
+  } catch(e) {
+    status.textContent = 'Save failed';
+    showToast('Upload failed', 'error');
+  }
+}
+
+async function loadUploadHistory() {
+  if (!scriptUrl) return;
+  try {
+    const res = await api({ action: 'getAllReports' });
+    allUploadedReports = res.reports || [];
+  } catch(e) {}
+}
+
+function renderUploadHistory() {
+  const el = document.getElementById('ul-history');
+  if (!allUploadedReports.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;">No reports uploaded yet.</div>'; return; }
+  const sorted = [...allUploadedReports].sort((a,b) => b.week.localeCompare(a.week));
+  const typeClass = {'Pay Report':'type-pay','Pro-log':'type-prolog','Daily Planner':'type-planner'};
+  el.innerHTML = sorted.map(r => {
+    const tc = typeClass[r.type] || 'type-pay';
+    const mgrList = (r.managers||[]).map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join(', ');
+    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+      <span class="badge ${tc}" style="font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500;white-space:nowrap;">${esc(r.type)}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:500;">${r.campaign?esc(r.campaign)+' — ':''}${formatWeek(r.week)}</div>
+        <div style="font-size:11px;color:var(--muted);">→ ${esc(mgrList)}</div>
+      </div>
+      <a href="${esc(r.url)}" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;white-space:nowrap;">View ↗</a>
+      <button onclick="deleteReport('${r.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 4px;line-height:1;transition:color .15s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--muted)'">×</button>
+    </div>`;
+  }).join('');
+}
+
+async function deleteReport(id) {
+  if (!confirm('Remove this report?')) return;
+  try {
+    await api({ action: 'deleteReport', id });
+    await loadUploadHistory();
+    renderUploadHistory();
+    showToast('Removed', 'success');
+  } catch(e) { showToast('Failed to remove', 'error'); }
+}
+
+function updateCampaignSuggestions() {
+  const campaigns = [...new Set(allUploadedReports.filter(r=>r.campaign).map(r=>r.campaign))];
+  const dl = document.getElementById('campaign-suggestions');
+  if (dl) dl.innerHTML = campaigns.map(c=>`<option value="${esc(c)}">`).join('');
+}
+
+// Init upload tab date to this week's Monday
+(function(){
+  const d=new Date(); d.setHours(0,0,0,0);
+  d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
+  const inp=document.getElementById('ul-week');
+  if(inp) inp.value=d.toISOString().split('T')[0];
+  // Init calendar event date to today
+  const calInp=document.getElementById('cal-date');
+  if(calInp){ const t=new Date(); calInp.value=t.toISOString().split('T')[0]; }
+})();
+function showToast(msg,type,duration) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.className='toast',duration||3000);
+}
+async function setPassword(manager) {
+  const inp = document.getElementById('pw-'+manager);
+  if (!inp) return;
+  const pw = inp.value.trim();
+  if (!pw) { showToast('Enter a password first', 'error'); return; }
+  try {
+    await api({ action: 'setPassword', manager, password: pw });
+    managerPasswords[manager] = pw;
+    showToast(`Password set for ${manager} ✓`, 'success');
+  } catch(e) { showToast('Failed to save password', 'error'); }
+}
+
+async function postAnnouncement() {
+  const title = document.getElementById('ann-title').value.trim();
+  const message = document.getElementById('ann-message').value.trim();
+  if (!title) { showToast('Add a title', 'error'); return; }
+  try {
+    await api({ action: 'saveAnnouncement', title, message });
+    showToast('Announcement posted ✓', 'success');
+  } catch(e) { showToast('Failed to post', 'error'); }
+}
+
+async function clearAnnouncement() {
+  try {
+    await api({ action: 'saveAnnouncement', title: '', message: '' });
+    document.getElementById('ann-title').value = '';
+    document.getElementById('ann-message').value = '';
+    showToast('Announcement cleared ✓', 'success');
+  } catch(e) { showToast('Failed to clear', 'error'); }
+}
+
+
+// ── Calendar push ─────────────────────────────────────
+let pushedCalEvents = [];
+
+function renderCalManagerCheckboxes() {
+  const wrap = document.getElementById('cal-manager-checkboxes');
+  if (!wrap) return;
+  if (!managers.length) { wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;">No managers added yet — add them in Setup first.</div>'; return; }
+  wrap.innerHTML = managers.map(m => {
+    const dn = m.charAt(0).toUpperCase() + m.slice(1);
+    return `<label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;">
+      <input type="checkbox" id="calm-${m}" value="${esc(m)}" style="cursor:pointer;" /> ${esc(dn)}
+    </label>`;
+  }).join('');
+}
+
+function calSelectAll() {
+  managers.forEach(m => { const cb = document.getElementById(`calm-${m}`); if (cb) cb.checked = true; });
+}
+
+function calSelectNone() {
+  managers.forEach(m => { const cb = document.getElementById(`calm-${m}`); if (cb) cb.checked = false; });
+}
+
+function getCalCheckedManagers() {
+  return managers.filter(m => { const cb = document.getElementById(`calm-${m}`); return cb && cb.checked; });
+}
+
+async function pushCalendarEvent() {
+  const title = document.getElementById('cal-title').value.trim();
+  const date = document.getElementById('cal-date').value;
+  const time = document.getElementById('cal-time').value;
+  const notes = document.getElementById('cal-notes').value.trim();
+  const selectedMgrs = getCalCheckedManagers();
+  const status = document.getElementById('cal-status');
+
+  if (!title) { showToast('Add an event title', 'error'); return; }
+  if (!date) { showToast('Pick a date', 'error'); return; }
+  if (!selectedMgrs.length) { showToast('Select at least one manager', 'error'); return; }
+
+  status.textContent = 'Pushing…';
+
+  const newEvent = {
+    id: 'ev' + Date.now(),
+    title,
+    date,
+    time: time || '',
+    notes: notes || '',
+    pushedAt: new Date().toISOString()
+  };
+
+  let successCount = 0;
+  const errors = [];
+
+  for (const mgr of selectedMgrs) {
+    try {
+      // Load existing events for this manager first
+      const res = await api({ action: 'getCalEvents', manager: mgr });
+      const existing = res.events || [];
+      // Append the new event
+      const updated = [...existing, newEvent];
+      await api({ action: 'saveCalEvents', manager: mgr, events: updated });
+      successCount++;
+    } catch(e) {
+      errors.push(mgr);
+    }
+  }
+
+  if (errors.length === 0) {
+    status.textContent = `✓ Pushed to ${successCount} manager${successCount !== 1 ? 's' : ''}`;
+    showToast(`Event pushed to ${successCount} manager${successCount !== 1 ? 's' : ''} ✓`, 'success');
+    // Save to local history
+    pushedCalEvents.unshift({ ...newEvent, managers: selectedMgrs });
+    renderCalHistory();
+    // Reset form
+    document.getElementById('cal-title').value = '';
+    document.getElementById('cal-time').value = '';
+    document.getElementById('cal-notes').value = '';
+    calSelectNone();
+    setTimeout(() => status.textContent = '', 4000);
+  } else {
+    status.textContent = `Pushed to ${successCount}, failed for: ${errors.join(', ')}`;
+    showToast(`Some pushes failed: ${errors.join(', ')}`, 'error', 5000);
+  }
+}
+
+function renderCalHistory() {
+  const el = document.getElementById('cal-history');
+  if (!el) return;
+  if (!pushedCalEvents.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;">No events pushed yet.</div>'; return; }
+  el.innerHTML = pushedCalEvents.map(e => {
+    const mgrList = (e.managers || []).map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(', ');
+    const dateStr = e.date ? new Date(e.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
+    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:500;">${esc(e.title)}${e.time ? ' · ' + esc(e.time) : ''}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${dateStr}${e.notes ? ' — ' + esc(e.notes) : ''}</div>
+        <div style="font-size:11px;color:var(--accent);margin-top:2px;">→ ${esc(mgrList)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
