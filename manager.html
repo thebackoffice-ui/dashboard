@@ -532,6 +532,115 @@ body{background:linear-gradient(180deg,#e9eeee 0%,#f4f7f7 100%);}
   .dash-stat-grid{gap:12px;}
 }
 
+
+
+/* ── SLEEK DENSITY OVERRIDE
+   Keeps the new dashboard layout, but makes it tighter, sharper and closer
+   to the original app sizing. No data/functionality changes. ── */
+:root{
+  --r:8px;
+  --rsm:5px;
+  --rlg:12px;
+  --s1:0 3px 12px rgba(28,45,45,.045);
+  --s2:0 8px 22px rgba(28,45,45,.075);
+  --s3:0 16px 42px rgba(28,45,45,.12);
+}
+body{font-size:13px;line-height:1.38;background:#eef3f3;}
+.sidebar{width:218px;padding:14px 10px;border-right:1px solid #edf2f2;}
+.sidebar-header{padding:14px 16px 22px;}
+.sidebar-logo{font-size:18px;font-weight:800;letter-spacing:-.035em;}
+.sidebar-mgr{padding:14px 14px;}
+.sidebar-name{font-size:13px;font-weight:750;}
+.sidebar-week{font-size:10px;}
+.sidebar-nav{gap:4px;padding:0 6px;}
+.nav-item{border-radius:9px;padding:9px 11px;font-size:12px;font-weight:650;gap:9px;}
+.nav-icon{font-size:14px;width:18px;}
+.theme-toggle{border-radius:9px;padding:8px 10px;font-size:11px;}
+.topbar{height:74px;padding:0 26px 14px;}
+.topbar-title{font-size:24px;font-weight:800;letter-spacing:-.035em;}
+.week-pill{font-size:10px;padding:6px 10px;border-radius:10px;}
+.home-scroll,.page-scroll{padding:0 26px 26px;}
+.card,.neo-card,.stat-card,.report-card,.rep-card,.wr-section,.lb-stat-card,.lb-row,.week-row{border-radius:12px;box-shadow:var(--s1);}
+.card-hd{padding:13px 15px 10px;}
+.card-bd{padding:13px 15px;}
+.dash-stat-grid{gap:16px;margin-bottom:18px;}
+.dash-metric{border-radius:11px;padding:15px 17px;min-height:96px;}
+.dash-metric:after{width:82px;height:82px;right:-26px;top:-26px;}
+.dash-metric-kicker{font-size:11px;font-weight:800;}
+.dash-metric-value{font-size:24px;margin-top:14px;font-weight:850;letter-spacing:-.035em;}
+.dash-metric-sub{font-size:10.5px;margin-top:7px;font-weight:600;}
+.dashboard-layout{grid-template-columns:minmax(0,1fr) 270px;gap:18px;}
+.dashboard-main,.dashboard-side{gap:18px;}
+.neo-card{padding:18px;}
+.neo-card-head{gap:12px;margin-bottom:14px;}
+.neo-card-head.compact{margin-bottom:10px;}
+.neo-card h2{font-size:18px;font-weight:800;letter-spacing:-.03em;}
+.neo-card p{font-size:11px;margin-top:1px;}
+.pill-action{border-radius:8px;font-size:10.5px;font-weight:800;padding:6px 10px;}
+.link-list{gap:9px;}
+.link-row{min-height:46px;border-radius:9px;padding:8px 11px;gap:10px;box-shadow:0 3px 12px rgba(36,54,54,.045);}
+.link-icon{width:28px;height:28px;border-radius:8px;}
+.link-icon svg{width:14px;height:14px;}
+.link-copy strong{font-size:12px;font-weight:800;}
+.link-copy em{font-size:10.5px;margin-top:1px;}
+.link-arrow{font-size:22px;}
+.soft-warning{margin-top:11px;border-radius:9px;padding:9px 10px;font-size:11px;}
+.ack-inline{border-radius:7px;padding:5px 8px;font-size:10px;}
+.team-table{gap:6px;max-height:350px;}
+.team-row{gap:9px;padding:9px;border-radius:9px;}
+.team-person strong{font-size:12px;font-weight:750;}
+.team-person span{font-size:10.5px;}
+.team-flag{font-size:10px;padding:3px 7px;}
+.av34{width:30px;height:30px;font-size:10px;}
+.av28{width:24px;height:24px;font-size:9px;}
+.side-label{font-size:10px;margin:12px 0 6px;}
+.agents-panel{padding:17px;}
+.agent-list{gap:7px;}
+.agent-pill{border-radius:9px;padding:7px 8px;gap:8px;}
+.agent-pill strong{font-size:11px;font-weight:750;}
+.agent-pill span{font-size:9.5px;}
+.agent-pill b{font-size:16px;}
+.notes-panel .notes-area{min-height:110px;border-radius:9px;font-size:12px;padding:10px 11px;}
+.report-tabs{padding:5px;border-radius:11px;gap:5px;margin-bottom:16px;}
+.rtab-btn{border-radius:8px;padding:8px 12px;font-size:12px;font-weight:750;}
+.wk-hdr{font-size:10.5px;margin:16px 0 8px;}
+.rh-row{border-radius:9px;padding:10px 12px;margin-bottom:7px;gap:8px;}
+.view-btn,.submit-btn,.add-btn,.save-btn-sm,.wr-submit-btn,.modal-btn.primary{border-radius:8px;}
+.view-btn{font-size:11px;padding:6px 10px;}
+.stat-card{padding:14px 16px;gap:10px;}
+.stat-icon{width:32px;height:32px;border-radius:8px;font-size:15px;}
+.stat-val{font-size:22px;}
+.stat-lbl{font-size:11px;}
+.page-wrap{max-width:720px;}
+.rep-card-head{padding:9px 12px;gap:9px;}
+.rep-name{font-size:12px;}
+.rep-meta{font-size:10px;}
+.rep-fields{gap:8px;margin-top:10px;}
+.field-input,.add-input,.wr-input,.modal-input{font-size:12px;padding:7px 9px;border-radius:6px;}
+.field-lbl,.modal-label,.wr-label,.sec-lbl,.card-title{font-size:10px;}
+.add-row{gap:7px;}
+.add-btn{font-size:12px;padding:8px 13px;}
+.week-row{padding:8px 11px;gap:8px;}
+.week-row-name{font-size:12px;}
+.week-row-sub{font-size:10.5px;}
+.wr-section-hdr{padding:11px 14px;}
+.wr-section-body{padding:14px;}
+.lb-stat-card{padding:11px 13px;}
+.lb-stat-val{font-size:22px;}
+.lb-row{padding:9px 12px;grid-template-columns:44px 1fr auto;}
+.lb-rank{width:32px;height:32px;border-radius:7px;font-size:12px;}
+.lb-row-name{font-size:12px;}
+.lb-score{font-size:20px;}
+.login-box{border-radius:14px;padding:32px 36px;}
+.login-title{font-size:20px;}
+@media(max-width:760px){
+  .sidebar{width:70px;padding:10px 7px;}
+  .nav-item{padding:10px 7px;}
+  .topbar{padding:18px 16px 12px;height:auto;}
+  .topbar-title{font-size:22px;}
+  .home-scroll,.page-scroll{padding:0 16px 22px;}
+}
+
 </style>
 </head>
 <body>
