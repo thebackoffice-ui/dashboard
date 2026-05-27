@@ -1096,7 +1096,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
               </div>
             </div>
           </div>
-          <div class="ptc-chart-wrap" style="height:220px;">
+          <div class="ptc-chart-wrap" style="height:240px;">
             <canvas id="rpt-ptc-canvas" class="ptc-canvas" style="height:100%;"></canvas>
           </div>
           <div class="ptc-stats" id="rpt-ptc-stats"></div>
@@ -3633,54 +3633,85 @@ function ptcDraw(canvas,data){
   const gridCol=dark?'#2a3a3a':'#eef0f3';
   const labelCol=dark?'#5a7070':'#9aabb8';
   const textCol=dark?'#8a9db0':'#6b7d8a';
-  const padL=52,padR=20,padT=16,padB=38;
-  const iW=W-padL-padR,iH=H-padT-padB;
-  const maxV=Math.max(...data.map(d=>Math.max(d.wire,d.take)),1);
 
-  // Grid
+  // Generous padding so lines never touch the edges
+  const padL=56,padR=40,padT=24,padB=42;
+  const iW=W-padL-padR,iH=H-padT-padB;
+
+  // Separate max for each series so a small Take line isn't squished
+  const wireVals=data.map(d=>d.wire);
+  const takeVals=data.map(d=>d.take);
+  const maxWire=Math.max(...wireVals,1);
+  const maxTake=Math.max(...takeVals,1);
+  // Use a shared scale only if they're in a similar range (within 3x); else dual axis
+  const useDual=maxWire>maxTake*3;
+  const maxLeft=maxWire;
+  const maxRight=useDual?maxTake:maxWire;
+
+  // Round max up to a nice number so gridlines land cleanly
+  function niceMax(v){
+    const mag=Math.pow(10,Math.floor(Math.log10(v)));
+    const frac=v/mag;
+    const nice=frac<=1?1:frac<=2?2:frac<=5?5:10;
+    return nice*mag*1.1;// 10% headroom
+  }
+  const niceLeft=niceMax(maxLeft);
+  const niceRight=niceMax(maxRight);
+
+  // Grid lines (4 steps)
   ctx.strokeStyle=gridCol;ctx.lineWidth=1;
   [0.25,0.5,0.75,1].forEach(p=>{
     const y=padT+iH-(p*iH);
     ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+iW,y);ctx.stroke();
-    const v=Math.round(maxV*p);
-    const lbl=v>=1000?'£'+(v/1000).toFixed(1)+'k':'£'+v;
-    ctx.fillStyle=labelCol;ctx.font='10px DM Sans,sans-serif';
-    ctx.textAlign='right';ctx.fillText(lbl,padL-7,y+4);
+    // Left axis (Wire)
+    const vL=Math.round(niceLeft*p);
+    const lblL=vL>=1000?'£'+(vL/1000).toFixed(vL>=10000?0:1)+'k':'£'+vL;
+    ctx.fillStyle=dark?'rgba(92,157,255,.6)':'rgba(60,120,220,.55)';
+    ctx.font='10px DM Sans,sans-serif';ctx.textAlign='right';
+    ctx.fillText(lblL,padL-8,y+3.5);
+    // Right axis (Take) — only show if dual scale
+    if(useDual){
+      const vR=Math.round(niceRight*p);
+      const lblR=vR>=1000?'£'+(vR/1000).toFixed(vR>=10000?0:1)+'k':'£'+vR;
+      ctx.fillStyle=dark?'rgba(38,198,176,.6)':'rgba(15,150,130,.55)';
+      ctx.textAlign='left';
+      ctx.fillText(lblR,padL+iW+8,y+3.5);
+    }
   });
 
   const xPos=i=>padL+i*(iW/(data.length-1||1));
-  const yPos=v=>padT+iH-(v/maxV)*iH;
+  const yWire=v=>padT+iH-(v/niceLeft)*iH;
+  const yTake=v=>padT+iH-(v/niceRight)*iH;
 
-  function drawLine(key,color){
-    if(data.length<2)return;
+  function drawArea(yFn,vals,color){
+    if(vals.length<2)return;
     ctx.beginPath();
-    data.forEach((d,i)=>{i===0?ctx.moveTo(xPos(i),yPos(d[key])):ctx.lineTo(xPos(i),yPos(d[key]));});
-    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
-    // Dots
-    data.forEach((d,i)=>{
-      ctx.beginPath();ctx.arc(xPos(i),yPos(d[key]),4,0,Math.PI*2);
+    ctx.moveTo(xPos(0),padT+iH);
+    vals.forEach((v,i)=>ctx.lineTo(xPos(i),yFn(v)));
+    ctx.lineTo(xPos(vals.length-1),padT+iH);ctx.closePath();
+    ctx.fillStyle=color;ctx.fill();
+  }
+  function drawLine(yFn,vals,color){
+    if(vals.length<2)return;
+    ctx.beginPath();
+    vals.forEach((v,i)=>{i===0?ctx.moveTo(xPos(i),yFn(v)):ctx.lineTo(xPos(i),yFn(v));});
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
+    vals.forEach((v,i)=>{
+      ctx.beginPath();ctx.arc(xPos(i),yFn(v),4,0,Math.PI*2);
       ctx.fillStyle=color;ctx.fill();
-      ctx.strokeStyle=dark?'#1a2634':'#fff';ctx.lineWidth=2;ctx.stroke();
+      ctx.strokeStyle=dark?'#131e2a':'#fff';ctx.lineWidth=2;ctx.stroke();
     });
   }
 
-  // Area fills
-  function drawArea(key,color){
-    if(data.length<2)return;
-    ctx.beginPath();
-    ctx.moveTo(xPos(0),padT+iH);
-    data.forEach((d,i)=>ctx.lineTo(xPos(i),yPos(d[key])));
-    ctx.lineTo(xPos(data.length-1),padT+iH);ctx.closePath();
-    ctx.fillStyle=color;ctx.fill();
-  }
-  drawArea('wire',dark?'rgba(92,157,255,.08)':'rgba(92,157,255,.07)');
-  drawArea('take',dark?'rgba(38,198,176,.08)':'rgba(38,198,176,.07)');
-  drawLine('wire','#5C9DFF');
-  drawLine('take','#26C6B0');
+  drawArea(yWire,wireVals,dark?'rgba(92,157,255,.07)':'rgba(92,157,255,.08)');
+  drawArea(yTake,takeVals,dark?'rgba(38,198,176,.07)':'rgba(38,198,176,.08)');
+  drawLine(yWire,wireVals,'#5C9DFF');
+  drawLine(yTake,takeVals,'#26C6B0');
 
-  // X labels
+  // X labels — skip crowded labels
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const step=data.length>16?Math.ceil(data.length/8):1;
+  const maxLabels=Math.floor(iW/60);
+  const step=data.length>maxLabels?Math.ceil(data.length/maxLabels):1;
   data.forEach((d,i)=>{
     if(i%step!==0&&i!==data.length-1)return;
     if(!d.wk)return;
@@ -3689,10 +3720,20 @@ function ptcDraw(canvas,data){
       const dy=parseInt(p[2]),mo=parseInt(p[1])-1;
       if(!isNaN(dy)&&!isNaN(mo)){
         ctx.fillStyle=textCol;ctx.font='bold 10px DM Sans,sans-serif';ctx.textAlign='center';
-        ctx.fillText(`${dy} ${months[mo]}`,xPos(i),padT+iH+16);
+        ctx.fillText(`${dy} ${months[mo]}`,xPos(i),padT+iH+18);
       }
     }
   });
+
+  // Dual scale legend hint
+  if(useDual){
+    ctx.font='9px DM Sans,sans-serif';ctx.textAlign='left';
+    ctx.fillStyle=dark?'rgba(92,157,255,.5)':'rgba(60,120,220,.45)';
+    ctx.fillText('Wire →',padL,padT-8);
+    ctx.textAlign='right';
+    ctx.fillStyle=dark?'rgba(38,198,176,.5)':'rgba(15,150,130,.45)';
+    ctx.fillText('← Take',padL+iW,padT-8);
+  }
 }
 
 // ══════════════════════════════════════════════════════
