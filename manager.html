@@ -76,6 +76,8 @@
 .nd-ann-dismiss:hover { background:rgba(255,255,255,.35); }
 .nd-section-lbl { font-size:10px; font-weight:800; color:var(--niond-muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
 [data-theme="dark"] .nd-stat,[data-theme="dark"] .nd-chart-card,[data-theme="dark"] .nd-links-card,[data-theme="dark"] .nd-lb-card,[data-theme="dark"] .nd-reps-card { background:var(--surface); border-color:var(--border); box-shadow:none; }
+[data-theme="dark"] #home-grid [style*="background:#fff;border-radius:10px"] { background:var(--surface) !important; }
+[data-theme="dark"] #home-grid [style*="border-top:3px solid"] { background:var(--surface) !important; }
 [data-theme="dark"] .nd-lb-row:hover,[data-theme="dark"] .nd-rep-row:hover,[data-theme="dark"] .nd-link-row:hover { background:var(--surface2); }
 [data-theme="dark"] .home-scroll { background:#0d1117 !important; }
 [data-theme="dark"] .nd-rank-1{background:rgba(254,249,195,.12);}[data-theme="dark"] .nd-rank-2{background:rgba(241,245,249,.08);}[data-theme="dark"] .nd-rank-3{background:rgba(255,247,237,.08);}
@@ -975,43 +977,43 @@ function renderHome(){
 
   document.getElementById('home-grid').innerHTML=`
 
-    <!-- ROW 1: Stat tiles — coloured blocks like reference -->
+    <!-- ROW 1: Stat tiles -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
 
-      <div style="background:#E8F1FF;border-radius:10px;padding:20px 22px;cursor:default;position:relative;overflow:hidden;">
-        <div style="font-size:12px;font-weight:600;color:#2979FF;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Active Reps</div>
-        <div style="font-size:32px;font-weight:800;color:#1a2a4a;letter-spacing:-.03em;line-height:1;">${active.length}</div>
-        <div style="font-size:11px;font-weight:600;color:${delta>0?'#00BFA5':delta<0?'#EF4444':'#94A3B8'};margin-top:6px;display:flex;align-items:center;gap:3px;">${delta>0?'▲ +'+delta+' from last week':delta<0?'▼ '+delta+' from last week':'— Same as last week'}</div>
-        <div style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);opacity:.12;color:#2979FF;">${ICO.users.replace('width="18"','width="64"').replace('height="18"','height="64"')}</div>
+      <div style="background:#fff;border-radius:10px;padding:20px 22px;cursor:default;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid #5C9DFF;">
+        <div style="font-size:11px;font-weight:700;color:#5C9DFF;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Active Reps</div>
+        <div style="font-size:34px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1;">${active.length}</div>
+        <div style="font-size:11px;font-weight:600;color:${delta>0?'#00BFA5':delta<0?'#EF4444':'#94A3B8'};margin-top:8px;display:flex;align-items:center;gap:3px;">${delta>0?'▲ +'+delta+' from last week':delta<0?'▼ '+delta+' from last week':'— Same as last week'}</div>
+        <div style="position:absolute;right:16px;top:18px;width:36px;height:36px;background:#EEF5FF;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#5C9DFF;">${ICO.users}</div>
       </div>
 
-      <div style="background:#FFF4E0;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
-        <div style="font-size:12px;font-weight:600;color:#FFA800;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Flagged</div>
-        <div style="font-size:32px;font-weight:800;color:#3a1a00;letter-spacing:-.03em;line-height:1;">${flagged.length}</div>
-        <div style="font-size:11px;font-weight:600;color:#94A3B8;margin-top:6px;">${leavers.length} leaver${leavers.length!==1?'s':''}</div>
-        <div style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);opacity:.12;color:#FFA800;">${ICO.warn.replace('width="18"','width="64"').replace('height="18"','height="64"')}</div>
+      <div style="background:#fff;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid #FFA800;">
+        <div style="font-size:11px;font-weight:700;color:#FFA800;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Flagged</div>
+        <div style="font-size:34px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1;">${flagged.length}</div>
+        <div style="font-size:11px;font-weight:600;color:#94A3B8;margin-top:8px;">${leavers.length} leaver${leavers.length!==1?'s':''}</div>
+        <div style="position:absolute;right:16px;top:18px;width:36px;height:36px;background:#FFF4E0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#FFA800;">${ICO.warn}</div>
       </div>
 
-      <div style="background:${weekSubmitted?'#E0F7F4':'#FFF4E0'};border-radius:10px;padding:20px 22px;cursor:${weekSubmitted?'default':'pointer'};position:relative;overflow:hidden;" onclick="${weekSubmitted?'':String.raw`switchTab('weekly')`}">
-        <div style="font-size:12px;font-weight:600;color:${weekSubmitted?'#00BFA5':'#FFA800'};margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Weekly Update</div>
-        <div style="font-size:22px;font-weight:800;color:${weekSubmitted?'#003a30':'#3a1a00'};letter-spacing:-.02em;line-height:1.1;">${weekSubmitted?'Submitted':'Pending'}</div>
-        <div style="font-size:11px;font-weight:600;color:${weekSubmitted?'#00BFA5':'#FFA800'};margin-top:6px;">${weekSubmitted?'Done for this week':'Tap to submit'}</div>
-        <div style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);opacity:.12;color:${weekSubmitted?'#00BFA5':'#FFA800'};">${(weekSubmitted?ICO.check:ICO.clock).replace(/width="1[68]"/,'width="64"').replace(/height="1[68]"/,'height="64"')}</div>
+      <div style="background:#fff;border-radius:10px;padding:20px 22px;cursor:${weekSubmitted?'default':'pointer'};position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid ${weekSubmitted?'#00BFA5':'#FFA800'};" onclick="${weekSubmitted?'':String.raw`switchTab('weekly')`}">
+        <div style="font-size:11px;font-weight:700;color:${weekSubmitted?'#00BFA5':'#FFA800'};margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Weekly Update</div>
+        <div style="font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1.1;">${weekSubmitted?'Submitted':'Pending'}</div>
+        <div style="font-size:11px;font-weight:600;color:${weekSubmitted?'#00BFA5':'#FFA800'};margin-top:8px;">${weekSubmitted?'Done for this week':'Tap to submit'}</div>
+        <div style="position:absolute;right:16px;top:18px;width:36px;height:36px;background:${weekSubmitted?'#E0F7F4':'#FFF4E0'};border-radius:8px;display:flex;align-items:center;justify-content:center;color:${weekSubmitted?'#00BFA5':'#FFA800'};">${weekSubmitted?ICO.check:ICO.clock}</div>
       </div>
 
-      <div style="background:#F0E8FE;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
-        <div style="font-size:12px;font-weight:600;color:#8533F5;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Latest Wire</div>
-        <div style="font-size:32px;font-weight:800;color:#1a0a30;letter-spacing:-.03em;line-height:1;">${curWire?'£'+curWire.toLocaleString('en-GB'):'—'}</div>
+      <div style="background:#fff;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid #8533F5;">
+        <div style="font-size:11px;font-weight:700;color:#8533F5;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Latest Wire</div>
+        <div style="font-size:34px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1;">${curWire?'£'+curWire.toLocaleString('en-GB'):'—'}</div>
         ${wireDiffHtml}
-        <div style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);opacity:.12;color:#8533F5;">${ICO.pound.replace('width="18"','width="64"').replace('height="18"','height="64"')}</div>
+        <div style="position:absolute;right:16px;top:18px;width:36px;height:36px;background:#F0E8FE;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8533F5;">${ICO.pound}</div>
       </div>
     </div>
 
     <!-- ROW 2: Chart (left) + Links (centre-right) + Calendar (far right) -->
-    <div style="display:grid;grid-template-columns:1fr 220px 220px;gap:14px;margin-bottom:20px;align-items:start;">
+    <div style="display:grid;grid-template-columns:1fr 230px 240px;gap:14px;margin-bottom:20px;align-items:stretch;">
 
       <!-- Production History -->
-      <div style="background:#fff;border-radius:10px;padding:22px 24px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+      <div style="background:#fff;border-radius:10px;padding:22px 24px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;flex-direction:column;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
           <div>
             <div style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.02em;">Production History</div>
@@ -1027,13 +1029,13 @@ function renderHome(){
             <div style="width:10px;height:10px;border-radius:50%;background:#26C6B0;"></div>Manager Take
           </div>
         </div>
-        <canvas id="prod-chart-canvas" height="160" style="width:100%;display:block;"></canvas>
+        <canvas id="prod-chart-canvas" style="width:100%;display:block;flex:1;min-height:160px;"></canvas>
       </div>
 
       <!-- This Week's Links — each as its own card -->
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;padding:4px 0 2px;">This Week's Links</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:2px;">Updated weekly</div>
+      <div style="display:flex;flex-direction:column;gap:10px;background:#fff;border-radius:10px;padding:20px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+        <div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:2px;">This Week's Links</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Updated weekly</div>
 
         ${latestPay
           ?`<a href="${esc(latestPay.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 14px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05)'">
@@ -1073,14 +1075,33 @@ function renderHome(){
       </div>
 
       <!-- Mini Calendar -->
-      <div style="background:#fff;border-radius:10px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div style="font-size:13px;font-weight:700;color:var(--text);">${MONTHS[mM]} ${mY}</div>
-          <button onclick="switchTab('calendar')" style="background:none;border:none;font-family:var(--font);font-size:11px;font-weight:600;color:#0f766e;cursor:pointer;padding:0;">Full calendar →</button>
+      <div style="background:#fff;border-radius:10px;padding:20px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;">${MONTHS[mM]} ${mY}</div>
+          <button onclick="switchTab('calendar')" style="background:none;border:none;font-family:var(--font);font-size:11px;font-weight:600;color:#0f766e;cursor:pointer;padding:0;white-space:nowrap;">Full calendar →</button>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
           ${calGrid}
         </div>
+        ${(()=>{
+          const next7=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()+i);return fmtDate(d);});
+          const upcoming=calEvents.filter(e=>next7.includes(e.date)).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
+          if(!upcoming.length)return'';
+          const CAT_C={personal:'#5C9DFF',work:'#26C6B0',team:'#F51D7E',reminder:'#FFA800',admin:'#8533F5',orange:'#FF6F00',rose:'#F43F5E',cyan:'#06B6D4'};
+          return'<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">'
+            +'<div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Upcoming</div>'
+            +upcoming.map(e=>{
+              const d=parseDate(e.date);
+              const isT=e.date===today;
+              const dayStr=isT?'Today':d?d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'';
+              const col=CAT_C[e.category||'personal']||'#0f766e';
+              return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">'
+                +'<div style="width:3px;height:32px;border-radius:2px;background:'+col+';flex-shrink:0;"></div>'
+                +'<div style="min-width:0;"><div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(e.title)+'</div>'
+                +'<div style="font-size:10px;color:var(--muted);">'+dayStr+(e.time?' · '+esc(e.time):'')+'</div></div>'
+                +'</div>';
+            }).join('')+'</div>';
+        })()}
       </div>
     </div>
 
@@ -1145,7 +1166,7 @@ function renderHome(){
     </div>
   `;
 
-  setTimeout(()=>drawProdChart(wireByWeek),60);
+  setTimeout(()=>drawProdChart(wireByWeek),80);
 
   if(typeof lbRows!=='undefined'&&!lbLoaded){
     lbInit().then(()=>renderHome()).catch(()=>{});
@@ -1158,7 +1179,7 @@ function drawProdChart(wireByWeek){
   if(!canvas)return;
   const dpr=window.devicePixelRatio||1;
   const W=canvas.offsetWidth||canvas.parentElement.offsetWidth||600;
-  const H=160;
+  const H=Math.max(canvas.offsetHeight||0, canvas.parentElement.offsetHeight ? canvas.parentElement.offsetHeight - 120 : 180, 160);
   canvas.width=W*dpr;
   canvas.height=H*dpr;
   canvas.style.width=W+'px';
