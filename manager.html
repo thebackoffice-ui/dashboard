@@ -127,6 +127,76 @@
   font-weight:700!important;
 }
 
+
+/* Strong vibrant position colours */
+.pos-colour-Trainee,
+.av.pos-Trainee,
+.nd-rep-av.pos-Trainee,
+.map-node.pos-Trainee,
+.map-bubble.pos-Trainee,
+.mini-map-bubble.pos-Trainee{
+  background:#b7ffe3!important;
+  color:#00a96e!important;
+  border:2px solid #00d68f!important;
+}
+
+.pos-colour-Solo,
+.av.pos-Solo,
+.nd-rep-av.pos-Solo,
+.map-node.pos-Solo,
+.map-bubble.pos-Solo,
+.mini-map-bubble.pos-Solo{
+  background:#ffe3b3!important;
+  color:#cc7700!important;
+  border:2px solid #ff9500!important;
+}
+
+.pos-colour-Leader,
+.av.pos-Leader,
+.nd-rep-av.pos-Leader,
+.map-node.pos-Leader,
+.map-bubble.pos-Leader,
+.mini-map-bubble.pos-Leader{
+  background:#bfdcff!important;
+  color:#1d4ed8!important;
+  border:2px solid #2563ff!important;
+}
+
+.pos-colour-Core,
+.av.pos-Core,
+.nd-rep-av.pos-Core,
+.map-node.pos-Core,
+.map-bubble.pos-Core,
+.mini-map-bubble.pos-Core{
+  background:#dccbff!important;
+  color:#6d28d9!important;
+  border:2px solid #7c3aed!important;
+}
+
+.pos-colour-Junior,
+.pos-colour-JuniorPartner,
+.av.pos-Junior,
+.av.pos-JuniorPartner,
+.nd-rep-av.pos-Junior,
+.nd-rep-av.pos-JuniorPartner,
+.map-node.pos-Junior,
+.map-node.pos-JuniorPartner,
+.map-bubble.pos-Junior,
+.map-bubble.pos-JuniorPartner,
+.mini-map-bubble.pos-Junior,
+.mini-map-bubble.pos-JuniorPartner{
+  background:#ffc9d7!important;
+  color:#e11d48!important;
+  border:2px solid #ff3366!important;
+}
+
+/* Initial circles more vibrant */
+.av,
+.nd-rep-av{
+  filter:saturate(1.15);
+  box-shadow:0 6px 14px rgba(0,0,0,.08)!important;
+}
+
 </style>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -315,16 +385,16 @@ select.field-input{cursor:pointer;appearance:none;}
 
 /* ── POS TAGS ── */
 .pos-tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;border:1px solid transparent;}
-.pos-Trainee{color:#00c78c;background:#d8fff0;border-color:#00c78c;}
-.pos-Solo{color:#ff9800;background:#fff0d6;border-color:#ff9800;}
-.pos-Leader{color:#3b82f6;background:#d9eaff;border-color:#3b82f6;}
-.pos-Core{color:#8b5cf6;background:#ece4ff;border-color:#8b5cf6;}
-.pos-Junior{color:#ff4f7b;background:#ffe3eb;border-color:#ff4f7b;}
-[data-theme="dark"] .pos-Trainee{color:#00c78c;background:#d8fff0;border-color:#00c78c;}
-[data-theme="dark"] .pos-Solo{color:#ff9800;background:#fff0d6;border-color:#ff9800;}
-[data-theme="dark"] .pos-Leader{color:#3b82f6;background:#d9eaff;border-color:#3b82f6;}
-[data-theme="dark"] .pos-Core{color:#8b5cf6;background:#ece4ff;border-color:#8b5cf6;}
-[data-theme="dark"] .pos-Junior{color:#ff4f7b;background:#ffe3eb;border-color:#ff4f7b;}
+.pos-Trainee{color:#00d68f;background:#b7ffe3;border-color:#00d68f;}
+.pos-Solo{color:#ff9500;background:#ffe3b3;border-color:#ff9500;}
+.pos-Leader{color:#2563ff;background:#bfdcff;border-color:#2563ff;}
+.pos-Core{color:#7c3aed;background:#dccbff;border-color:#7c3aed;}
+.pos-Junior{color:#ff3366;background:#ffc9d7;border-color:#ff3366;}
+[data-theme="dark"] .pos-Trainee{color:#00d68f;background:#b7ffe3;border-color:#00d68f;}
+[data-theme="dark"] .pos-Solo{color:#ff9500;background:#ffe3b3;border-color:#ff9500;}
+[data-theme="dark"] .pos-Leader{color:#2563ff;background:#bfdcff;border-color:#2563ff;}
+[data-theme="dark"] .pos-Core{color:#7c3aed;background:#dccbff;border-color:#7c3aed;}
+[data-theme="dark"] .pos-Junior{color:#ff3366;background:#ffc9d7;border-color:#ff3366;}
 .leaver-tag{font-size:11px;font-weight:600;color:var(--warning);background:var(--warning-soft);border:1px solid rgba(217,119,6,.2);padding:2px 7px;border-radius:20px;}
 
 /* ── FLAG ── */
@@ -485,11 +555,11 @@ select.wr-input{cursor:pointer;appearance:none;}
 .home-event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
 /* Event colours */
-.ev-personal{background:#dbeafe;color:#1d4ed8;border-left:3px solid #3b82f6;}
+.ev-personal{background:#dbeafe;color:#1d4ed8;border-left:3px solid #2563ff;}
 .ev-work{background:#dcfce7;color:#15803d;border-left:3px solid #22c55e;}
 .ev-team{background:#fce7f3;color:#be185d;border-left:3px solid #ec4899;}
 .ev-reminder{background:#fef9c3;color:#92400e;border-left:3px solid #f59e0b;}
-.ev-admin{background:#f0fdfa;color:#0f766e;border-left:3px solid #8b5cf6;}
+.ev-admin{background:#f0fdfa;color:#0f766e;border-left:3px solid #7c3aed;}
 .ev-orange{background:#ffedd5;color:#c2410c;border-left:3px solid #f97316;}
 .ev-rose{background:#ffe4e6;color:#be123c;border-left:3px solid #f43f5e;}
 .ev-cyan{background:#cffafe;color:#0e7490;border-left:3px solid #06b6d4;}
@@ -595,9 +665,9 @@ select.wr-input{cursor:pointer;appearance:none;}
 .map-node.pos-Trainee,
 .map-bubble.pos-Trainee,
 .mini-map-bubble.pos-Trainee{
-  background:#d8fff0!important;
-  color:#00c78c!important;
-  border:1px solid #00c78c!important;
+  background:#b7ffe3!important;
+  color:#00d68f!important;
+  border:1px solid #00d68f!important;
 }
 .pos-colour-Solo,
 .pos-colour-solo,
@@ -606,9 +676,9 @@ select.wr-input{cursor:pointer;appearance:none;}
 .map-node.pos-Solo,
 .map-bubble.pos-Solo,
 .mini-map-bubble.pos-Solo{
-  background:#fff0d6!important;
-  color:#ff9800!important;
-  border:1px solid #ff9800!important;
+  background:#ffe3b3!important;
+  color:#ff9500!important;
+  border:1px solid #ff9500!important;
 }
 .pos-colour-Leader,
 .pos-colour-leader,
@@ -617,9 +687,9 @@ select.wr-input{cursor:pointer;appearance:none;}
 .map-node.pos-Leader,
 .map-bubble.pos-Leader,
 .mini-map-bubble.pos-Leader{
-  background:#d9eaff!important;
-  color:#3b82f6!important;
-  border:1px solid #3b82f6!important;
+  background:#bfdcff!important;
+  color:#2563ff!important;
+  border:1px solid #2563ff!important;
 }
 .pos-colour-Core,
 .pos-colour-core,
@@ -628,9 +698,9 @@ select.wr-input{cursor:pointer;appearance:none;}
 .map-node.pos-Core,
 .map-bubble.pos-Core,
 .mini-map-bubble.pos-Core{
-  background:#ece4ff!important;
-  color:#8b5cf6!important;
-  border:1px solid #8b5cf6!important;
+  background:#dccbff!important;
+  color:#7c3aed!important;
+  border:1px solid #7c3aed!important;
 }
 .pos-colour-Junior,
 .pos-colour-junior,
@@ -646,9 +716,9 @@ select.wr-input{cursor:pointer;appearance:none;}
 .map-bubble.pos-JuniorPartner,
 .mini-map-bubble.pos-Junior,
 .mini-map-bubble.pos-JuniorPartner{
-  background:#ffe3eb!important;
-  color:#ff4f7b!important;
-  border:1px solid #ff4f7b!important;
+  background:#ffc9d7!important;
+  color:#ff3366!important;
+  border:1px solid #ff3366!important;
 }
 
 </style>
@@ -899,11 +969,11 @@ select.wr-input{cursor:pointer;appearance:none;}
     <div class="modal-field"><label class="modal-label">Title</label><input class="modal-input" id="ev-title" type="text" placeholder="Event name…"/></div>
     <div class="modal-field"><label class="modal-label">Category</label>
       <div class="colour-picker" id="ev-colour-picker" style="gap:10px;">
-        <div class="colour-swatch selected" data-cat="personal" style="background:#3b82f6;" title="Personal" onclick="selectCat(this,'personal')"></div>
+        <div class="colour-swatch selected" data-cat="personal" style="background:#2563ff;" title="Personal" onclick="selectCat(this,'personal')"></div>
         <div class="colour-swatch" data-cat="work" style="background:#22c55e;" title="Work" onclick="selectCat(this,'work')"></div>
         <div class="colour-swatch" data-cat="team" style="background:#ec4899;" title="Pink" onclick="selectCat(this,'team')"></div>
         <div class="colour-swatch" data-cat="reminder" style="background:#f59e0b;" title="Yellow" onclick="selectCat(this,'reminder')"></div>
-        <div class="colour-swatch" data-cat="admin" style="background:#8b5cf6;" title="Purple" onclick="selectCat(this,'admin')"></div>
+        <div class="colour-swatch" data-cat="admin" style="background:#7c3aed;" title="Purple" onclick="selectCat(this,'admin')"></div>
         <div class="colour-swatch" data-cat="orange" style="background:#f97316;" title="Orange" onclick="selectCat(this,'orange')"></div>
         <div class="colour-swatch" data-cat="rose" style="background:#f43f5e;" title="Rose" onclick="selectCat(this,'rose')"></div>
         <div class="colour-swatch" data-cat="cyan" style="background:#06b6d4;" title="Cyan" onclick="selectCat(this,'cyan')"></div>
@@ -1024,11 +1094,11 @@ function posKey(pos){
 function posStyle(pos){
   const k=posKey(pos);
   const map={
-    Trainee:['#d8fff0','#00c78c'],
-    Solo:['#fff0d6','#ff9800'],
-    Leader:['#d9eaff','#3b82f6'],
-    Core:['#ece4ff','#8b5cf6'],
-    Junior:['#ffe3eb','#ff4f7b']
+    Trainee:['#b7ffe3','#00d68f'],
+    Solo:['#ffe3b3','#ff9500'],
+    Leader:['#bfdcff','#2563ff'],
+    Core:['#dccbff','#7c3aed'],
+    Junior:['#ffc9d7','#ff3366']
   };
   if(!map[k])return '';
   return `background:${map[k][0]};color:${map[k][1]};border:1px solid ${map[k][1]};`;
@@ -1088,7 +1158,7 @@ const SVG={
   dash:'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8" stroke-linecap="round"/></svg>',
 };
 
-const CAT_COLORS={personal:'#3b82f6',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#8b5cf6',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
+const CAT_COLORS={personal:'#2563ff',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#7c3aed',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
 
 function renderHome(){
   const annSlot=document.getElementById('announcement-slot');
@@ -2192,7 +2262,7 @@ function renderCalendar(){
   let nd=1;while(cells.length%7!==0)cells.push({date:fmtDate(new Date(calYear,calMonth+1,nd++)),other:true});
 
   // ── Main calendar grid ──
-  const CAT_C={personal:'#3b82f6',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#8b5cf6',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
+  const CAT_C={personal:'#2563ff',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#7c3aed',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
   const CAT_BG={personal:'#dbeafe',work:'#dcfce7',team:'#fce7f3',reminder:'#fef9c3',admin:'#f0fdfa',orange:'#ffedd5',rose:'#ffe4e6',cyan:'#cffafe'};
   const CAT_TXT={personal:'#1d4ed8',work:'#15803d',team:'#be185d',reminder:'#92400e',admin:'#0f766e',orange:'#c2410c',rose:'#be123c',cyan:'#0e7490'};
 
@@ -2203,7 +2273,7 @@ function renderCalendar(){
     const isToday=c.date===today;
     const isSel=c.date===selectedDay;
     const evHtml=evs.slice(0,3).map(e=>{
-      const col=CAT_C[e.category||'personal']||'#3b82f6';
+      const col=CAT_C[e.category||'personal']||'#2563ff';
       const bg=CAT_BG[e.category||'personal']||'#dbeafe';
       const txt=CAT_TXT[e.category||'personal']||'#1d4ed8';
       return`<div class="cal-event" style="background:${bg};color:${txt};" onclick="openEditEvent(event,'${e.id}')" title="${esc(e.title)}">${esc(e.title)}</div>`;
@@ -2269,14 +2339,14 @@ function renderEventsList(){
   if(titleEl)titleEl.textContent=isToday?"Today's Events":"Events";
   if(dateEl)dateEl.textContent=dayLabel;
 
-  const CAT_C={personal:'#3b82f6',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#0f766e',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
+  const CAT_C={personal:'#2563ff',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#0f766e',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
   const evs=calEvents.filter(e=>e.date===day);
   if(!evs.length){
     listEl.innerHTML='<div class="event-list-empty">No events this day.<br><span style="font-size:11px;">Click + to add one.</span></div>';
     return;
   }
   listEl.innerHTML=evs.map(e=>{
-    const col=CAT_C[e.category||'personal']||'#3b82f6';
+    const col=CAT_C[e.category||'personal']||'#2563ff';
     return`<div class="event-list-row" onclick="openEditEvent(event,'${e.id}')">
       <div class="event-list-dot" style="background:${col};"></div>
       <div style="flex:1;min-width:0;">
