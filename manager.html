@@ -800,6 +800,139 @@ select.wr-input{cursor:pointer;appearance:none;}
 .profile-upload-btn{position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:#0f766e;border:2px solid #fff;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s;}
 .profile-upload-btn:hover{opacity:.85;}
 
+/* ══════════════════════════════════════════
+   REP SCORECARD MODAL
+══════════════════════════════════════════ */
+.scorecard-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px);}
+.scorecard-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:500px;max-height:86vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.22);overflow:hidden;}
+.sc-hdr{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.sc-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.sc-hdr-info{flex:1;min-width:0;}
+.sc-hdr-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
+.sc-hdr-pos{margin-top:3px;}
+.sc-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:background .12s;flex-shrink:0;}
+.sc-close:hover{background:var(--surface2);}
+.sc-body{padding:18px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
+.sc-sec-title{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.sc-timeline{display:flex;flex-direction:column;position:relative;}
+.sc-timeline::before{content:'';position:absolute;left:10px;top:4px;bottom:4px;width:1.5px;background:var(--border);}
+.sc-tl-row{display:flex;align-items:flex-start;gap:12px;padding-bottom:14px;position:relative;}
+.sc-tl-row:last-child{padding-bottom:0;}
+.sc-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--surface);}
+.sc-dot.pos{background:rgba(15,118,110,.12);color:#0f766e;}
+.sc-dot.flag-risk{background:rgba(220,38,38,.1);color:#dc2626;}
+.sc-dot.flag-ok{background:rgba(22,163,74,.1);color:#16a34a;}
+.sc-dot.flag-warn{background:rgba(249,115,22,.1);color:#f97316;}
+.sc-dot.flag-watch{background:rgba(13,107,97,.1);color:#0d6b61;}
+.sc-tl-body{flex:1;min-width:0;padding-top:1px;}
+.sc-tl-label{font-size:13px;font-weight:600;color:var(--text);}
+.sc-tl-date{font-size:11px;color:var(--muted);margin-top:1px;}
+.sc-empty-msg{font-size:12px;color:var(--subtle);padding:10px 0;}
+/* Notes inside scorecard */
+.sc-note-list{display:flex;flex-direction:column;gap:6px;}
+.sc-note-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.sc-note-text{font-size:13px;color:var(--text);line-height:1.55;}
+.sc-note-meta{font-size:10px;color:var(--subtle);margin-top:5px;}
+.sc-note-add{display:flex;gap:8px;margin-top:4px;}
+.sc-note-input{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 11px;border-radius:var(--rsm);outline:none;transition:border-color .15s;}
+.sc-note-input:focus{border-color:var(--accent);}
+.sc-note-save{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:8px 14px;border-radius:var(--rsm);cursor:pointer;white-space:nowrap;}
+.sc-note-save:hover{opacity:.85;}
+/* Scorecard trigger on rep cards */
+.sc-trigger-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.sc-trigger-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ══════════════════════════════════════════
+   PAY TREND TAB
+══════════════════════════════════════════ */
+.ptc-scroll{flex:1;overflow-y:auto;padding:24px 28px;}
+.ptc-page{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:20px;}
+.ptc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--s1);overflow:hidden;}
+.ptc-card-hdr{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.ptc-card-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.01em;}
+.ptc-card-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.ptc-legend{display:flex;gap:16px;}
+.ptc-leg{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--muted);}
+.ptc-leg-dot{width:10px;height:10px;border-radius:50%;}
+.ptc-range-pills{display:flex;gap:5px;}
+.ptc-rpill{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;cursor:pointer;transition:all .15s;}
+.ptc-rpill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.ptc-chart-wrap{padding:20px 22px 16px;position:relative;}
+.ptc-canvas{display:block;width:100%;}
+.ptc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 22px 20px;}
+.ptc-stat{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px 15px;}
+.ptc-stat-lbl{font-size:11px;color:var(--muted);font-weight:500;}
+.ptc-stat-val{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.02em;margin-top:2px;}
+.ptc-stat.hi .ptc-stat-val{color:var(--accent);}
+[data-theme="dark"] .ptc-stat{background:var(--surface2);}
+
+/* ══════════════════════════════════════════
+   NOTES TAB
+══════════════════════════════════════════ */
+.notes-shell{display:flex;height:100%;overflow:hidden;}
+/* Sidebar */
+.notes-sb{width:214px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.notes-sb-top{padding:14px 12px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.notes-sb-title{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.notes-new-btn{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:700;padding:8px 0;border-radius:6px;cursor:pointer;width:100%;transition:opacity .15s;}
+.notes-new-btn:hover{opacity:.85;}
+.notes-folder-scroll{flex:1;overflow-y:auto;padding:6px 8px;}
+.nf-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .12s;user-select:none;}
+.nf-item:hover{background:var(--surface2);color:var(--text);}
+.nf-item.active{background:var(--accent-soft,rgba(15,118,110,.08));color:var(--accent);font-weight:700;}
+.nf-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.nf-count{margin-left:auto;font-size:10px;font-weight:700;color:var(--subtle);background:var(--surface2);border-radius:10px;padding:1px 6px;}
+.nf-item.active .nf-count{background:var(--accent-soft,rgba(15,118,110,.1));color:var(--accent);}
+.nf-add-btn{display:flex;align-items:center;gap:6px;padding:7px 9px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:6px;border:none;background:none;width:100%;font-family:var(--font);transition:all .12s;}
+.nf-add-btn:hover{background:var(--surface2);color:var(--accent);}
+/* Main area */
+.notes-main{flex:1;display:flex;overflow:hidden;background:var(--bg);}
+.notes-list-col{width:260px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.notes-list-toolbar{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.notes-list-search-wrap{position:relative;flex:1;}
+.notes-list-search{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:6px 10px 6px 28px;border-radius:20px;outline:none;transition:border-color .15s;}
+.notes-list-search:focus{border-color:var(--accent);}
+.nls-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;}
+.notes-list-items{flex:1;overflow-y:auto;padding:8px;}
+.n-card{border-radius:8px;padding:11px 12px;cursor:pointer;transition:all .15s;margin-bottom:4px;border:1px solid transparent;}
+.n-card:hover{background:var(--surface2);}
+.n-card.active{background:var(--accent-soft,rgba(15,118,110,.07));border-color:var(--accent);}
+.n-card.pinned{border-left:3px solid var(--accent);}
+.n-card-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px;}
+.n-pin-ico{font-size:10px;color:var(--accent);flex-shrink:0;}
+.n-card-preview{font-size:11px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;}
+.n-card-meta{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.n-folder-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid transparent;}
+.n-date{font-size:10px;color:var(--subtle);margin-left:auto;}
+/* Editor */
+.notes-editor-col{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.notes-editor-hdr{padding:12px 18px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.n-title-input{flex:1;background:none;border:none;color:var(--text);font-family:var(--font);font-size:15px;font-weight:700;outline:none;padding:0;}
+.n-title-input::placeholder{color:var(--subtle);}
+.n-ed-actions{display:flex;gap:6px;align-items:center;}
+.n-ed-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .15s;}
+.n-ed-btn:hover{border-color:var(--accent);color:var(--accent);}
+.n-ed-btn.pinned{border-color:var(--accent);color:var(--accent);background:var(--accent-soft,rgba(15,118,110,.08));}
+.n-ed-btn.del:hover{border-color:var(--danger);color:var(--danger);}
+.notes-editor-body{flex:1;overflow-y:auto;padding:18px 20px;background:var(--surface);}
+.n-body-input{width:100%;height:100%;min-height:300px;background:none;border:none;color:var(--text);font-family:var(--font);font-size:13px;line-height:1.75;resize:none;outline:none;}
+.n-body-input::placeholder{color:var(--subtle);}
+.n-ed-folder-row{padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.n-ed-folder-lbl{font-size:11px;color:var(--muted);font-weight:500;}
+.n-ed-folder-sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:4px 8px;border-radius:6px;outline:none;cursor:pointer;}
+.n-ed-save-pill{margin-left:auto;font-size:11px;color:var(--subtle);}
+/* Empty states */
+.notes-blank{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-size:13px;background:var(--surface);}
+.notes-blank-ico{font-size:34px;opacity:.3;margin-bottom:4px;}
+/* Folder create modal */
+.nf-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:700;display:flex;align-items:center;justify-content:center;}
+.nf-modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px;width:300px;box-shadow:0 16px 40px rgba(0,0,0,.2);}
+.nf-modal-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;}
+.nf-colour-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px;}
+.nf-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;}
+.nf-swatch.sel{border-color:var(--text);transform:scale(1.2);}
+.nf-modal-actions{display:flex;gap:8px;justify-content:flex-end;}
+
 </style>
 </head>
 <body>
@@ -862,6 +995,8 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       <button class="nav-item" onclick="switchTab('leaderboard')" id="nav-leaderboard"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h6M10 15v3M7 18h6"/><path d="M5 3v5a5 5 0 0 0 10 0V3"/><path d="M5 6H3a2 2 0 1 0 0 4h2M15 6h2a2 2 0 1 0 0 4h-2" stroke-linecap="round"/></svg></span>Leaderboard</button>
       <button class="nav-item" onclick="switchTab('map')" id="nav-map"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 4l6 2 6-2 6 2v13l-6-2-6 2-6-2z" stroke-linejoin="round"/><path d="M7 6v13M13 4v13" stroke-linecap="round"/></svg></span>Team Map</button>
       <button class="nav-item" onclick="switchTab('notifications')" id="nav-notifications"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 0 1 6 6c0 3.5 1.5 5 1.5 5h-15S4 11.5 4 8a6 6 0 0 1 6-6z" stroke-linejoin="round"/><path d="M8.5 17a1.5 1.5 0 0 0 3 0" stroke-linecap="round"/></svg></span>Notifications<span id="notif-badge" class="nav-badge" style="display:none;">0</span></button>
+      <button class="nav-item" onclick="switchTab('paytrend')" id="nav-paytrend"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 14l4-5 4 3 5-7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Pay Trend</button>
+      <button class="nav-item" onclick="switchTab('notes')" id="nav-notes"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h10a1 1 0 0 1 1 1v10l-4 4H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke-linejoin="round"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/></svg></span>Notes</button>
     </div>
     <div class="sidebar-footer">
       <button class="theme-toggle" onclick="toggleTheme()"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 13A7 7 0 1 1 7 3a5 5 0 0 0 10 10z" stroke-linejoin="round"/></svg><span id="theme-lbl">Dark mode</span></button>
@@ -1099,8 +1234,134 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       </div>
     </div>
 
+    <!-- PAY TREND -->
+    <div class="tab-content" id="ptab-paytrend">
+      <div class="topbar">
+        <span class="topbar-title">Pay Trend</span>
+        <div class="topbar-right">
+          <div class="ptc-range-pills" id="ptc-range-pills">
+            <button class="ptc-rpill active" onclick="ptcSetRange(this,6)">6w</button>
+            <button class="ptc-rpill" onclick="ptcSetRange(this,12)">12w</button>
+            <button class="ptc-rpill" onclick="ptcSetRange(this,0)">All</button>
+          </div>
+        </div>
+      </div>
+      <div class="ptc-scroll">
+        <div class="ptc-page">
+          <!-- Chart card -->
+          <div class="ptc-card">
+            <div class="ptc-card-hdr">
+              <div>
+                <div class="ptc-card-title">Office Wire vs Manager's Take</div>
+                <div class="ptc-card-sub" id="ptc-sub">Weekly breakdown</div>
+              </div>
+              <div class="ptc-legend">
+                <div class="ptc-leg"><div class="ptc-leg-dot" style="background:#5C9DFF;"></div>Office Wire</div>
+                <div class="ptc-leg"><div class="ptc-leg-dot" style="background:#26C6B0;"></div>My Take</div>
+              </div>
+            </div>
+            <div class="ptc-chart-wrap" style="height:260px;">
+              <canvas id="ptc-canvas" class="ptc-canvas" style="height:100%;"></canvas>
+            </div>
+            <div class="ptc-stats" id="ptc-stats"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="tab-content" id="ptab-notes">
+      <div class="topbar">
+        <span class="topbar-title">Notes</span>
+        <div class="topbar-right" id="notes-topbar-right"></div>
+      </div>
+      <div class="notes-shell">
+        <!-- Folder sidebar -->
+        <div class="notes-sb">
+          <div class="notes-sb-top">
+            <div class="notes-sb-title">Folders</div>
+            <button class="notes-new-btn" onclick="notesNewNote()">+ New note</button>
+          </div>
+          <div class="notes-folder-scroll" id="nf-list"></div>
+          <div style="padding:8px 10px;border-top:1px solid var(--border);flex-shrink:0;">
+            <button class="nf-add-btn" onclick="notesShowFolderModal()">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+              New folder
+            </button>
+          </div>
+        </div>
+        <!-- Notes list + editor -->
+        <div class="notes-main">
+          <div class="notes-list-col">
+            <div class="notes-list-toolbar">
+              <div class="notes-list-search-wrap">
+                <svg class="nls-ico" width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <input class="notes-list-search" id="notes-search" type="text" placeholder="Search notes…" oninput="notesFilter()"/>
+              </div>
+            </div>
+            <div class="notes-list-items" id="notes-list-items"></div>
+          </div>
+          <div class="notes-editor-col" id="notes-editor-col">
+            <div class="notes-blank" id="notes-blank">
+              <div class="notes-blank-ico">📝</div>
+              <div style="font-weight:600;color:var(--text);">No note selected</div>
+              <div style="font-size:12px;">Create a note or pick one from the list</div>
+            </div>
+            <div id="notes-editor-wrap" style="display:none;flex:1;display:none;flex-direction:column;overflow:hidden;">
+              <div class="notes-editor-hdr">
+                <input class="n-title-input" id="n-title" placeholder="Untitled note" oninput="notesMarkDirty()"/>
+                <div class="n-ed-actions">
+                  <button class="n-ed-btn" id="n-pin-btn" onclick="notesTogglePin()">📌 Pin</button>
+                  <button class="n-ed-btn del" onclick="notesDeleteCurrent()">Delete</button>
+                </div>
+              </div>
+              <div style="padding:6px 18px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-shrink:0;">
+                <span style="font-size:11px;color:var(--muted);font-weight:500;">Folder:</span>
+                <select class="n-ed-folder-sel" id="n-folder-sel" onchange="notesMarkDirty()"></select>
+                <span style="font-size:11px;color:var(--subtle);margin-left:auto;" id="n-saved-lbl"></span>
+              </div>
+              <div class="notes-editor-body">
+                <textarea class="n-body-input" id="n-body" placeholder="Start writing…" oninput="notesMarkDirty()"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /content-area -->
 </div><!-- /app-shell -->
+
+<!-- SCORECARD MODAL -->
+<div id="scorecard-backdrop" class="scorecard-backdrop" style="display:none;" onclick="if(event.target===this)closeScorecard()">
+  <div class="scorecard-modal">
+    <div class="sc-hdr">
+      <div class="sc-av" id="sc-av"></div>
+      <div class="sc-hdr-info">
+        <div class="sc-hdr-name" id="sc-name"></div>
+        <div class="sc-hdr-pos" id="sc-pos"></div>
+      </div>
+      <button class="sc-close" onclick="closeScorecard()">✕</button>
+    </div>
+    <div class="sc-body" id="sc-body"></div>
+  </div>
+</div>
+
+<!-- FOLDER CREATE MODAL -->
+<div id="nf-modal-backdrop" class="nf-modal-backdrop" style="display:none;" onclick="if(event.target===this)notesCloseFolderModal()">
+  <div class="nf-modal">
+    <div class="nf-modal-title">New folder</div>
+    <div class="field-group" style="margin-bottom:0;">
+      <label class="field-lbl">Folder name</label>
+      <input class="field-input" id="nf-name-input" type="text" placeholder="e.g. 1-to-1s" style="margin-bottom:0;" onkeydown="if(event.key==='Enter')notesSaveFolder()"/>
+    </div>
+    <div class="nf-colour-row" id="nf-colour-row"></div>
+    <div class="nf-modal-actions">
+      <button class="modal-btn secondary" onclick="notesCloseFolderModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="notesSaveFolder()">Create</button>
+    </div>
+  </div>
+</div>
 
 <!-- Event modal -->
 <div id="event-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)closeEventModal()">
@@ -1293,7 +1554,11 @@ async function loadAll(){
   }catch(e){console.error(e);showToast('Could not load data','error',5000);renderAll();}
 }
 
-function renderAll(){renderHome();renderReps();renderWeekly();renderReports();renderCalendar();refreshAddLeaderDropdown();}
+function renderAll(){
+  // Hydrate scorecard notes from roster (stored in rep.managerNotes by saveRep)
+  roster.forEach(r=>{if(r.managerNotes&&r.managerNotes.length)repNotes[r.id]=r.managerNotes;});
+  renderHome();renderReps();renderWeekly();renderReports();renderCalendar();refreshAddLeaderDropdown();
+}
 function getMgrDisplay(){return rawName.trim().charAt(0).toUpperCase()+rawName.trim().slice(1);}
 
 // ── HOME ──────────────────────────────────────────────
@@ -1709,6 +1974,7 @@ function renderReps(){
           </div>
         </div>
         <button class="expand-btn" id="eb-${r.id}">›</button>
+        <button class="sc-trigger-btn" onclick="event.stopPropagation();openScorecard('${r.id}')">Scorecard</button>
       </div>
       <div class="rep-card-body" id="rb-${r.id}">
         <div class="rep-fields">
@@ -3087,7 +3353,7 @@ function clearMap(){if(!confirm('Clear the map?'))return;sp.nodes=[];sp.edges=[]
 async function saveMap(){const md=JSON.stringify({nodes:sp.nodes,edges:sp.edges});try{await api({action:'saveMap',manager:managerName,mapData:md});showToast('Map saved ✓','success');}catch(e){showToast('Failed to save map','error');}}
 
 // ── Tab switching ─────────────────────────────────────
-const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications'];
+const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications','paytrend','notes'];
 function switchTab(tab){
   TABS.forEach(id=>{
     const nav=document.getElementById(`nav-${id}`);
@@ -3101,6 +3367,8 @@ function switchTab(tab){
   if(tab==='leaderboard')lbInit();
   if(tab==='review'){showReviewForm();}
   if(tab==='notifications'){renderManagerNotifs();markAllNotifsRead();}
+  if(tab==='paytrend'){ptcRender();}
+  if(tab==='notes'){notesRenderFolders();notesRenderList();}
 }
 
 // ── LEADERBOARD ───────────────────────────────────────
@@ -3208,4 +3476,418 @@ async function markAllNotifsRead(){
   updateNotifBadge();
   renderManagerNotifs();
 }
+
+// ══════════════════════════════════════════════════════
+// REP SCORECARD
+// ══════════════════════════════════════════════════════
+let repNotes={};// keyed by rep id, array of {text,date}
+
+function openScorecard(repId){
+  const rep=roster.find(r=>r.id===repId);if(!rep)return;
+  const ini=(rep.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const avEl=document.getElementById('sc-av');
+  avEl.textContent=ini;
+  avEl.className='sc-av '+posClass(rep.position||'');
+  document.getElementById('sc-name').textContent=rep.name||'—';
+  const posEl=document.getElementById('sc-pos');
+  posEl.innerHTML=rep.position?`<span class="pos-tag ${posClass(rep.position)}" style="font-size:11px;">${esc(rep.position)}</span>`:'';
+
+  const body=document.getElementById('sc-body');
+  const notes=repNotes[repId]||[];
+
+  // Build position history from roster history field if present
+  const posHistory=rep.positionHistory||[];
+  const posHtml=posHistory.length
+    ? posHistory.map(ph=>`<div class="sc-tl-row">
+        <div class="sc-dot pos">★</div>
+        <div class="sc-tl-body"><div class="sc-tl-label">${esc(ph.position)}</div><div class="sc-tl-date">${esc(ph.date||'')}</div></div>
+      </div>`).join('')
+    : rep.position
+      ? `<div class="sc-tl-row"><div class="sc-dot pos">★</div><div class="sc-tl-body"><div class="sc-tl-label">Currently: ${esc(rep.position)}</div><div class="sc-tl-date">No change history recorded</div></div></div>`
+      : `<div class="sc-empty-msg">No position history yet.</div>`;
+
+  // Flag history
+  const flagHistory=rep.flagHistory||[];
+  const currentFlag=rep.flag?FLAGS.find(f=>f.id===rep.flag):null;
+  const flagRows=[...flagHistory];
+  if(currentFlag&&!flagRows.find(f=>f.current)){flagRows.unshift({label:currentFlag.label,id:currentFlag.id,date:'Current',current:true});}
+  const flagDotClass=f=>{
+    if(f.id==='AtRisk')return'flag-risk';
+    if(f.id==='DoingWell')return'flag-ok';
+    if(f.id==='Conversation')return'flag-warn';
+    return'flag-watch';
+  };
+  const flagHtml=flagRows.length
+    ? flagRows.map(f=>`<div class="sc-tl-row">
+        <div class="sc-dot ${flagDotClass(f)}">●</div>
+        <div class="sc-tl-body"><div class="sc-tl-label">${esc(f.label||f.id)}</div><div class="sc-tl-date">${esc(f.date||'')}</div></div>
+      </div>`).join('')
+    : `<div class="sc-empty-msg">No flags on record.</div>`;
+
+  // Notes
+  const notesHtml=notes.length
+    ? `<div class="sc-note-list">${notes.map((n,i)=>`<div class="sc-note-card"><div class="sc-note-text">${esc(n.text)}</div><div class="sc-note-meta">${esc(n.date)}</div></div>`).join('')}</div>`
+    : `<div class="sc-empty-msg">No notes yet — add one below.</div>`;
+
+  body.innerHTML=`
+    <div>
+      <div class="sc-sec-title">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5L8 2z" stroke-linejoin="round"/></svg>
+        Position History
+      </div>
+      <div class="sc-timeline">${posHtml}</div>
+    </div>
+    <div>
+      <div class="sc-sec-title">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.5l2 2" stroke-linecap="round"/></svg>
+        Flag History
+      </div>
+      <div class="sc-timeline">${flagHtml}</div>
+    </div>
+    <div>
+      <div class="sc-sec-title">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 2h10a1 1 0 0 1 1 1v8l-3 3H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" stroke-linejoin="round"/><path d="M5 6h6M5 9h4" stroke-linecap="round"/></svg>
+        Manager Notes
+      </div>
+      ${notesHtml}
+      <div class="sc-note-add" style="margin-top:10px;">
+        <input class="sc-note-input" id="sc-note-input-${repId}" type="text" placeholder="Add a note about ${esc(rep.name.split(' ')[0])}…" onkeydown="if(event.key==='Enter')scAddNote('${repId}')"/>
+        <button class="sc-note-save" onclick="scAddNote('${repId}')">Save</button>
+      </div>
+    </div>`;
+
+  document.getElementById('scorecard-backdrop').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
+function closeScorecard(){
+  document.getElementById('scorecard-backdrop').style.display='none';
+  document.body.style.overflow='';
+}
+
+function scAddNote(repId){
+  const input=document.getElementById(`sc-note-input-${repId}`);
+  const text=(input?.value||'').trim();
+  if(!text)return;
+  const rep=roster.find(r=>r.id===repId);
+  if(!rep)return;
+  if(!repNotes[repId])repNotes[repId]=[];
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  repNotes[repId].unshift({text,date:dateStr});
+  // Persist by storing notes array inside the rep object and saving via existing saveRep
+  rep.managerNotes=repNotes[repId];
+  api({action:'saveRep',manager:managerName,rep}).catch(()=>{});
+  openScorecard(repId);
+}
+
+// ══════════════════════════════════════════════════════
+// PAY TREND CHART TAB
+// ══════════════════════════════════════════════════════
+let ptcRange=6;
+function ptcSetRange(btn,n){
+  document.querySelectorAll('.ptc-rpill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ptcRange=n;
+  ptcRender();
+}
+
+function ptcGetData(){
+  const allPayWeeks=[...new Set([
+    ...allReports.filter(r=>r.type==='Pay Report').map(r=>r.week),
+    ...allPayData.map(p=>p.week)
+  ])].filter(Boolean).sort();
+  const weeks=ptcRange>0?allPayWeeks.slice(-ptcRange):allPayWeeks;
+  return weeks.map(wk=>{
+    const rep=allReports.find(r=>r.type==='Pay Report'&&r.week===wk);
+    const pd=allPayData.find(p=>p.week===wk);
+    const wire=parseFloat((pd&&pd.officeWire!==''?pd.officeWire:null)||rep?.officeWire||0)||0;
+    const take=parseFloat((pd&&pd.mgrTake!==''?pd.mgrTake:null)||rep?.mgrTake||0)||0;
+    return{wk,wire,take};
+  });
+}
+
+function ptcRender(){
+  const data=ptcGetData();
+  const sub=document.getElementById('ptc-sub');
+  if(sub)sub.textContent=data.length?`${data.length} week${data.length!==1?'s':''} of data`:'No pay data yet';
+
+  // Summary stats
+  const statsEl=document.getElementById('ptc-stats');
+  if(statsEl){
+    const totalWire=data.reduce((s,d)=>s+d.wire,0);
+    const totalTake=data.reduce((s,d)=>s+d.take,0);
+    const avgTake=data.filter(d=>d.take>0).length?totalTake/data.filter(d=>d.take>0).length:0;
+    const fmt=n=>n>=1000?'£'+(n/1000).toFixed(1)+'k':'£'+Math.round(n).toLocaleString('en-GB');
+    statsEl.innerHTML=`
+      <div class="ptc-stat"><div class="ptc-stat-lbl">Total Wire</div><div class="ptc-stat-val">${fmt(totalWire)}</div></div>
+      <div class="ptc-stat hi"><div class="ptc-stat-lbl">Total Take</div><div class="ptc-stat-val">${fmt(totalTake)}</div></div>
+      <div class="ptc-stat"><div class="ptc-stat-lbl">Avg Take / week</div><div class="ptc-stat-val">${fmt(avgTake)}</div></div>`;
+  }
+
+  // Draw line chart
+  const canvas=document.getElementById('ptc-canvas');
+  if(!canvas||!data.length)return;
+  requestAnimationFrame(()=>ptcDraw(canvas,data));
+}
+
+function ptcDraw(canvas,data){
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.offsetWidth||700;
+  const H=canvas.parentElement.offsetHeight||240;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const dark=isDark();
+  const gridCol=dark?'#2a3a3a':'#eef0f3';
+  const labelCol=dark?'#5a7070':'#9aabb8';
+  const textCol=dark?'#8a9db0':'#6b7d8a';
+  const padL=52,padR=20,padT=16,padB=38;
+  const iW=W-padL-padR,iH=H-padT-padB;
+  const maxV=Math.max(...data.map(d=>Math.max(d.wire,d.take)),1);
+
+  // Grid
+  ctx.strokeStyle=gridCol;ctx.lineWidth=1;
+  [0.25,0.5,0.75,1].forEach(p=>{
+    const y=padT+iH-(p*iH);
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+iW,y);ctx.stroke();
+    const v=Math.round(maxV*p);
+    const lbl=v>=1000?'£'+(v/1000).toFixed(1)+'k':'£'+v;
+    ctx.fillStyle=labelCol;ctx.font='10px DM Sans,sans-serif';
+    ctx.textAlign='right';ctx.fillText(lbl,padL-7,y+4);
+  });
+
+  const xPos=i=>padL+i*(iW/(data.length-1||1));
+  const yPos=v=>padT+iH-(v/maxV)*iH;
+
+  function drawLine(key,color){
+    if(data.length<2)return;
+    ctx.beginPath();
+    data.forEach((d,i)=>{i===0?ctx.moveTo(xPos(i),yPos(d[key])):ctx.lineTo(xPos(i),yPos(d[key]));});
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+    // Dots
+    data.forEach((d,i)=>{
+      ctx.beginPath();ctx.arc(xPos(i),yPos(d[key]),4,0,Math.PI*2);
+      ctx.fillStyle=color;ctx.fill();
+      ctx.strokeStyle=dark?'#1a2634':'#fff';ctx.lineWidth=2;ctx.stroke();
+    });
+  }
+
+  // Area fills
+  function drawArea(key,color){
+    if(data.length<2)return;
+    ctx.beginPath();
+    ctx.moveTo(xPos(0),padT+iH);
+    data.forEach((d,i)=>ctx.lineTo(xPos(i),yPos(d[key])));
+    ctx.lineTo(xPos(data.length-1),padT+iH);ctx.closePath();
+    ctx.fillStyle=color;ctx.fill();
+  }
+  drawArea('wire',dark?'rgba(92,157,255,.08)':'rgba(92,157,255,.07)');
+  drawArea('take',dark?'rgba(38,198,176,.08)':'rgba(38,198,176,.07)');
+  drawLine('wire','#5C9DFF');
+  drawLine('take','#26C6B0');
+
+  // X labels
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const step=data.length>16?Math.ceil(data.length/8):1;
+  data.forEach((d,i)=>{
+    if(i%step!==0&&i!==data.length-1)return;
+    if(!d.wk)return;
+    const p=d.wk.split('-');
+    if(p.length===3){
+      const dy=parseInt(p[2]),mo=parseInt(p[1])-1;
+      if(!isNaN(dy)&&!isNaN(mo)){
+        ctx.fillStyle=textCol;ctx.font='bold 10px DM Sans,sans-serif';ctx.textAlign='center';
+        ctx.fillText(`${dy} ${months[mo]}`,xPos(i),padT+iH+16);
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// NOTES TAB
+// ══════════════════════════════════════════════════════
+const NOTE_COLOURS=['#0f766e','#2563ff','#7c3aed','#f59e0b','#ec4899','#ef4444','#06b6d4','#22c55e'];
+let notesData={folders:[{id:'default',name:'General',color:'#0f766e'}],notes:[]};
+let notesActiveFolderId='all';
+let notesActiveNoteId=null;
+let notesDirtyTimer=null;
+let notesFolderPickedColor=NOTE_COLOURS[0];
+
+function notesInit(){
+  // `notes` is already loaded from the sheet by loadAll() via getNotes.
+  // It may be our JSON blob or legacy plain text — handle both.
+  try{const p=JSON.parse(notes);if(p&&p.folders&&p.notes)notesData=p;}catch(e){}
+  // localStorage acts as an instant-load cache between sessions
+  const cached=localStorage.getItem(`tt_notes_${managerName}`);
+  if(cached){try{const p=JSON.parse(cached);if(p&&p.folders&&p.notes)notesData=p;}catch(e){}}
+  notesRenderFolders();
+  notesRenderList();
+}
+
+function notesSave(){
+  const json=JSON.stringify(notesData);
+  localStorage.setItem(`tt_notes_${managerName}`,json);
+  // Reuse existing saveNotes action — same endpoint, same sheet cell, just JSON now
+  notes=json;
+  api({action:'saveNotes',manager:managerName,notes:json}).catch(()=>{});
+}
+
+function notesMarkDirty(){
+  clearTimeout(notesDirtyTimer);
+  const lbl=document.getElementById('n-saved-lbl');
+  if(lbl)lbl.textContent='Saving…';
+  notesDirtyTimer=setTimeout(()=>{notesFlushEdit();if(lbl)lbl.textContent='Saved ✓';},800);
+}
+
+function notesFlushEdit(){
+  if(!notesActiveNoteId)return;
+  const note=notesData.notes.find(n=>n.id===notesActiveNoteId);
+  if(!note)return;
+  note.title=document.getElementById('n-title').value||'Untitled';
+  note.body=document.getElementById('n-body').value||'';
+  note.folder=document.getElementById('n-folder-sel').value||'default';
+  note.updatedAt=new Date().toISOString();
+  notesRenderList();
+  notesSave();
+}
+
+function notesRenderFolders(){
+  const all=notesData.notes.length;
+  const pinned=notesData.notes.filter(n=>n.pinned).length;
+  let html=`<div class="nf-item ${notesActiveFolderId==='all'?'active':''}" onclick="notesSetFolder('all')">
+    <div class="nf-dot" style="background:#6b7d8a;"></div>All notes<span class="nf-count">${all}</span></div>`;
+  if(pinned){html+=`<div class="nf-item ${notesActiveFolderId==='pinned'?'active':''}" onclick="notesSetFolder('pinned')">
+    <div class="nf-dot" style="background:#f59e0b;"></div>📌 Pinned<span class="nf-count">${pinned}</span></div>`;}
+  notesData.folders.forEach(f=>{
+    const cnt=notesData.notes.filter(n=>n.folder===f.id).length;
+    html+=`<div class="nf-item ${notesActiveFolderId===f.id?'active':''}" onclick="notesSetFolder('${f.id}')">
+      <div class="nf-dot" style="background:${esc(f.color)};"></div>${esc(f.name)}<span class="nf-count">${cnt}</span></div>`;
+  });
+  document.getElementById('nf-list').innerHTML=html;
+}
+
+function notesSetFolder(id){
+  notesActiveFolderId=id;
+  notesRenderFolders();
+  notesRenderList();
+}
+
+function notesFilter(){notesRenderList();}
+
+function notesRenderList(){
+  const q=(document.getElementById('notes-search')?.value||'').toLowerCase();
+  let notes=[...notesData.notes];
+  if(notesActiveFolderId==='pinned')notes=notes.filter(n=>n.pinned);
+  else if(notesActiveFolderId!=='all')notes=notes.filter(n=>n.folder===notesActiveFolderId);
+  if(q)notes=notes.filter(n=>(n.title+n.body).toLowerCase().includes(q));
+  // Pinned first, then by updatedAt desc
+  notes.sort((a,b)=>{if(a.pinned&&!b.pinned)return-1;if(!a.pinned&&b.pinned)return 1;return(b.updatedAt||'').localeCompare(a.updatedAt||'');});
+
+  const el=document.getElementById('notes-list-items');
+  if(!el)return;
+  if(!notes.length){el.innerHTML=`<div style="text-align:center;padding:32px 0;font-size:12px;color:var(--muted);">${q?'No results':'No notes yet'}</div>`;return;}
+
+  el.innerHTML=notes.map(n=>{
+    const folder=notesData.folders.find(f=>f.id===n.folder);
+    const preview=(n.body||'').replace(/\n/g,' ').trim().slice(0,80);
+    const date=n.updatedAt?new Date(n.updatedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+    return`<div class="n-card ${n.pinned?'pinned':''} ${n.id===notesActiveNoteId?'active':''}" onclick="notesOpenNote('${n.id}')">
+      <div class="n-card-title">${n.pinned?'<span class="n-pin-ico">📌</span>':''}${esc(n.title||'Untitled')}</div>
+      ${preview?`<div class="n-card-preview">${esc(preview)}</div>`:''}
+      <div class="n-card-meta">
+        ${folder?`<span class="n-folder-pill" style="background:${folder.color}18;color:${folder.color};border-color:${folder.color}40;">${esc(folder.name)}</span>`:''}
+        <span class="n-date">${date}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function notesOpenNote(id){
+  notesFlushEdit();
+  notesActiveNoteId=id;
+  const note=notesData.notes.find(n=>n.id===id);
+  if(!note)return;
+  document.getElementById('notes-blank').style.display='none';
+  const wrap=document.getElementById('notes-editor-wrap');
+  wrap.style.display='flex';wrap.style.flexDirection='column';wrap.style.overflow='hidden';wrap.style.flex='1';
+  document.getElementById('n-title').value=note.title||'';
+  document.getElementById('n-body').value=note.body||'';
+  const pinBtn=document.getElementById('n-pin-btn');
+  pinBtn.textContent=note.pinned?'📌 Unpin':'📌 Pin';
+  pinBtn.className='n-ed-btn'+(note.pinned?' pinned':'');
+  // Folder selector
+  const sel=document.getElementById('n-folder-sel');
+  sel.innerHTML=notesData.folders.map(f=>`<option value="${f.id}" ${note.folder===f.id?'selected':''}>${esc(f.name)}</option>`).join('');
+  const savedLbl=document.getElementById('n-saved-lbl');
+  if(savedLbl)savedLbl.textContent='';
+  notesRenderList();
+}
+
+function notesNewNote(){
+  notesFlushEdit();
+  const id='note_'+Date.now();
+  const folderId=notesActiveFolderId==='all'||notesActiveFolderId==='pinned'
+    ? (notesData.folders[0]?.id||'default')
+    : notesActiveFolderId;
+  const note={id,title:'',body:'',folder:folderId,pinned:false,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  notesData.notes.unshift(note);
+  notesSave();
+  notesRenderFolders();
+  notesRenderList();
+  notesOpenNote(id);
+  setTimeout(()=>document.getElementById('n-title')?.focus(),50);
+}
+
+function notesTogglePin(){
+  if(!notesActiveNoteId)return;
+  const note=notesData.notes.find(n=>n.id===notesActiveNoteId);
+  if(!note)return;
+  note.pinned=!note.pinned;
+  const btn=document.getElementById('n-pin-btn');
+  btn.textContent=note.pinned?'📌 Unpin':'📌 Pin';
+  btn.className='n-ed-btn'+(note.pinned?' pinned':'');
+  notesSave();notesRenderList();notesRenderFolders();
+}
+
+function notesDeleteCurrent(){
+  if(!notesActiveNoteId)return;
+  if(!confirm('Delete this note?'))return;
+  notesData.notes=notesData.notes.filter(n=>n.id!==notesActiveNoteId);
+  notesActiveNoteId=null;
+  document.getElementById('notes-editor-wrap').style.display='none';
+  document.getElementById('notes-blank').style.display='flex';
+  notesSave();notesRenderFolders();notesRenderList();
+}
+
+function notesShowFolderModal(){
+  notesFolderPickedColor=NOTE_COLOURS[0];
+  const row=document.getElementById('nf-colour-row');
+  row.innerHTML=NOTE_COLOURS.map(c=>`<div class="nf-swatch ${c===notesFolderPickedColor?'sel':''}" style="background:${c};" onclick="notesFolderPickColor(this,'${c}')"></div>`).join('');
+  document.getElementById('nf-name-input').value='';
+  document.getElementById('nf-modal-backdrop').style.display='flex';
+  setTimeout(()=>document.getElementById('nf-name-input').focus(),50);
+}
+
+function notesCloseFolderModal(){document.getElementById('nf-modal-backdrop').style.display='none';}
+
+function notesFolderPickColor(el,color){
+  notesFolderPickedColor=color;
+  document.querySelectorAll('.nf-swatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function notesSaveFolder(){
+  const name=(document.getElementById('nf-name-input').value||'').trim();
+  if(!name){showToast('Enter a folder name','error');return;}
+  const id='folder_'+Date.now();
+  notesData.folders.push({id,name,color:notesFolderPickedColor});
+  notesCloseFolderModal();
+  notesSave();notesRenderFolders();notesRenderList();
+  showToast(`Folder "${name}" created ✓`,'success');
+}
+
+// Initialise notes on load
+document.addEventListener('DOMContentLoaded',()=>{notesInit();});
 </script>

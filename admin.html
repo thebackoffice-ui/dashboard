@@ -703,7 +703,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ── Apps Script source ─────────────────────────────────
-const APPS_SCRIPT_VERSION = '2.1.0'; // Update this when you change the script
+const APPS_SCRIPT_VERSION = '2.2.0'; // Update this when you change the script
 const APPS_SCRIPT = `// The Back Office — Google Apps Script v${APPS_SCRIPT_VERSION}
 // Extensions > Apps Script > paste > Deploy as Web App (Anyone)
 
@@ -732,6 +732,365 @@ function safeDate(val) {
 function doPost(e) {
   const data = JSON.parse(e.postData.contents);
   let result = {};
+
+  if (data.action === 'checkPassword') {
+    const mh = getOrCreate('managers', ['name']);
+    const rows = mh.getDataRange().getValues().slice(1);
+    const row = rows.find(r => r[0] === data.manager);
+    const storedPw = row && row.length > 1 ? String(row[1]) : '';
+    result = { ok: storedPw !== '' && storedPw === String(data.password) };
+
+  } else if (data.action === 'submit') {
+    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
+    const rows = sh.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) {
+      if (rows[i][1] === data.manager && rows[i][2] === data.week) sh.deleteRow(i+1);
+    }
+    const ts = new Date().toISOString();
+    data.rows.forEach(r => sh.appendRow([ts, data.manager, data.week, r.name, r.email||'', r.position||'', r.leaver?'yes':'no']));
+    const ph = getOrCreate('people', ['name','email','manager','firstSeen']);
+    const pRows = ph.getDataRange().getValues();
+    data.rows.forEach(r => {
+      if (!pRows.some(p => p[0].toLowerCase()===r.name.toLowerCase() && p[2]===data.manager))
+        ph.appendRow([r.name, r.email||'', data.manager, data.week]);
+    });
+    result = { ok: true };
+
+  } else if (data.action === 'getSubmission') {
+    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
+    const ah = getOrCreate('acks', ['manager','week','ackedAt']);
+    const rows = sh.getDataRange().getValues().slice(1);
+    const ackRows = ah.getDataRange().getValues().slice(1);
+    result.rows = rows.filter(r => r[1]===data.manager && r[2]===data.week)
+      .map(r => ({ name:r[3], email:r[4], position:r[5], leaver:r[6]==='yes' }));
+    result.acked = ackRows.some(r => r[0]===data.manager && r[1]===data.week);
+
+  } else if (data.action === 'getRoster') {
+    const rh = getOrCreate('roster', ['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt','managerNotes']);
+    result.roster = rh.getDataRange().getValues().slice(1)
+      .filter(r => r[1] === data.manager)
+      .map(r => ({
+        id:r[0], name:r[2], email:r[3], position:r[4], leader:r[5],
+        notes:r[6], flag:r[7], leaver:r[8]==='yes', addedOn:r[9],
+        managerNotes: (() => { try { return r[11] ? JSON.parse(r[11]) : []; } catch(e) { return []; } })()
+      }));
+
+  } else if (data.action === 'saveRep') {
+    const rh = getOrCreate('roster', ['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt','managerNotes']);
+    const r = data.rep;
+    const managerNotesJson = r.managerNotes && r.managerNotes.length ? JSON.stringify(r.managerNotes) : '';
+    const row = [r.id, data.manager, r.name||'', r.email||'', r.position||'', r.leader||'', r.notes||'', r.flag||'', r.leaver?'yes':'no', r.addedOn||'', new Date().toISOString(), managerNotesJson];
+    const rows = rh.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===r.id && rows[i][1]===data.manager) { rh.getRange(i+1,1,1,row.length).setValues([row]); found=true; break; }
+    }
+    if (!found) rh.appendRow(row);
+    result = { ok: true };
+
+  } else if (data.action === 'getAllData') {
+    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
+    const ph = getOrCreate('people', ['name','email','manager','firstSeen']);
+    const mh = getOrCreate('managers', ['name']);
+    const rh = getOrCreate('roster', ['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt','managerNotes']);
+    result = {
+      subs: sh.getDataRange().getValues().slice(1).map(r => ({ manager:r[1],week:r[2],name:r[3],email:r[4],position:r[5],leaver:r[6]==='yes' })),
+      people: ph.getDataRange().getValues().slice(1).map(r => ({ name:r[0],email:r[1],manager:r[2],firstSeen:r[3] })),
+      managers: mh.getDataRange().getValues().slice(1).map(r => r[0]).filter(Boolean),
+      roster: rh.getDataRange().getValues().slice(1).map(r => ({
+        id:r[0],manager:r[1],name:r[2],email:r[3],position:r[4],leader:r[5],
+        notes:r[6],flag:r[7],leaver:r[8]==='yes',addedOn:r[9],
+        managerNotes: (() => { try { return r[11] ? JSON.parse(r[11]) : []; } catch(e) { return []; } })()
+      }))
+    };
+
+  } else if (data.action === 'addManager') {
+    const mh = getOrCreate('managers', ['name','password']);
+    const existing = mh.getDataRange().getValues().slice(1).map(r => r[0]);
+    if (!existing.includes(data.name)) mh.appendRow([data.name, data.password||'']);
+    result = { ok: true };
+
+  } else if (data.action === 'setPassword') {
+    const mh = getOrCreate('managers', ['name','password']);
+    const rows = mh.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0] === data.manager) { mh.getRange(i+1,2).setValue(data.password); result = { ok:true }; break; }
+    }
+
+  } else if (data.action === 'removeManager') {
+    const mh = getOrCreate('managers', ['name','password']);
+    const rows = mh.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) { if (rows[i][0]===data.name) mh.deleteRow(i+1); }
+    result = { ok: true };
+
+  } else if (data.action === 'saveMap') {
+    const mh = getOrCreate('maps', ['manager','mapData','updatedAt']);
+    const rows = mh.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager) { mh.getRange(i+1,2,1,2).setValues([[data.mapData, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) mh.appendRow([data.manager, data.mapData, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'loadMap') {
+    const mh = getOrCreate('maps', ['manager','mapData','updatedAt']);
+    const row = mh.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
+    result = { mapData: row ? row[1] : null };
+
+  } else if (data.action === 'saveReport') {
+    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']);
+    const r = data.report;
+    rh.appendRow([r.id, r.type, r.url, r.campaign||'', String(r.week||''), (r.managers||[]).join(','), r.uploadedAt||'', r.officeWire||'', r.mgrTake||'']);
+    result = { ok: true };
+
+  } else if (data.action === 'getAllReports') {
+    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']);
+    result = { reports: rh.getDataRange().getValues().slice(1).map(r => ({ id:r[0],type:r[1],url:r[2],campaign:r[3],week:safeDate(r[4]),managers:r[5]?String(r[5]).split(','):[],uploadedAt:r[6]||'',officeWire:r[7]!=null?String(r[7]):'',mgrTake:r[8]!=null?String(r[8]):'' })) };
+
+  } else if (data.action === 'getReports') {
+    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']);
+    result = { reports: rh.getDataRange().getValues().slice(1)
+      .filter(r => r[5] && r[5].split(',').map(m=>m.trim()).includes(data.manager))
+      .map(r => ({ id:r[0],type:r[1],url:r[2],campaign:r[3],week:safeDate(r[4]),managers:r[5]?String(r[5]).split(','):[],uploadedAt:r[6]||'',officeWire:r[7]!=null?String(r[7]):'',mgrTake:r[8]!=null?String(r[8]):'' })) };
+
+  } else if (data.action === 'deleteReport') {
+    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt']);
+    const rows = rh.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) { if (rows[i][0]===data.id) { rh.deleteRow(i+1); break; } }
+    result = { ok: true };
+
+  } else if (data.action === 'savePayData') {
+    const ph = getOrCreate('pay_data', ['manager','week','officeWire','mgrTake','updatedAt']);
+    const rows = ph.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager && rows[i][1]===data.week) {
+        ph.getRange(i+1,3,1,3).setValues([[data.officeWire||'', data.mgrTake||'', new Date().toISOString()]]);
+        found=true; break;
+      }
+    }
+    if (!found) ph.appendRow([data.manager, String(data.week||''), data.officeWire||'', data.mgrTake||'', new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getPayData') {
+    const ph = getOrCreate('pay_data', ['manager','week','officeWire','mgrTake','updatedAt']);
+    const rows = ph.getDataRange().getValues().slice(1).filter(r => r[0]===data.manager);
+    result = { payData: rows.map(r => ({ week:safeDate(r[1]), officeWire:r[2]!=null?String(r[2]):'', mgrTake:r[3]!=null?String(r[3]):'' })) };
+
+  } else if (data.action === 'ackReport') {
+    const ah = getOrCreate('acks', ['manager','week','ackedAt']);
+    const rows = ah.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager && rows[i][1]===data.week) { ah.getRange(i+1,3).setValue(new Date().toISOString()); found=true; break; }
+    }
+    if (!found) ah.appendRow([data.manager, data.week, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getCalEvents') {
+    const ch = getOrCreate('cal_events', ['manager','events','updatedAt']);
+    const row = ch.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
+    try { result = { events: row ? JSON.parse(row[1]) : [] }; } catch(e) { result = { events: [] }; }
+
+  } else if (data.action === 'saveCalEvents') {
+    const ch = getOrCreate('cal_events', ['manager','events','updatedAt']);
+    const rows = ch.getDataRange().getValues();
+    const evJson = JSON.stringify(data.events||[]);
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager) { ch.getRange(i+1,2,1,2).setValues([[evJson, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) ch.appendRow([data.manager, evJson, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getAnnouncement') {
+    const ah = getOrCreate('announcements', ['id','title','message','active','createdAt']);
+    const rows = ah.getDataRange().getValues().slice(1);
+    const active = rows.filter(r => r[3]==='yes').sort((a,b) => b[4].localeCompare(a[4]));
+    result = { announcement: active.length ? { id:active[0][0], title:active[0][1], message:active[0][2] } : null };
+
+  } else if (data.action === 'saveAnnouncement') {
+    const ah = getOrCreate('announcements', ['id','title','message','active','createdAt']);
+    const rows = ah.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) ah.getRange(i+1,4).setValue('no');
+    if (data.title) ah.appendRow(['ann'+Date.now(), data.title, data.message||'', 'yes', new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getNotes') {
+    const nh = getOrCreate('notes', ['manager','notes','updatedAt']);
+    const row = nh.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
+    result = { notes: row ? row[1] : '' };
+
+  } else if (data.action === 'saveNotes') {
+    const nh = getOrCreate('notes', ['manager','notes','updatedAt']);
+    const rows = nh.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager) { nh.getRange(i+1,2,1,2).setValues([[data.notes, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) nh.appendRow([data.manager, data.notes, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getLastWeekCount') {
+    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
+    const parts = data.currentWeek.split('-');
+    const cur = new Date(+parts[0],+parts[1]-1,+parts[2]);
+    cur.setDate(cur.getDate()-7);
+    const y=cur.getFullYear(),m=String(cur.getMonth()+1).padStart(2,'0'),d=String(cur.getDate()).padStart(2,'0');
+    const prevWeek = y+'-'+m+'-'+d;
+    const rows = sh.getDataRange().getValues().slice(1);
+    result = { count: rows.filter(r => r[1]===data.manager && r[2]===prevWeek && r[6]!=='yes').length };
+
+  } else if (data.action === 'saveWeeklyReview') {
+    const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
+    const rows = rh.getDataRange().getValues();
+    // Remove existing review for same manager+week
+    for (let i = rows.length-1; i >= 1; i--) {
+      if (rows[i][1]===data.manager && rows[i][2]===data.week) rh.deleteRow(i+1);
+    }
+    const reviewId = data.id||('wr'+Date.now());
+    const submittedAt = new Date().toISOString();
+    rh.appendRow([reviewId, data.manager, data.week, JSON.stringify(data.reviewData), submittedAt]);
+
+    // Send email to admin recipients
+    try {
+      var esh = getOrCreate('settings', ['key','value','updatedAt']);
+      var erow = esh.getDataRange().getValues().slice(1).find(function(r){return r[0]==='reviewEmails';});
+      var emailStr = erow ? String(erow[1]) : '';
+      if (emailStr) {
+        var parts = emailStr.split(','); var recipients = []; for(var pi=0;pi<parts.length;pi++){var pt=parts[pi].trim();if(pt)recipients.push(pt);}
+        if (recipients.length) {
+          var dn2 = data.manager.charAt(0).toUpperCase() + data.manager.slice(1);
+          var wf = data.week || '';
+          var subj = 'Weekly Review - ' + dn2 + ' - w/c ' + wf;
+          var rd2 = data.reviewData || {};
+          var pdfHtml = rd2.pdfHtml || '';
+          var bodyText = 'Weekly Review: ' + dn2 + ', Week: ' + wf;
+          recipients.forEach(function(to) {
+            try {
+              if (pdfHtml) {
+                MailApp.sendEmail({to:to, subject:subj, body:bodyText, htmlBody:pdfHtml});
+              } else {
+                MailApp.sendEmail(to, subj, bodyText);
+              }
+            } catch(me2) {}
+          });
+        }
+      }
+    } catch(mailErr) {}
+
+    result = { ok: true };
+
+  } else if (data.action === 'getManagerReviews') {
+    const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
+    result = { reviews: rh.getDataRange().getValues().slice(1)
+      .filter(r => r[1]===data.manager)
+      .map(r => ({
+        id:r[0], manager:r[1], week:r[2],
+        reviewData: (() => { try { return JSON.parse(r[3]); } catch(e) { return {}; } })(),
+        submittedAt:r[4]
+      })) };
+
+  } else if (data.action === 'getAllWeeklyReviews') {
+    const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
+    result = { reviews: rh.getDataRange().getValues().slice(1).map(r => ({
+      id:r[0], manager:r[1], week:r[2],
+      reviewData: (() => { try { return JSON.parse(r[3]); } catch(e) { return {}; } })(),
+      submittedAt:r[4]
+    })) };
+
+  } else if (data.action === 'saveReviewEmails') {
+    const sh = getOrCreate('settings', ['key','value','updatedAt']);
+    const rows = sh.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]==='reviewEmails') { sh.getRange(i+1,2,1,2).setValues([[data.emails, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) sh.appendRow(['reviewEmails', data.emails, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getReviewEmails') {
+    const sh = getOrCreate('settings', ['key','value','updatedAt']);
+    const row = sh.getDataRange().getValues().slice(1).find(r => r[0]==='reviewEmails');
+    result = { emails: row ? row[1] : '' };
+
+  } else if (data.action === 'saveProfilePic') {
+    const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
+    const rows = ph.getDataRange().getValues();
+    let found = false;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.manager) { ph.getRange(i+1,2,1,2).setValues([[data.picData, new Date().toISOString()]]); found=true; break; }
+    }
+    if (!found) ph.appendRow([data.manager, data.picData, new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'getProfilePic') {
+    const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
+    const row = ph.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
+    result = { picData: row ? row[1] : null };
+
+  } else if (data.action === 'getAllProfilePics') {
+    const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
+    const rows = ph.getDataRange().getValues().slice(1);
+    result = { pics: rows.map(r => ({ manager:r[0], picData:r[1] })) };
+
+  } else if (data.action === 'saveNotification') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    const n = data.notification;
+    nh.appendRow([n.id, n.manager, n.title||'', n.message||'', n.sentAt||new Date().toISOString(), '']);
+    result = { ok: true };
+
+  } else if (data.action === 'getNotifications') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    result = { notifications: nh.getDataRange().getValues().slice(1)
+      .filter(r => r[1]===data.manager)
+      .map(r => ({ id:r[0], manager:r[1], title:r[2], message:r[3], sentAt:r[4]||'', readAt:r[5]||'' })) };
+
+  } else if (data.action === 'getAllNotifications') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    result = { notifications: nh.getDataRange().getValues().slice(1)
+      .map(r => ({ id:r[0], manager:r[1], title:r[2], message:r[3], sentAt:r[4]||'', readAt:r[5]||'' })) };
+
+  } else if (data.action === 'markNotifRead') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    const rows = nh.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.id && rows[i][1]===data.manager) {
+        nh.getRange(i+1,6).setValue(new Date().toISOString()); break;
+      }
+    }
+    result = { ok: true };
+
+  } else if (data.action === 'deleteNotification') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    const rows = nh.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) {
+      if (rows[i][0]===data.id) { nh.deleteRow(i+1); break; }
+    }
+    result = { ok: true };
+
+  } else if (data.action === 'getNotifTemplates') {
+    const th = getOrCreate('notif_templates', ['id','name','title','message','createdAt']);
+    result = { templates: th.getDataRange().getValues().slice(1)
+      .map(r => ({ id:r[0], name:r[1], title:r[2], message:r[3], createdAt:r[4]||'' })) };
+
+  } else if (data.action === 'saveNotifTemplate') {
+    const th = getOrCreate('notif_templates', ['id','name','title','message','createdAt']);
+    th.appendRow([data.template.id, data.template.name, data.template.title||'', data.template.message||'', new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'deleteNotifTemplate') {
+    const th = getOrCreate('notif_templates', ['id','name','title','message','createdAt']);
+    const rows = th.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) {
+      if (rows[i][0]===data.id) { th.deleteRow(i+1); break; }
+    }
+    result = { ok: true };
+  }
+
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}`;
 
   if (data.action === 'checkPassword') {
     const mh = getOrCreate('managers', ['name']);
