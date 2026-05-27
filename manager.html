@@ -879,6 +879,238 @@ select.wr-input{cursor:pointer;appearance:none;}
 }
 
 </style>
+
+
+<style>
+/* =========================================================
+   DESIGN SYSTEM PASS ONLY
+   - consistent vibrant position colours
+   - initials/profile circles + mini/team map bubbles
+   - non-dashboard containers matched to dashboard softness
+   No functionality changes.
+   ========================================================= */
+
+:root{
+  --s1:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.03);
+  --s2:0 4px 12px rgba(15,23,42,.06);
+  --s3:0 8px 24px rgba(15,23,42,.10);
+  --niond-shadow:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.03);
+  --niond-shadow-md:0 4px 12px rgba(15,23,42,.06);
+}
+
+/* Match other tabs to the dashboard's cleaner white-card look */
+.card,
+.stat-card,
+.report-card,
+.rep-card,
+.week-row,
+.rh-row,
+.wr-section,
+.wr-past-card,
+.lb-row,
+.lb-stat-card,
+.lb-podium-card,
+.cal-main,
+.mini-cal-card,
+.events-card,
+.map-stage-wrap,
+.nd-stat,
+.nd-chart-card,
+.nd-links-card,
+.nd-lb-card,
+.nd-reps-card{
+  background:var(--surface)!important;
+  border:1px solid var(--border)!important;
+  border-radius:var(--rlg)!important;
+  box-shadow:var(--s1)!important;
+}
+
+.report-card:hover,
+.rh-row:hover,
+.wr-past-card:hover,
+.lb-row:hover,
+.nd-stat:hover{
+  box-shadow:var(--s2)!important;
+  border-color:var(--border2)!important;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .report-card,
+[data-theme="dark"] .rep-card,
+[data-theme="dark"] .week-row,
+[data-theme="dark"] .rh-row,
+[data-theme="dark"] .wr-section,
+[data-theme="dark"] .wr-past-card,
+[data-theme="dark"] .lb-row,
+[data-theme="dark"] .lb-stat-card,
+[data-theme="dark"] .lb-podium-card,
+[data-theme="dark"] .cal-main,
+[data-theme="dark"] .mini-cal-card,
+[data-theme="dark"] .events-card,
+[data-theme="dark"] .map-stage-wrap,
+[data-theme="dark"] .nd-stat,
+[data-theme="dark"] .nd-chart-card,
+[data-theme="dark"] .nd-links-card,
+[data-theme="dark"] .nd-lb-card,
+[data-theme="dark"] .nd-reps-card{
+  background:var(--surface)!important;
+  border-color:var(--border)!important;
+  box-shadow:none!important;
+}
+
+/* Shared position colour targets */
+.pos-tag,
+.av,
+.nd-rep-av,
+.rep-avatar,
+.initial-circle,
+.dashboard-avatar,
+.sidebar-avatar,
+.mini-avatar,
+.map-node,
+.map-bubble,
+.mini-map-bubble{
+  border-width:2px!important;
+  border-style:solid!important;
+  font-weight:700!important;
+}
+
+/* Trainee */
+.pos-Trainee,
+.pos-colour-Trainee,
+.av.pos-Trainee,
+.nd-rep-av.pos-Trainee,
+.rep-avatar.pos-Trainee,
+.initial-circle.pos-Trainee,
+.dashboard-avatar.pos-Trainee,
+.mini-avatar.pos-Trainee,
+.map-node.pos-Trainee,
+.map-bubble.pos-Trainee,
+.mini-map-bubble.pos-Trainee,
+[data-position="Trainee"],
+[data-pos="Trainee"]{
+  background:#d7ffec!important;
+  color:#159e73!important;
+  border-color:#29ba8a!important;
+}
+
+/* Solo */
+.pos-Solo,
+.pos-colour-Solo,
+.av.pos-Solo,
+.nd-rep-av.pos-Solo,
+.rep-avatar.pos-Solo,
+.initial-circle.pos-Solo,
+.dashboard-avatar.pos-Solo,
+.mini-avatar.pos-Solo,
+.map-node.pos-Solo,
+.map-bubble.pos-Solo,
+.mini-map-bubble.pos-Solo,
+[data-position="Solo"],
+[data-pos="Solo"]{
+  background:#ffe7bd!important;
+  color:#d57900!important;
+  border-color:#fd9705!important;
+}
+
+/* Leader */
+.pos-Leader,
+.pos-colour-Leader,
+.av.pos-Leader,
+.nd-rep-av.pos-Leader,
+.rep-avatar.pos-Leader,
+.initial-circle.pos-Leader,
+.dashboard-avatar.pos-Leader,
+.mini-avatar.pos-Leader,
+.map-node.pos-Leader,
+.map-bubble.pos-Leader,
+.mini-map-bubble.pos-Leader,
+[data-position="Leader"],
+[data-pos="Leader"]{
+  background:#d9ebff!important;
+  color:#185fae!important;
+  border-color:#2276d2!important;
+}
+
+/* Core */
+.pos-Core,
+.pos-colour-Core,
+.av.pos-Core,
+.nd-rep-av.pos-Core,
+.rep-avatar.pos-Core,
+.initial-circle.pos-Core,
+.dashboard-avatar.pos-Core,
+.mini-avatar.pos-Core,
+.map-node.pos-Core,
+.map-bubble.pos-Core,
+.mini-map-bubble.pos-Core,
+[data-position="Core"],
+[data-pos="Core"]{
+  background:#e8e1ff!important;
+  color:#6552ce!important;
+  border-color:#7664dc!important;
+}
+
+/* Junior Partner + */
+.pos-Junior,
+.pos-JuniorPartner,
+.pos-JuniorPartnerPlus,
+.pos-colour-Junior,
+.pos-colour-JuniorPartner,
+.pos-colour-JuniorPartnerPlus,
+.av.pos-Junior,
+.av.pos-JuniorPartner,
+.av.pos-JuniorPartnerPlus,
+.nd-rep-av.pos-Junior,
+.nd-rep-av.pos-JuniorPartner,
+.nd-rep-av.pos-JuniorPartnerPlus,
+.rep-avatar.pos-Junior,
+.rep-avatar.pos-JuniorPartner,
+.rep-avatar.pos-JuniorPartnerPlus,
+.initial-circle.pos-Junior,
+.initial-circle.pos-JuniorPartner,
+.initial-circle.pos-JuniorPartnerPlus,
+.dashboard-avatar.pos-Junior,
+.dashboard-avatar.pos-JuniorPartner,
+.dashboard-avatar.pos-JuniorPartnerPlus,
+.mini-avatar.pos-Junior,
+.mini-avatar.pos-JuniorPartner,
+.mini-avatar.pos-JuniorPartnerPlus,
+.map-node.pos-Junior,
+.map-node.pos-JuniorPartner,
+.map-node.pos-JuniorPartnerPlus,
+.map-bubble.pos-Junior,
+.map-bubble.pos-JuniorPartner,
+.map-bubble.pos-JuniorPartnerPlus,
+.mini-map-bubble.pos-Junior,
+.mini-map-bubble.pos-JuniorPartner,
+.mini-map-bubble.pos-JuniorPartnerPlus,
+[data-position="Junior"],
+[data-position="Junior Partner"],
+[data-position="Junior Partner +"],
+[data-position="Junior Partner+"],
+[data-pos="Junior"],
+[data-pos="Junior Partner +"],
+[data-pos="Junior Partner+"]{
+  background:#ffdce6!important;
+  color:#db4566!important;
+  border-color:#f16383!important;
+}
+
+.av,
+.nd-rep-av,
+.rep-avatar,
+.initial-circle,
+.dashboard-avatar,
+.mini-avatar,
+.map-node,
+.map-bubble,
+.mini-map-bubble{
+  box-shadow:0 4px 10px rgba(15,23,42,.07)!important;
+}
+</style>
+
 </head>
 <body>
 <script>const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyeCMHtk4box-1rKwTt4UKF5UlpsyGWB2QISs522KkoQvJ3XzhjvvQ8wcOWU3bYJ7dc/exec';
