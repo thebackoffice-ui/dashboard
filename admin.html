@@ -1829,10 +1829,8 @@ async function setPassword(manager) {
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-</script>
-</body>
-</html>
-<script>
+
+
 // ── Calendar colour picker ────────────────────────────
 const CAT_COLORS_ADM={personal:'#2563ff',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#7c3aed',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
 function selectCalColour(el,cat){document.querySelectorAll('#cal-colour-picker .cal-swatch').forEach(s=>s.classList.remove('selected'));el.classList.add('selected');}
@@ -1965,3 +1963,5 @@ async function deleteNotifTemplate(){
   catch(e){showToast('Failed to delete','error');}
 }
 </script>
+</body>
+</html>
