@@ -512,6 +512,38 @@ select.field-input{cursor:pointer;appearance:none;}
 .rh-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px;box-shadow:var(--s1);transition:border-color .15s;}
 .rh-row:hover{border-color:var(--border2);}
 
+/* ── REPORTS SEARCH ── */
+.rpt-search-wrap{position:relative;display:flex;align-items:center;}
+.rpt-search-icon{position:absolute;left:10px;color:var(--subtle);pointer-events:none;}
+.rpt-search-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:6px 12px 6px 30px;border-radius:20px;outline:none;width:200px;transition:border-color .15s,width .2s;}
+.rpt-search-input:focus{border-color:var(--accent);width:240px;}
+.rpt-search-input::placeholder{color:var(--subtle);}
+
+/* ── REPORTS SUMMARY STRIP ── */
+.rpt-summary{display:grid;gap:10px;margin-bottom:20px;}
+.rpt-summary.pay-grid{grid-template-columns:repeat(4,1fr);}
+.rpt-summary.basic-grid{grid-template-columns:repeat(3,1fr);}
+.rpt-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--s1);}
+.rpt-stat-val{font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1;}
+.rpt-stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:500;}
+.rpt-stat.accent-stat{background:linear-gradient(135deg,rgba(15,118,110,.07),rgba(20,184,166,.04));border-color:var(--accent-border);}
+.rpt-stat.accent-stat .rpt-stat-val{color:var(--accent);}
+
+/* ── MONTH ACCORDION ── */
+.month-accordion{margin-bottom:8px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);box-shadow:var(--s1);}
+.month-accordion.is-current{border-color:var(--accent-border);}
+.month-acc-hdr{display:flex;align-items:center;gap:10px;padding:11px 16px;background:var(--surface);cursor:pointer;user-select:none;transition:background .12s;}
+.month-acc-hdr:hover{background:var(--surface2);}
+.month-accordion.is-current .month-acc-hdr{background:linear-gradient(90deg,rgba(15,118,110,.05),transparent);}
+.month-acc-chevron{font-size:13px;color:var(--subtle);transition:transform .2s;flex-shrink:0;line-height:1;}
+.month-acc-hdr.open .month-acc-chevron{transform:rotate(90deg);}
+.month-acc-title{font-size:13px;font-weight:700;color:var(--text);flex:1;}
+.month-acc-meta{font-size:11px;color:var(--muted);font-weight:500;}
+.month-acc-body{border-top:1px solid var(--border);padding:10px 12px;background:var(--bg);display:none;}
+.month-acc-body.open{display:block;}
+.month-acc-body .rh-row{background:var(--surface);}
+.rpt-no-results{font-size:13px;color:var(--muted);text-align:center;padding:32px 0;}
+
 /* ── WEEKLY REVIEW ── */
 .wr-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);box-shadow:var(--s1);margin-bottom:16px;overflow:hidden;}
 .wr-section-hdr{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:10px;}
@@ -855,7 +887,15 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
 
     <!-- REPORTS -->
     <div class="tab-content" id="ptab-reports">
-      <div class="topbar"><span class="topbar-title">Reports</span></div>
+      <div class="topbar">
+        <span class="topbar-title">Reports</span>
+        <div class="topbar-right">
+          <div class="rpt-search-wrap">
+            <svg class="rpt-search-icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="rpt-search" class="rpt-search-input" type="text" placeholder="Search by month or date…" oninput="filterReports()"/>
+          </div>
+        </div>
+      </div>
       <div class="page-scroll"><div class="page-wrap">
         <div class="report-tabs">
           <button class="rtab-btn active" onclick="switchReportTab('pay')">💰 Pay Reports</button>
@@ -863,12 +903,15 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
           <button class="rtab-btn" onclick="switchReportTab('prolog')">📋 Pro-logs</button>
         </div>
         <div class="rtab-panel active" id="rtab-pay">
+          <div id="pay-summary-strip"></div>
           <div id="pay-reports-list"></div>
         </div>
         <div class="rtab-panel" id="rtab-planner">
+          <div id="planner-summary-strip"></div>
           <div id="planner-reports-list"></div>
         </div>
         <div class="rtab-panel" id="rtab-prolog">
+          <div id="prolog-summary-strip"></div>
           <div id="prolog-reports-list"></div>
         </div>
       </div></div>
@@ -1711,6 +1754,7 @@ async function submitWeek(){
 function switchReportTab(tab){
   document.querySelectorAll('.rtab-btn').forEach((b,i)=>{const tabs=['pay','planner','prolog'];b.classList.toggle('active',tabs[i]===tab);});
   document.querySelectorAll('.rtab-panel').forEach(p=>p.classList.toggle('active',p.id===`rtab-${tab}`));
+  const s=document.getElementById('rpt-search');if(s){s.value='';filterReports();}
 }
 
 function getPayDataForWeek(week){
@@ -1807,46 +1851,202 @@ function buildPayProductionCard(week){
 }
 
 function renderReports(){
-  const iconMap={'Pay Report':'📊','Pro-log':'📋','Daily Planner':'📅'};
-  const tcMap={'Pay Report':'rt-pay','Pro-log':'rt-prolog','Daily Planner':'rt-planner'};
-  // Pay reports list — with production card
-  const payEl=document.getElementById('pay-reports-list');
+  _renderPayReports();
+  _renderSimpleReports(allReports.filter(r=>r.type==='Daily Planner'),'planner-reports-list','planner-summary-strip','rt-planner','📅');
+  _renderSimpleReports(allReports.filter(r=>r.type==='Pro-log'),'prolog-reports-list','prolog-summary-strip','rt-prolog','📋');
+}
+
+function _weekToMonthKey(w){
+  // w is "YYYY-MM-DD" — return "YYYY-MM"
+  if(!w||typeof w!=='string')return'';
+  return w.slice(0,7);
+}
+function _monthKeyLabel(mk){
+  if(!mk)return'—';
+  const [y,m]=mk.split('-');
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return(MONTHS[parseInt(m,10)-1]||'?')+' '+y;
+}
+function _currentMonthKey(){return weekKey.slice(0,7);}
+
+// ── Pay Reports ────────────────────────────────────────
+function _renderPayReports(){
+  const stripEl=document.getElementById('pay-summary-strip');
+  const listEl=document.getElementById('pay-reports-list');
   const payReports=allReports.filter(r=>r.type==='Pay Report');
+
+  // Summary strip
   if(!payReports.length){
-    payEl.innerHTML='<div class="empty-state"><strong>None yet</strong>Will appear here when uploaded.</div>';
-  } else {
-    const byW={};payReports.forEach(r=>{if(!byW[r.week])byW[r.week]=[];byW[r.week].push(r);});
-    const weeks=Object.keys(byW).sort((a,b)=>b.localeCompare(a));
-    payEl.innerHTML=weeks.map(w=>{
-      const isNow=w===weekKey;
-      return`<div class="wk-hdr">${fmtReportDate(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
-      ${buildPayProductionCard(w)}
-      ${byW[w].map(r=>`<div class="rh-row">
-        <span style="font-size:18px;">📊</span>
-        <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">Pay Report${r.campaign?` — ${esc(r.campaign)}`:''}</div>${isNow?`<div style="font-size:11px;color:var(--warning);margin-top:1px;">⚠ Review and let Elle know before 11am Friday</div>`:''}</div>
-        <span class="rtype-badge rt-pay">Pay Report</span>
-        <a href="${esc(r.url)}" target="_blank" class="view-btn ghost">View ↗</a>
-      </div>`).join('')}`;
-    }).join('');
+    stripEl.innerHTML='';
+    listEl.innerHTML='<div class="empty-state"><strong>None yet</strong>Will appear here when uploaded.</div>';
+    return;
   }
-  function renderList(reports,elId){
-    const el=document.getElementById(elId);
-    if(!reports.length){el.innerHTML='<div class="empty-state"><strong>None yet</strong>Will appear here when uploaded.</div>';return;}
-    const byW={};reports.forEach(r=>{if(!byW[r.week])byW[r.week]=[];byW[r.week].push(r);});
-    const weeks=Object.keys(byW).sort((a,b)=>b.localeCompare(a));
-    el.innerHTML=weeks.map(w=>{
+  const allWeeks=[...new Set([...payReports.map(r=>r.week),...allPayData.map(p=>p.week)])].filter(Boolean);
+  let totalWire=0,totalTake=0,weeksWithData=0;
+  allWeeks.forEach(w=>{
+    const pd=getPayDataForWeek(w);
+    const wire=parseFloat(pd.officeWire)||0;
+    const take=parseFloat(pd.mgrTake)||0;
+    if(wire>0||take>0)weeksWithData++;
+    totalWire+=wire;totalTake+=take;
+  });
+  const weeks=Object.keys(allWeeks.reduce((a,w)=>{a[w]=1;return a;},{})).sort();
+  const dateRange=weeks.length>1?`${fmtReportDate(weeks[0])} – ${fmtReportDate(weeks[weeks.length-1])}`:(weeks[0]?fmtReportDate(weeks[0]):'—');
+  stripEl.innerHTML=`<div class="rpt-summary pay-grid">
+    <div class="rpt-stat"><div class="rpt-stat-val">${payReports.length}</div><div class="rpt-stat-lbl">Pay reports total</div></div>
+    <div class="rpt-stat"><div class="rpt-stat-val">${weeksWithData}</div><div class="rpt-stat-lbl">Weeks with figures</div></div>
+    <div class="rpt-stat accent-stat"><div class="rpt-stat-val">£${totalWire>0?totalWire.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div><div class="rpt-stat-lbl">Total office wire</div></div>
+    <div class="rpt-stat accent-stat"><div class="rpt-stat-val">£${totalTake>0?totalTake.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div><div class="rpt-stat-lbl">Total your take</div></div>
+  </div>`;
+
+  // Group by week then by month
+  const byW={};payReports.forEach(r=>{if(!byW[r.week])byW[r.week]=[];byW[r.week].push(r);});
+  const sortedWeeks=Object.keys(byW).sort((a,b)=>b.localeCompare(a));
+  const byMonth={};
+  sortedWeeks.forEach(w=>{const mk=_weekToMonthKey(w);if(!byMonth[mk])byMonth[mk]=[];byMonth[mk].push(w);});
+  const sortedMonths=Object.keys(byMonth).sort((a,b)=>b.localeCompare(a));
+  const curMk=_currentMonthKey();
+
+  listEl.innerHTML=sortedMonths.map(mk=>{
+    const isCur=mk===curMk;
+    const mWeeks=byMonth[mk];
+    // month-level wire/take totals
+    let mWire=0,mTake=0;
+    mWeeks.forEach(w=>{const pd=getPayDataForWeek(w);mWire+=parseFloat(pd.officeWire)||0;mTake+=parseFloat(pd.mgrTake)||0;});
+    const metaParts=[`${mWeeks.length} week${mWeeks.length!==1?'s':''}`];
+    if(mWire>0)metaParts.push(`£${mWire.toLocaleString('en-GB',{maximumFractionDigits:0})} wire`);
+    if(mTake>0)metaParts.push(`£${mTake.toLocaleString('en-GB',{maximumFractionDigits:0})} take`);
+    const bodyHtml=mWeeks.map(w=>{
       const isNow=w===weekKey;
-      return`<div class="wk-hdr">${fmtReportDate(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
-      ${byW[w].map(r=>`<div class="rh-row">
-        <span style="font-size:18px;">${iconMap[r.type]||'📄'}</span>
-        <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">${esc(r.type)}${r.campaign?` — ${esc(r.campaign)}`:''}</div>${isNow&&r.type==='Pay Report'?`<div style="font-size:11px;color:var(--warning);margin-top:1px;">⚠ Review and let Elle know before 11am Friday</div>`:''}</div>
-        <span class="rtype-badge ${tcMap[r.type]||'rt-pay'}">${esc(r.type)}</span>
-        <a href="${esc(r.url)}" target="_blank" class="view-btn ghost">View ↗</a>
-      </div>`).join('')}`;
+      return`<div class="rpt-week-block" data-week="${w}">
+        <div class="wk-hdr" style="margin-top:8px;">${fmtReportDate(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
+        ${buildPayProductionCard(w)}
+        ${byW[w].map(r=>`<div class="rh-row">
+          <span style="font-size:18px;">📊</span>
+          <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">Pay Report${r.campaign?` — ${esc(r.campaign)}`:''}</div>${isNow?`<div style="font-size:11px;color:var(--warning);margin-top:1px;">⚠ Review and let Elle know before 11am Friday</div>`:''}</div>
+          <span class="rtype-badge rt-pay">Pay Report</span>
+          <a href="${esc(r.url)}" target="_blank" class="view-btn ghost">View ↗</a>
+        </div>`).join('')}
+      </div>`;
     }).join('');
+    return`<div class="month-accordion${isCur?' is-current':''}" data-month="${mk}">
+      <div class="month-acc-hdr${isCur?' open':''}" onclick="toggleMonthAcc(this)">
+        <span class="month-acc-chevron">›</span>
+        <span class="month-acc-title">${_monthKeyLabel(mk)}</span>
+        ${isCur?'<span class="now-badge">Current</span>':''}
+        <span class="month-acc-meta">${metaParts.join(' · ')}</span>
+      </div>
+      <div class="month-acc-body${isCur?' open':''}">${bodyHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Simple (planner / prolog) Reports ─────────────────
+function _renderSimpleReports(reports,listId,stripId,badgeClass,icon){
+  const stripEl=document.getElementById(stripId);
+  const listEl=document.getElementById(listId);
+  if(!reports.length){
+    stripEl.innerHTML='';
+    listEl.innerHTML='<div class="empty-state"><strong>None yet</strong>Will appear here when uploaded.</div>';
+    return;
   }
-  renderList(allReports.filter(r=>r.type==='Daily Planner'),'planner-reports-list');
-  renderList(allReports.filter(r=>r.type==='Pro-log'),'prolog-reports-list');
+  // Summary strip
+  const allWks=[...new Set(reports.map(r=>r.week))].sort();
+  stripEl.innerHTML=`<div class="rpt-summary basic-grid">
+    <div class="rpt-stat"><div class="rpt-stat-val">${reports.length}</div><div class="rpt-stat-lbl">Total reports</div></div>
+    <div class="rpt-stat"><div class="rpt-stat-val">${allWks.length}</div><div class="rpt-stat-lbl">Weeks covered</div></div>
+    <div class="rpt-stat"><div class="rpt-stat-val">${_monthKeyLabel(allWks[0]?allWks[0].slice(0,7):'')}</div><div class="rpt-stat-lbl">Earliest on record</div></div>
+  </div>`;
+
+  // Group by week then month
+  const byW={};reports.forEach(r=>{if(!byW[r.week])byW[r.week]=[];byW[r.week].push(r);});
+  const sortedWeeks=Object.keys(byW).sort((a,b)=>b.localeCompare(a));
+  const byMonth={};
+  sortedWeeks.forEach(w=>{const mk=_weekToMonthKey(w);if(!byMonth[mk])byMonth[mk]=[];byMonth[mk].push(w);});
+  const sortedMonths=Object.keys(byMonth).sort((a,b)=>b.localeCompare(a));
+  const curMk=_currentMonthKey();
+
+  listEl.innerHTML=sortedMonths.map(mk=>{
+    const isCur=mk===curMk;
+    const mWeeks=byMonth[mk];
+    const totalInMonth=mWeeks.reduce((s,w)=>s+(byW[w]||[]).length,0);
+    const bodyHtml=mWeeks.map(w=>{
+      const isNow=w===weekKey;
+      return`<div class="rpt-week-block" data-week="${w}">
+        <div class="wk-hdr" style="margin-top:8px;">${fmtReportDate(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
+        ${byW[w].map(r=>`<div class="rh-row">
+          <span style="font-size:18px;">${icon}</span>
+          <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">${esc(r.type)}${r.campaign?` — ${esc(r.campaign)}`:''}</div></div>
+          <span class="rtype-badge ${badgeClass}">${esc(r.type)}</span>
+          <a href="${esc(r.url)}" target="_blank" class="view-btn ghost">View ↗</a>
+        </div>`).join('')}
+      </div>`;
+    }).join('');
+    return`<div class="month-accordion${isCur?' is-current':''}" data-month="${mk}">
+      <div class="month-acc-hdr${isCur?' open':''}" onclick="toggleMonthAcc(this)">
+        <span class="month-acc-chevron">›</span>
+        <span class="month-acc-title">${_monthKeyLabel(mk)}</span>
+        ${isCur?'<span class="now-badge">Current</span>':''}
+        <span class="month-acc-meta">${mWeeks.length} week${mWeeks.length!==1?'s':''} · ${totalInMonth} report${totalInMonth!==1?'s':''}</span>
+      </div>
+      <div class="month-acc-body${isCur?' open':''}">${bodyHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleMonthAcc(hdr){
+  const body=hdr.nextElementSibling;
+  const open=body.classList.toggle('open');
+  hdr.classList.toggle('open',open);
+}
+
+function filterReports(){
+  const q=(document.getElementById('rpt-search').value||'').trim().toLowerCase();
+  // Find which tab is active
+  const panels=['pay','planner','prolog'];
+  const activePanel=panels.find(p=>document.getElementById('rtab-'+p).classList.contains('active'))||'pay';
+  const listId=activePanel+'-reports-list';
+  const listEl=document.getElementById(listId);
+  if(!listEl)return;
+  const accordions=listEl.querySelectorAll('.month-accordion');
+  let anyVisible=false;
+  accordions.forEach(acc=>{
+    const mk=acc.dataset.month||'';
+    const label=_monthKeyLabel(mk).toLowerCase();
+    const weeks=acc.querySelectorAll('.rpt-week-block');
+    let accMatch=!q||label.includes(q)||mk.includes(q);
+    if(!accMatch){
+      // check individual weeks
+      weeks.forEach(wb=>{
+        const wDate=(wb.dataset.week||'').toLowerCase();
+        const wLabel=fmtReportDate(wb.dataset.week||'').toLowerCase();
+        if(wDate.includes(q)||wLabel.includes(q))accMatch=true;
+      });
+    }
+    acc.style.display=accMatch?'':'none';
+    if(accMatch){
+      anyVisible=true;
+      // If searching, expand all matching; if clearing, keep current state
+      if(q){
+        acc.querySelector('.month-acc-hdr').classList.add('open');
+        acc.querySelector('.month-acc-body').classList.add('open');
+        // show/hide individual week blocks
+        weeks.forEach(wb=>{
+          const wDate=(wb.dataset.week||'').toLowerCase();
+          const wLabel=fmtReportDate(wb.dataset.week||'').toLowerCase();
+          wb.style.display=(!q||wDate.includes(q)||wLabel.includes(q)||label.includes(q))?'':'none';
+        });
+      } else {
+        weeks.forEach(wb=>wb.style.display='');
+      }
+    }
+  });
+  // No results message
+  let noRes=listEl.querySelector('.rpt-no-results');
+  if(!anyVisible&&q){
+    if(!noRes){noRes=document.createElement('div');noRes.className='rpt-no-results';listEl.appendChild(noRes);}
+    noRes.textContent=`No results for "${q}"`;noRes.style.display='';
+  } else if(noRes){noRes.style.display='none';}
 }
 
 // ── WEEKLY REVIEW ─────────────────────────────────────
