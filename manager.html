@@ -293,16 +293,16 @@ select.field-input{cursor:pointer;appearance:none;}
 
 /* ── POS TAGS ── */
 .pos-tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;border:1px solid transparent;}
-.pos-Trainee{color:#2a9470;background:#e6f7f0;border-color:#b0e0d0;}
-.pos-Solo{color:#c87810;background:#fef3e0;border-color:#f0d090;}
-.pos-Leader{color:#3060c0;background:#e6eef8;border-color:#a8c0e8;}
-.pos-Core{color:#6848b0;background:#ede8f8;border-color:#c0aee0;}
-.pos-Junior{color:#F51D7E;background:#FEE8F3;border-color:#FCA0CF;}
-[data-theme="dark"] .pos-Trainee{color:#60d4a8;background:rgba(42,148,112,.18);border-color:rgba(96,212,168,.25);}
-[data-theme="dark"] .pos-Solo{color:#f0b040;background:rgba(200,120,16,.2);border-color:rgba(240,176,64,.25);}
-[data-theme="dark"] .pos-Leader{color:#80a8f0;background:rgba(48,96,192,.18);border-color:rgba(128,168,240,.25);}
-[data-theme="dark"] .pos-Core{color:#b098e8;background:rgba(104,72,176,.18);border-color:rgba(176,152,232,.25);}
-[data-theme="dark"] .pos-Junior{color:#f088a8;background:rgba(200,72,112,.18);border-color:rgba(240,136,168,.25);}
+.pos-Trainee{color:#29ba8a;background:#e6f6ef;border-color:#29ba8a;}
+.pos-Solo{color:#fd9705;background:#fdf0df;border-color:#fd9705;}
+.pos-Leader{color:#2276d2;background:#e3f0fe;border-color:#2276d2;}
+.pos-Core{color:#7664dc;background:#edeafc;border-color:#7664dc;}
+.pos-Junior{color:#f16383;background:#fdeaef;border-color:#f16383;}
+[data-theme="dark"] .pos-Trainee{color:#29ba8a;background:#e6f6ef;border-color:#29ba8a;}
+[data-theme="dark"] .pos-Solo{color:#fd9705;background:#fdf0df;border-color:#fd9705;}
+[data-theme="dark"] .pos-Leader{color:#2276d2;background:#e3f0fe;border-color:#2276d2;}
+[data-theme="dark"] .pos-Core{color:#7664dc;background:#edeafc;border-color:#7664dc;}
+[data-theme="dark"] .pos-Junior{color:#f16383;background:#fdeaef;border-color:#f16383;}
 .leaver-tag{font-size:11px;font-weight:600;color:var(--warning);background:var(--warning-soft);border:1px solid rgba(217,119,6,.2);padding:2px 7px;border-radius:20px;}
 
 /* ── FLAG ── */
@@ -564,6 +564,71 @@ select.wr-input{cursor:pointer;appearance:none;}
 .profile-upload-wrap{position:relative;display:inline-block;}
 .profile-upload-btn{position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:#0f766e;border:2px solid #fff;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s;}
 .profile-upload-btn:hover{opacity:.85;}
+
+/* Position colours for name circles and mini map bubbles */
+.pos-colour-Trainee,
+.pos-colour-trainee,
+.av.pos-Trainee,
+.nd-rep-av.pos-Trainee,
+.map-node.pos-Trainee,
+.map-bubble.pos-Trainee,
+.mini-map-bubble.pos-Trainee{
+  background:#e6f6ef!important;
+  color:#29ba8a!important;
+  border:1px solid #29ba8a!important;
+}
+.pos-colour-Solo,
+.pos-colour-solo,
+.av.pos-Solo,
+.nd-rep-av.pos-Solo,
+.map-node.pos-Solo,
+.map-bubble.pos-Solo,
+.mini-map-bubble.pos-Solo{
+  background:#fdf0df!important;
+  color:#fd9705!important;
+  border:1px solid #fd9705!important;
+}
+.pos-colour-Leader,
+.pos-colour-leader,
+.av.pos-Leader,
+.nd-rep-av.pos-Leader,
+.map-node.pos-Leader,
+.map-bubble.pos-Leader,
+.mini-map-bubble.pos-Leader{
+  background:#e3f0fe!important;
+  color:#2276d2!important;
+  border:1px solid #2276d2!important;
+}
+.pos-colour-Core,
+.pos-colour-core,
+.av.pos-Core,
+.nd-rep-av.pos-Core,
+.map-node.pos-Core,
+.map-bubble.pos-Core,
+.mini-map-bubble.pos-Core{
+  background:#edeafc!important;
+  color:#7664dc!important;
+  border:1px solid #7664dc!important;
+}
+.pos-colour-Junior,
+.pos-colour-junior,
+.pos-colour-JuniorPartner,
+.pos-colour-juniorpartner,
+.av.pos-Junior,
+.av.pos-JuniorPartner,
+.nd-rep-av.pos-Junior,
+.nd-rep-av.pos-JuniorPartner,
+.map-node.pos-Junior,
+.map-node.pos-JuniorPartner,
+.map-bubble.pos-Junior,
+.map-bubble.pos-JuniorPartner,
+.mini-map-bubble.pos-Junior,
+.mini-map-bubble.pos-JuniorPartner{
+  background:#fdeaef!important;
+  color:#f16383!important;
+  border:1px solid #f16383!important;
+}
+
 </style>
 </head>
 <body>
@@ -922,6 +987,33 @@ function handleProfilePic(input){
     showToast('Profile picture updated ✓','success');
   };
   reader.readAsDataURL(file);
+}
+
+
+function posKey(pos){
+  const p=String(pos||'').toLowerCase().replace(/[^a-z]/g,'');
+  if(p.includes('trainee'))return 'Trainee';
+  if(p.includes('solo'))return 'Solo';
+  if(p.includes('leader'))return 'Leader';
+  if(p.includes('core'))return 'Core';
+  if(p.includes('junior'))return 'Junior';
+  return '';
+}
+function posStyle(pos){
+  const k=posKey(pos);
+  const map={
+    Trainee:['#e6f6ef','#29ba8a'],
+    Solo:['#fdf0df','#fd9705'],
+    Leader:['#e3f0fe','#2276d2'],
+    Core:['#edeafc','#7664dc'],
+    Junior:['#fdeaef','#f16383']
+  };
+  if(!map[k])return '';
+  return `background:${map[k][0]};color:${map[k][1]};border:1px solid ${map[k][1]};`;
+}
+function posClass(pos){
+  const k=posKey(pos);
+  return k?`pos-colour-${k}`:'';
 }
 
 // ── State ──────────────────────────────────────────────
@@ -1361,7 +1453,7 @@ function renderReps(){
     const flagInfo=r.flag?FLAGS.find(f=>f.id===r.flag):null;
     return`<div class="rep-card ${r.leaver?'is-leaver':''}" id="rc-${r.id}">
       <div class="rep-card-head" onclick="toggleCard('${r.id}')">
-        <div class="av av34" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
+        <div class="av av34 ${posClass(r.Position||r.position||r.Pos||r.pos)}" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
         <div class="rep-info">
           <div class="rep-name">${esc(r.name)}</div>
           <div class="rep-meta">
@@ -1415,7 +1507,7 @@ function renderWeekly(){
   const active=roster.filter(r=>!r.leaver);
   if(!active.length){list.innerHTML='<div class="empty-state"><strong>No active reps</strong>Add reps on My Reps first.</div>';return;}
   list.innerHTML=active.map(r=>{const wl=weekLeavers.has(r.id);const c=pc(r.position||'default');const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);return`<div class="week-row ${wl?'is-leaver':''}" id="wr-${r.id}">
-    <div class="av av28" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
+    <div class="av av28 ${posClass(r.Position||r.position||r.Pos||r.pos)}" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
     <div class="week-row-info"><div class="week-row-name" style="${wl?'text-decoration:line-through;color:var(--subtle);':''}">${esc(r.name)}</div><div class="week-row-sub">${r.position||'—'}${r.email?` · ${esc(r.email)}`:''}</div></div>
     ${wl?'<span class="leaver-tag">Leaving</span>':''}
     <button class="leaver-toggle" onclick="toggleWeekLeaver('${r.id}')">${wl?'Undo':'Left this week'}</button>
