@@ -4,7 +4,83 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Back Office</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Niond-style dashboard redesign ── */
+:root {
+  --niond-bg: #f5f7f8;
+  --niond-surface: #ffffff;
+  --niond-border: #e8ecee;
+  --niond-text: #0f1923;
+  --niond-muted: #6b7d8a;
+  --niond-subtle: #a0b0ba;
+  --niond-green: #8eca44;
+  --niond-green-soft: rgba(142,202,68,0.12);
+  --niond-teal: #0d9488;
+  --niond-teal-soft: rgba(13,148,136,0.1);
+  --niond-teal2: #14b8a6;
+  --niond-purple: #7c8ff5;
+  --niond-purple-soft: rgba(124,143,245,0.12);
+  --niond-amber: #f59e0b;
+  --niond-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --niond-shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --niond-r: 14px;
+  --niond-rsm: 8px;
+}
+.home-scroll { background: var(--niond-bg) !important; }
+.nd-stat { background:var(--niond-surface); border:1px solid var(--niond-border); border-radius:var(--niond-r); padding:20px 22px; box-shadow:var(--niond-shadow); display:flex; flex-direction:column; gap:10px; transition:box-shadow .15s; }
+.nd-stat:hover { box-shadow:var(--niond-shadow-md); }
+.nd-stat-top { display:flex; align-items:center; justify-content:space-between; }
+.nd-stat-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.nd-stat-val { font-size:26px; font-weight:700; letter-spacing:-.03em; color:var(--niond-text); line-height:1; }
+.nd-stat-lbl { font-size:12px; color:var(--niond-muted); font-weight:500; }
+.nd-stat-delta { font-size:11px; font-weight:600; display:flex; align-items:center; gap:4px; }
+.nd-delta-up { color:#0d9488; } .nd-delta-dn { color:#ef4444; } .nd-delta-same { color:var(--niond-muted); }
+.nd-chart-card, .nd-links-card, .nd-lb-card, .nd-reps-card { background:var(--niond-surface); border:1px solid var(--niond-border); border-radius:var(--niond-r); box-shadow:var(--niond-shadow); overflow:hidden; }
+.nd-card-hdr { padding:18px 22px 14px; display:flex; align-items:flex-start; justify-content:space-between; border-bottom:1px solid var(--niond-border); }
+.nd-card-title { font-size:15px; font-weight:700; color:var(--niond-text); }
+.nd-card-sub { font-size:12px; color:var(--niond-muted); margin-top:2px; }
+.nd-export-btn { background:var(--niond-green); color:#fff; border:none; font-family:var(--font); font-size:11px; font-weight:700; padding:6px 14px; border-radius:20px; cursor:pointer; letter-spacing:.04em; transition:opacity .15s; flex-shrink:0; }
+.nd-export-btn:hover { opacity:.85; }
+.nd-chart-legend { display:flex; gap:16px; align-items:center; padding:10px 22px 0; }
+.nd-legend-item { display:flex; align-items:center; gap:5px; font-size:11px; font-weight:600; color:var(--niond-muted); }
+.nd-legend-dot { width:8px; height:8px; border-radius:50%; }
+.nd-link-row { display:flex; align-items:center; gap:12px; padding:13px 18px; border-bottom:1px solid var(--niond-border); cursor:pointer; transition:background .1s; text-decoration:none; color:inherit; }
+.nd-link-row:last-child { border-bottom:none; }
+.nd-link-row:hover { background:var(--niond-bg); }
+.nd-link-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.nd-link-name { font-size:13px; font-weight:600; color:var(--niond-text); }
+.nd-link-sub { font-size:11px; color:var(--niond-muted); margin-top:1px; }
+.nd-link-arrow { margin-left:auto; color:var(--niond-subtle); flex-shrink:0; }
+.nd-link-none { padding:13px 18px; font-size:12px; color:var(--niond-muted); }
+.nd-lb-row { display:grid; grid-template-columns:32px 1fr auto; gap:12px; align-items:center; padding:11px 18px; border-bottom:1px solid var(--niond-border); transition:background .1s; }
+.nd-lb-row:last-child { border-bottom:none; }
+.nd-lb-row:hover { background:var(--niond-bg); }
+.nd-rank-badge { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; }
+.nd-rank-1{background:#fef9c3;color:#92400e;} .nd-rank-2{background:#f1f5f9;color:#475569;} .nd-rank-3{background:#fff7ed;color:#7c2d12;} .nd-rank-n{background:var(--niond-bg);color:var(--niond-muted);}
+.nd-lb-name { font-size:13px; font-weight:600; color:var(--niond-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.nd-lb-camp { font-size:11px; color:var(--niond-muted); }
+.nd-lb-score { font-size:14px; font-weight:800; color:var(--niond-teal); letter-spacing:-.02em; }
+.nd-reps-card { display:flex; flex-direction:column; }
+.nd-rep-row { display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--niond-border); transition:background .1s; cursor:pointer; }
+.nd-rep-row:hover { background:var(--niond-bg); }
+.nd-rep-row:last-child { border-bottom:none; }
+.nd-rep-av { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+.nd-rep-name { font-size:13px; font-weight:500; color:var(--niond-text); }
+.nd-rep-pos { font-size:11px; color:var(--niond-muted); }
+.nd-rep-flag { width:6px; height:6px; border-radius:50%; margin-left:auto; flex-shrink:0; }
+.nd-view-all-btn { display:flex; align-items:center; justify-content:center; gap:6px; padding:11px 16px; background:var(--niond-teal-soft); border:none; border-top:1px solid var(--niond-border); color:var(--niond-teal); font-family:var(--font); font-size:12px; font-weight:700; cursor:pointer; transition:background .15s; width:100%; letter-spacing:.03em; }
+.nd-view-all-btn:hover { background:rgba(13,148,136,.16); }
+.nd-ann-banner { background:linear-gradient(135deg,#0c7a70,#14b8a6); border-radius:var(--niond-r); padding:14px 18px; display:flex; align-items:center; gap:12px; margin-bottom:16px; color:#fff; box-shadow:var(--niond-shadow-md); }
+.nd-ann-dismiss { background:rgba(255,255,255,.2); border:none; color:#fff; width:26px; height:26px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-left:auto; transition:background .15s; }
+.nd-ann-dismiss:hover { background:rgba(255,255,255,.35); }
+.nd-section-lbl { font-size:10px; font-weight:800; color:var(--niond-muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+[data-theme="dark"] .nd-stat,[data-theme="dark"] .nd-chart-card,[data-theme="dark"] .nd-links-card,[data-theme="dark"] .nd-lb-card,[data-theme="dark"] .nd-reps-card { background:var(--surface); border-color:var(--border); }
+[data-theme="dark"] .nd-lb-row:hover,[data-theme="dark"] .nd-rep-row:hover,[data-theme="dark"] .nd-link-row:hover { background:var(--surface2); }
+[data-theme="dark"] .home-scroll { background:var(--bg) !important; }
+[data-theme="dark"] .nd-rank-1{background:rgba(254,249,195,.12);}[data-theme="dark"] .nd-rank-2{background:rgba(241,245,249,.08);}[data-theme="dark"] .nd-rank-3{background:rgba(255,247,237,.08);}
+[data-theme="dark"] .nd-stat-val,[data-theme="dark"] .nd-lb-name,[data-theme="dark"] .nd-rep-name,[data-theme="dark"] .nd-link-name,[data-theme="dark"] .nd-card-title { color:var(--text); }
+</style>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -17,7 +93,7 @@
   --warning:#d97706;--warning-soft:rgba(217,119,6,0.09);
   --sidebar:#0a2020;--sidebar-active:#0d7377;--sidebar-text:#7aacac;--sidebar-hover:rgba(255,255,255,0.06);
   --s1:0 1px 3px rgba(0,0,0,0.06);--s2:0 4px 12px rgba(0,0,0,0.08);--s3:0 8px 28px rgba(0,0,0,0.12);
-  --font:'Inter',sans-serif;--r:10px;--rsm:6px;--rlg:14px;
+  --font:'DM Sans',sans-serif;--r:10px;--rsm:6px;--rlg:14px;
 }
 [data-theme="dark"]{
   --bg:#080f0f;--surface:#0f1a1a;--surface2:#162222;--border:#1e3030;--border2:#284040;
@@ -449,17 +525,17 @@ select.wr-input{cursor:pointer;appearance:none;}
       <div class="sidebar-week" id="sb-week">—</div>
     </div>
     <div class="sidebar-nav">
-      <button class="nav-item active" onclick="switchTab('home')" id="nav-home"><span class="nav-icon">🏠</span>Home</button>
-      <button class="nav-item" onclick="switchTab('reps')" id="nav-reps"><span class="nav-icon">👥</span>My Reps</button>
-      <button class="nav-item" onclick="switchTab('weekly')" id="nav-weekly"><span class="nav-icon">📋</span>Weekly Update<span id="weekly-badge" class="nav-badge" style="display:none;">!</span></button>
-      <button class="nav-item" onclick="switchTab('reports')" id="nav-reports"><span class="nav-icon">📊</span>Reports</button>
-      <button class="nav-item" onclick="switchTab('review')" id="nav-review"><span class="nav-icon">📝</span>Weekly Review</button>
-      <button class="nav-item" onclick="switchTab('calendar')" id="nav-calendar"><span class="nav-icon">📅</span>Calendar</button>
-      <button class="nav-item" onclick="switchTab('leaderboard')" id="nav-leaderboard"><span class="nav-icon">🏆</span>Leaderboard</button>
-      <button class="nav-item" onclick="switchTab('map')" id="nav-map"><span class="nav-icon">🗺️</span>Team Map</button>
+      <button class="nav-item active" onclick="switchTab('home')" id="nav-home"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9.5L10 3l7 6.5V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke-linejoin="round"/><path d="M7 19V12h6v7" stroke-linejoin="round"/></svg></span>Home</button>
+      <button class="nav-item" onclick="switchTab('reps')" id="nav-reps"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path d="M4 17a7 7 0 0 1 12 0" stroke-linecap="round"/></svg></span>My Reps</button>
+      <button class="nav-item" onclick="switchTab('weekly')" id="nav-weekly"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="12" height="15" rx="2"/><path d="M8 7h4M8 10h4M8 13h2" stroke-linecap="round"/></svg></span>Weekly Update<span id="weekly-badge" class="nav-badge" style="display:none;">!</span></button>
+      <button class="nav-item" onclick="switchTab('reports')" id="nav-reports"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="11" width="3" height="6" rx="1"/><rect x="8.5" y="7" width="3" height="10" rx="1"/><rect x="14" y="3" width="3" height="14" rx="1"/></svg></span>Reports</button>
+      <button class="nav-item" onclick="switchTab('review')" id="nav-review"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H6a1 1 0 0 0-1 1v13l5-3 5 3V4a1 1 0 0 0-1-1z" stroke-linejoin="round"/></svg></span>Weekly Review</button>
+      <button class="nav-item" onclick="switchTab('calendar')" id="nav-calendar"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="13" rx="2"/><path d="M3 9h14M7 3v4M13 3v4" stroke-linecap="round"/></svg></span>Calendar</button>
+      <button class="nav-item" onclick="switchTab('leaderboard')" id="nav-leaderboard"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h6M10 15v3M7 18h6"/><path d="M5 3v5a5 5 0 0 0 10 0V3"/><path d="M5 6H3a2 2 0 1 0 0 4h2M15 6h2a2 2 0 1 0 0 4h-2" stroke-linecap="round"/></svg></span>Leaderboard</button>
+      <button class="nav-item" onclick="switchTab('map')" id="nav-map"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 4l6 2 6-2 6 2v13l-6-2-6 2-6-2z" stroke-linejoin="round"/><path d="M7 6v13M13 4v13" stroke-linecap="round"/></svg></span>Team Map</button>
     </div>
     <div class="sidebar-footer">
-      <button class="theme-toggle" onclick="toggleTheme()"><span>🌙</span><span id="theme-lbl">Dark mode</span></button>
+      <button class="theme-toggle" onclick="toggleTheme()"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 13A7 7 0 1 1 7 3a5 5 0 0 0 10 10z" stroke-linejoin="round"/></svg><span id="theme-lbl">Dark mode</span></button>
     </div>
   </nav>
 
@@ -773,10 +849,13 @@ const CAT_COLORS={personal:'#2563eb',work:'#16a34a',team:'#0d7377',reminder:'#f5
 function renderHome(){
   const annSlot=document.getElementById('announcement-slot');
   if(announcement&&!localStorage.getItem('tt_ann_dismissed_'+announcement.id)){
-    annSlot.innerHTML=`<div class="announcement-banner" style="margin-bottom:16px;">
-      <div class="ann-icon">📣</div>
-      <div class="ann-body"><div class="ann-title">${esc(announcement.title)}</div><div class="ann-text">${esc(announcement.message)}</div></div>
-      <button class="ann-dismiss" onclick="dismissAnn('${announcement.id}')">×</button>
+    annSlot.innerHTML=`<div class="nd-ann-banner">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" style="flex-shrink:0;opacity:.9"><path d="M10 2l8 15H2L10 2z" stroke-linejoin="round"/><path d="M10 9v4M10 15h.01" stroke-linecap="round"/></svg>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:1px;">${esc(announcement.title)}</div>
+        <div style="font-size:12px;opacity:.88;line-height:1.4;">${esc(announcement.message)}</div>
+      </div>
+      <button class="nd-ann-dismiss" onclick="dismissAnn('${announcement.id}')">&#x2715;</button>
     </div>`;
   }else annSlot.innerHTML='';
 
@@ -787,132 +866,223 @@ function renderHome(){
   const leavers=roster.filter(r=>r.leaver);
   const flagged=roster.filter(r=>r.flag&&!r.leaver);
   const delta=active.length-lastWeekCount;
-  const deltaHtml=delta===0
-    ?`<span class="stat-delta delta-same" style="display:flex;align-items:center;gap:3px;">${SVG.dash} Same as last week</span>`
-    :delta>0
-    ?`<span class="stat-delta delta-up" style="display:flex;align-items:center;gap:3px;">${SVG.arrow_up} +${delta} from last week</span>`
-    :`<span class="stat-delta delta-dn" style="display:flex;align-items:center;gap:3px;">${SVG.arrow_dn} ${delta} from last week</span>`;
 
-  const payReports=allReports.filter(r=>r.type==='Pay Report').sort((a,b)=>b.uploadedAt.localeCompare(a.uploadedAt));
+  const deltaHtml=delta===0
+    ?`<span class="nd-stat-delta nd-delta-same"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h6" stroke-linecap="round"/></svg> Same as last week</span>`
+    :delta>0
+    ?`<span class="nd-stat-delta nd-delta-up"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3M3 6l3-3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg> +${delta} from last week</span>`
+    :`<span class="nd-stat-delta nd-delta-dn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3v6M3 6l3 3 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg> ${delta} from last week</span>`;
+
+  const payReports=allReports.filter(r=>r.type==='Pay Report').sort((a,b)=>b.week.localeCompare(a.week));
   const latestPay=payReports[0]||null;
   const isThisWeekPay=latestPay&&latestPay.week===weekKey;
-  const planners=allReports.filter(r=>r.type==='Daily Planner').sort((a,b)=>b.uploadedAt.localeCompare(a.uploadedAt));
+  const planners=allReports.filter(r=>r.type==='Daily Planner').sort((a,b)=>b.week.localeCompare(a.week));
   const latestPlanner=planners[0]||null;
-  const prologs=allReports.filter(r=>r.type==='Pro-log').sort((a,b)=>b.uploadedAt.localeCompare(a.uploadedAt));
+  const prologs=allReports.filter(r=>r.type==='Pro-log').sort((a,b)=>b.week.localeCompare(a.week));
   const latestProlog=prologs[0]||null;
 
-  // Mini calendar data
-  const today=fmtDate(new Date());
-  const now=new Date();
-  const miniYear=now.getFullYear(),miniMonth=now.getMonth();
-  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const miniFirst=new Date(miniYear,miniMonth,1);
-  const miniStartDow=miniFirst.getDay()===0?6:miniFirst.getDay()-1;
-  const miniDaysInMonth=new Date(miniYear,miniMonth+1,0).getDate();
-  const miniPrevDays=new Date(miniYear,miniMonth,0).getDate();
-  const miniCells=[];
-  for(let i=miniStartDow-1;i>=0;i--)miniCells.push({date:fmtDate(new Date(miniYear,miniMonth-1,miniPrevDays-i)),other:true});
-  for(let d=1;d<=miniDaysInMonth;d++)miniCells.push({date:fmtDate(new Date(miniYear,miniMonth,d)),other:false});
-  let nd=1;while(miniCells.length%7!==0)miniCells.push({date:fmtDate(new Date(miniYear,miniMonth+1,nd++)),other:true});
+  // 6-week wire data
+  const sixWeeks=[];
+  for(let i=5;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i*7);sixWeeks.push(getWeekKey(d));}
+  const wireByWeek=sixWeeks.map(wk=>{
+    const pd=allPayData.find(p=>p.week===wk);
+    const rep=allReports.find(r=>r.type==='Pay Report'&&r.week===wk);
+    return{wk,wire:parseFloat((pd&&pd.officeWire)||rep?.officeWire||0)||0,take:parseFloat((pd&&pd.mgrTake)||rep?.mgrTake||0)||0};
+  });
+  const maxWire=Math.max(...wireByWeek.map(w=>Math.max(w.wire,w.take)),1);
+  const chartH=130,padL=10,padR=10,padT=12,padB=20,innerH=chartH-padT-padB;
+  const chartW=520,innerW=chartW-padL-padR;
+  const groupStep=innerW/6;
+  const bw=Math.floor(groupStep*0.32);
+  const gridLines=[0.25,0.5,0.75,1].map(pct=>{
+    const y=padT+innerH-(pct*innerH);
+    const val=Math.round(maxWire*pct);
+    const lbl=val>=1000?'£'+(val/1000).toFixed(1)+'k':'£'+val;
+    return `<line x1="${padL}" y1="${y}" x2="${chartW-padR}" y2="${y}" stroke="#e8ecee" stroke-width="1"/><text x="${padL-2}" y="${y+4}" text-anchor="end" font-size="8" fill="#a0b0ba" font-family="DM Sans,sans-serif">${lbl}</text>`;
+  }).join('');
+  const chartBars=wireByWeek.map((d,i)=>{
+    const cx=padL+i*groupStep+groupStep/2;
+    const wireH=Math.max(Math.round((d.wire/maxWire)*innerH),d.wire>0?2:0);
+    const takeH=Math.max(Math.round((d.take/maxWire)*innerH),d.take>0?2:0);
+    const shortWk=d.wk?d.wk.slice(5).replace('-','/'):'';
+    return `<rect x="${cx-bw-3}" y="${padT+innerH-wireH}" width="${bw}" height="${wireH}" rx="3" fill="#b8e0f5" opacity="0.9"/>
+      <rect x="${cx+3}" y="${padT+innerH-takeH}" width="${bw}" height="${takeH}" rx="3" fill="#8eca44" opacity="0.9"/>
+      <text x="${cx}" y="${padT+innerH+14}" text-anchor="middle" font-size="9" fill="#6b7d8a" font-family="DM Sans,sans-serif">${shortWk}</text>`;
+  }).join('');
 
-  const miniGridHtml=['M','T','W','T','F','S','S'].map(d=>`<div class="mini-cal-hdr">${d}</div>`).join('')
-    +miniCells.map(c=>{
-      const evs=calEvents.filter(e=>e.date===c.date);
-      const isT=c.date===today;
-      return`<div class="mini-cal-cell ${c.other?'':'this-month'} ${isT?'today':''} ${evs.length?'has-events':''}">${parseInt(c.date.split('-')[2])}</div>`;
-    }).join('');
+  // Leaderboard snapshot
+  const lbSnap=(typeof lbRows!=='undefined'&&lbRows.length)?lbFiltered().slice(0,5):[];
+  const rankClass=i=>i===0?'nd-rank-1':i===1?'nd-rank-2':i===2?'nd-rank-3':'nd-rank-n';
 
-  // Upcoming events (next 7 days)
-  const next7=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()+i);return fmtDate(d);});
-  const upcomingEvs=calEvents.filter(e=>next7.includes(e.date)).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,5);
-  const upcomingHtml=upcomingEvs.length
-    ?upcomingEvs.map(e=>{
-      const isT=e.date===today;
-      const d=parseDate(e.date);
-      const dayStr=isT?'Today':d?d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'';
-      const col=CAT_COLORS[e.category||'personal']||'#0d7377';
-      return`<div class="home-event-row"><div class="home-event-dot" style="background:${col};"></div><div style="flex:1;min-width:0;"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(e.title)}</div><div style="font-size:10px;color:var(--muted);">${dayStr}${e.time?' · '+esc(e.time):''}</div></div></div>`;
-    }).join('')
-    :`<div style="font-size:12px;color:var(--subtle);padding:8px 0;">No upcoming events</div>`;
+  // Reps snapshot
+  const repSnap=active.slice(0,5);
+  function ndC(pos){const m=isDark()?PCD:PC;return m[pos]||m.default;}
+
+  const curWire=wireByWeek[5]?.wire||0;
+  const prevWire=wireByWeek[4]?.wire||0;
+  const wireDiff=curWire-prevWire;
+  const wireColor=curWire>=prevWire?'#0d9488':'#ef4444';
+  const wireDiffHtml=prevWire?`${wireDiff>=0?'&#9650;':'&#9660;'} £${Math.abs(wireDiff).toLocaleString('en-GB')} vs prev`:'&nbsp;';
+
+  // SVG icons
+  const ICO={
+    users:`<svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path d="M4 17a7 7 0 0 1 12 0" stroke-linecap="round"/></svg>`,
+    warn:`<svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3L2 17h16L10 3z" stroke-linejoin="round"/><path d="M10 9v4M10 15h.01" stroke-linecap="round"/></svg>`,
+    check:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l4 4L14 4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    clock:`<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>`,
+    pound:`<svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 5a4 4 0 0 0-7 2.5V11H4M4 14h12M6 11h6" stroke-linecap="round"/></svg>`,
+    pay:`<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="12" rx="2"/><path d="M14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM2 9h16" stroke-linecap="round"/></svg>`,
+    cal:`<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="13" rx="2"/><path d="M3 9h14M7 3v4M13 3v4" stroke-linecap="round"/></svg>`,
+    doc:`<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h8l4 4v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v5h5M7 11h6M7 14h4" stroke-linecap="round"/></svg>`,
+    chevron:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    trophy:`<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h6M10 15v3M7 18h6"/><path d="M5 3v5a5 5 0 0 0 10 0V3"/><path d="M5 6H3a2 2 0 1 0 0 4h2M15 6h2a2 2 0 1 0 0 4h-2" stroke-linecap="round"/></svg>`,
+    reps:`<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17a6 6 0 0 1 10 0M9 17a6 6 0 0 1 10 0" stroke-linecap="round"/></svg>`,
+    info:`<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"/><path d="M7 5v4M7 10h.01" stroke-linecap="round"/></svg>`,
+  };
 
   document.getElementById('home-grid').innerHTML=`
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;">
-      <div class="stat-card">
-        <div class="stat-icon" style="background:var(--accent-soft);color:var(--accent);">${SVG.users}</div>
-        <div><div class="stat-val">${active.length}</div><div class="stat-lbl">Active reps</div>${deltaHtml}</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;">
+      <div class="nd-stat">
+        <div class="nd-stat-top">
+          <div><div class="nd-stat-lbl">Active Reps</div><div class="nd-stat-val">${active.length}</div></div>
+          <div class="nd-stat-icon" style="background:#e0f5f4;color:#0d9488;">${ICO.users}</div>
+        </div>${deltaHtml}
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:var(--warning-soft);color:var(--warning);">${SVG.warning}</div>
-        <div><div class="stat-val">${leavers.length}</div><div class="stat-lbl">Leavers</div><span class="stat-delta delta-same" style="display:flex;align-items:center;gap:3px;">${SVG.dash} ${flagged.length} flagged</span></div>
+      <div class="nd-stat">
+        <div class="nd-stat-top">
+          <div><div class="nd-stat-lbl">Flagged</div><div class="nd-stat-val">${flagged.length}</div></div>
+          <div class="nd-stat-icon" style="background:#fef3c7;color:#d97706;">${ICO.warn}</div>
+        </div>
+        <span class="nd-stat-delta" style="color:#d97706;">${leavers.length} leaver${leavers.length!==1?'s':''}</span>
       </div>
-      <div class="stat-card" style="cursor:${weekSubmitted?'default':'pointer'};" onclick="${weekSubmitted?'':"switchTab('weekly')"}">
-        <div class="stat-icon" style="background:${weekSubmitted?'var(--success-soft)':'var(--warning-soft)'};color:${weekSubmitted?'var(--success)':'var(--warning)'};">${weekSubmitted?SVG.check:SVG.clock}</div>
-        <div><div class="stat-val" style="font-size:16px;font-weight:600;margin-top:2px;">${weekSubmitted?'Submitted':'Pending'}</div><div class="stat-lbl">Weekly update</div>
-        <span class="stat-delta ${weekSubmitted?'delta-up':'delta-dn'}" style="display:flex;align-items:center;gap:3px;">${weekSubmitted?SVG.check:SVG.clock} ${weekSubmitted?'Done':'Tap to submit'}</span></div>
+      <div class="nd-stat" style="cursor:${weekSubmitted?'default':'pointer'};" onclick="${weekSubmitted?'':String.raw`switchTab('weekly')`}">
+        <div class="nd-stat-top">
+          <div>
+            <div class="nd-stat-lbl">Weekly Update</div>
+            <div class="nd-stat-val" style="font-size:18px;color:${weekSubmitted?'#0d9488':'#d97706'};">${weekSubmitted?'Submitted':'Pending'}</div>
+          </div>
+          <div class="nd-stat-icon" style="background:${weekSubmitted?'#e0f5f4':'#fef3c7'};color:${weekSubmitted?'#0d9488':'#d97706'};">${weekSubmitted?ICO.check:ICO.clock}</div>
+        </div>
+        <span class="nd-stat-delta ${weekSubmitted?'nd-delta-up':'nd-delta-dn'}">${weekSubmitted?ICO.check:ICO.clock} ${weekSubmitted?'Done for this week':'Tap to submit'}</span>
+      </div>
+      <div class="nd-stat">
+        <div class="nd-stat-top">
+          <div><div class="nd-stat-lbl">Latest Wire</div><div class="nd-stat-val">${curWire?'£'+curWire.toLocaleString('en-GB'):'—'}</div></div>
+          <div class="nd-stat-icon" style="background:#dcfce7;color:#16a34a;">${ICO.pound}</div>
+        </div>
+        <span class="nd-stat-delta" style="color:${wireColor};">${wireDiffHtml}</span>
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 300px;gap:14px;margin-bottom:14px;">
-      <!-- Links section -->
-      <div style="grid-column:1/4;background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);box-shadow:var(--s1);overflow:hidden;">
-        <div style="padding:14px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-          <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;">This week's links</span>
-          <button onclick="switchTab('reports')" style="background:none;border:none;color:var(--accent);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;">View all →</button>
+    <div style="display:grid;grid-template-columns:1fr 268px;gap:14px;margin-bottom:16px;">
+      <div class="nd-chart-card">
+        <div class="nd-card-hdr">
+          <div>
+            <div class="nd-card-title">Production History</div>
+            <div class="nd-card-sub">Last 6 weeks — office wire &amp; manager take</div>
+          </div>
+          <button class="nd-export-btn" onclick="switchTab('reports')">View All</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
-          <div style="padding:16px 18px;border-right:1px solid var(--border);">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-              <div style="width:30px;height:30px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.chart}</div>
-              <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Pay Report</span>
-            </div>
-            ${latestPay?`<div style="font-size:13px;font-weight:500;margin-bottom:2px;">${isThisWeekPay?'This week':'Latest'}</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${formatWeek(latestPay.week)}</div>${isThisWeekPay?`<div class="friday-warn" style="margin-bottom:10px;">Review &amp; let Elle know changes before 11am Friday</div>`:''}<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><a href="${esc(latestPay.url)}" target="_blank" class="view-btn">${SVG.link} View</a><button class="ack-btn ${ackDone?'done':''}" onclick="acknowledgeReport()" id="ack-btn">${ackDone?'Acknowledged ✓':'Mark reviewed'}</button></div>`:`<div style="font-size:13px;color:var(--subtle);">Not uploaded yet</div>`}
+        <div style="display:flex;gap:18px;align-items:center;padding:12px 20px 0;">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#6b7d8a;">
+            <div style="width:10px;height:10px;border-radius:50%;background:#b8e0f5;"></div>Office Wire
           </div>
-          <div style="padding:16px 18px;border-right:1px solid var(--border);">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-              <div style="width:30px;height:30px;border-radius:8px;background:var(--warning-soft);color:var(--warning);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.calendar}</div>
-              <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Daily Planner</span>
-            </div>
-            ${latestPlanner?`<div style="font-size:13px;font-weight:500;margin-bottom:2px;">${esc(latestPlanner.campaign||'Daily Planner')}</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${formatWeek(latestPlanner.week)}</div><a href="${esc(latestPlanner.url)}" target="_blank" class="view-btn">${SVG.link} View</a>`:`<div style="font-size:13px;color:var(--subtle);">Not uploaded yet</div>`}
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#6b7d8a;">
+            <div style="width:10px;height:10px;border-radius:50%;background:#8eca44;"></div>Manager Take
           </div>
-          <div style="padding:16px 18px;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-              <div style="width:30px;height:30px;border-radius:8px;background:var(--success-soft);color:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.doc}</div>
-              <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Pro-log</span>
-            </div>
-            ${latestProlog?`<div style="font-size:13px;font-weight:500;margin-bottom:2px;">${esc(latestProlog.campaign||'Pro-log')}</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${formatWeek(latestProlog.week)}</div><a href="${esc(latestProlog.url)}" target="_blank" class="view-btn">${SVG.link} View</a>`:`<div style="font-size:13px;color:var(--subtle);">Not uploaded yet</div>`}
-          </div>
+        </div>
+        <div style="padding:8px 14px 16px;">
+          <svg viewBox="0 0 520 150" width="100%" height="150" xmlns="http://www.w3.org/2000/svg">
+            ${gridLines}
+            ${chartBars}
+          </svg>
         </div>
       </div>
 
-      <!-- Mini calendar -->
-      <div class="card" style="grid-column:4;">
-        <div class="card-hd">
-          <span class="card-title">${months[miniMonth]} ${miniYear}</span>
-          <button class="card-action" onclick="switchTab('calendar')">Full calendar →</button>
+      <div class="nd-links-card">
+        <div class="nd-card-hdr">
+          <div><div class="nd-card-title">This Week's Links</div><div class="nd-card-sub">Updated weekly</div></div>
         </div>
-        <div class="card-bd" style="padding:10px 14px;">
-          <div class="mini-cal-grid">${miniGridHtml}</div>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 6px;">Upcoming</div>
-          <div class="home-events-list">${upcomingHtml}</div>
-        </div>
+        ${latestPay
+          ?`<a href="${esc(latestPay.url)}" target="_blank" class="nd-link-row">
+              <div class="nd-link-icon" style="background:#e0f5f4;color:#0d9488;">${ICO.pay}</div>
+              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub">${isThisWeekPay?'This week · '+latestPay.week:'Latest — '+formatWeek(latestPay.week)}</div></div>
+              <div class="nd-link-arrow">${ICO.chevron}</div>
+            </a>`
+          :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
+              <div class="nd-link-icon" style="background:#f0f4f5;color:#a0b0ba;">${ICO.pay}</div>
+              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub">Not uploaded yet</div></div>
+            </div>`}
+        ${latestPlanner
+          ?`<a href="${esc(latestPlanner.url)}" target="_blank" class="nd-link-row">
+              <div class="nd-link-icon" style="background:#fef3c7;color:#d97706;">${ICO.cal}</div>
+              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">${esc(latestPlanner.campaign||formatWeek(latestPlanner.week))}</div></div>
+              <div class="nd-link-arrow">${ICO.chevron}</div>
+            </a>`
+          :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
+              <div class="nd-link-icon" style="background:#f0f4f5;color:#a0b0ba;">${ICO.cal}</div>
+              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">Not uploaded yet</div></div>
+            </div>`}
+        ${latestProlog
+          ?`<a href="${esc(latestProlog.url)}" target="_blank" class="nd-link-row">
+              <div class="nd-link-icon" style="background:#f0fdf4;color:#16a34a;">${ICO.doc}</div>
+              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">${esc(latestProlog.campaign||formatWeek(latestProlog.week))}</div></div>
+              <div class="nd-link-arrow">${ICO.chevron}</div>
+            </a>`
+          :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
+              <div class="nd-link-icon" style="background:#f0f4f5;color:#a0b0ba;">${ICO.doc}</div>
+              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">Not uploaded yet</div></div>
+            </div>`}
+        ${isThisWeekPay?`<div style="margin:8px 12px;background:#fffbeb;border:1px solid rgba(217,119,6,.18);border-radius:8px;padding:7px 11px;font-size:11px;color:#b45309;display:flex;align-items:center;gap:6px;">${ICO.info} Advise changes by 11am Friday</div>`:''}
+        ${latestPay?`<div style="padding:8px 14px 12px;"><button class="ack-btn ${ackDone?'done':''}" id="ack-btn" onclick="acknowledgeReport()" style="font-size:11px;padding:5px 12px;">${ackDone?'Acknowledged &#10003;':'Mark as reviewed'}</button></div>`:''}
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 280px;gap:14px;">
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Team snapshot</span><button class="card-action" onclick="switchTab('reps')">Manage →</button></div>
-        <div class="card-bd" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;max-height:220px;overflow-y:auto;">
-          ${active.length?active.map(r=>{const c=pc(r.position||'default');const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);const ldr=r.leader==='__mgr__'?getMgrDisplay():(roster.find(x=>x.id===r.leader)||null);const flagInfo=r.flag?FLAGS.find(f=>f.id===r.flag):null;return`<div class="roster-item"><div class="av av28" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div><div class="ri-info"><div class="ri-name">${esc(r.name)}</div><div class="ri-sub">${r.position||'—'}${ldr?` · →${esc(typeof ldr==='string'?ldr:ldr.name)}`:''}</div></div>${flagInfo?`<div class="flag-dot" style="background:${flagInfo.color};" title="${esc(flagInfo.label)}"></div>`:''}</div>`;}).join(''):`<div style="color:var(--subtle);font-size:13px;padding:4px 0;">No reps yet.</div>`}
-          ${leavers.length?`<div style="font-size:11px;color:var(--subtle);padding:6px 2px;grid-column:1/-1;">${leavers.length} leaver${leavers.length>1?'s':''} not shown</div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 268px;gap:14px;">
+      <div class="nd-lb-card">
+        <div class="nd-card-hdr">
+          <div><div class="nd-card-title">Top Agents</div><div class="nd-card-sub">National leaderboard — this week</div></div>
+          <button onclick="switchTab('leaderboard');setTimeout(lbInit,50);" style="background:var(--niond-green,#8eca44);color:#fff;border:none;font-family:var(--font);font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;cursor:pointer;letter-spacing:.04em;flex-shrink:0;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Full Board</button>
         </div>
+        ${lbSnap.length
+          ?lbSnap.map((r,i)=>{
+              const score=(typeof lbNum!=='undefined')?lbNum(r['Week Total']):(Number(r['Week Total'])||0);
+              const medals=['🥇','🥈','🥉'];
+              const rankHtml=i<3?`<div class="nd-rank-badge nd-rank-${i+1}" style="font-size:15px;">${medals[i]}</div>`:`<div class="nd-rank-badge nd-rank-n">${i+1}</div>`;
+              return `<div class="nd-lb-row">${rankHtml}<div style="min-width:0;"><div class="nd-lb-name">${esc(r.Agent)}</div><div class="nd-lb-camp">${esc(r.Campaign||'—')}</div></div><div class="nd-lb-score">${score.toLocaleString()}</div></div>`;
+            }).join('')
+          :`<div style="padding:28px 18px;text-align:center;">
+              <div style="color:var(--niond-muted,#6b7d8a);font-size:13px;margin-bottom:12px;">Leaderboard loads when you visit the full board</div>
+              <button onclick="switchTab('leaderboard');setTimeout(lbInit,50);" style="background:none;border:1px solid #e8ecee;color:#0d9488;font-family:var(--font);font-size:12px;font-weight:600;padding:8px 18px;border-radius:20px;cursor:pointer;">Load Leaderboard</button>
+            </div>`}
       </div>
-      <div class="card">
-        <div class="card-hd"><span class="card-title">Quick notes</span><button class="card-action" onclick="saveNotes()">Save</button></div>
-        <div class="card-bd"><textarea class="notes-area" id="notes-area" placeholder="Jot anything down…">${esc(notes)}</textarea></div>
+
+      <div class="nd-reps-card">
+        <div class="nd-card-hdr">
+          <div><div class="nd-card-title">Agents</div><div class="nd-card-sub">${active.length} active · ${leavers.length} leaver${leavers.length!==1?'s':''}</div></div>
+        </div>
+        ${repSnap.length
+          ?repSnap.map(r=>{
+              const c=ndC(r.position||'default');
+              const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+              const fi=r.flag?FLAGS.find(f=>f.id===r.flag):null;
+              return `<div class="nd-rep-row" onclick="switchTab('reps')">
+                <div class="nd-rep-av" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
+                <div style="min-width:0;flex:1;"><div class="nd-rep-name">${esc(r.name)}</div><div class="nd-rep-pos">${esc(r.position||'—')}</div></div>
+                ${fi?`<div class="nd-rep-flag" style="background:${fi.color};" title="${esc(fi.label)}"></div>`:''}
+              </div>`;
+            }).join('')
+          :`<div style="padding:18px 16px;color:#6b7d8a;font-size:13px;">No reps yet.</div>`}
+        <button class="nd-view-all-btn" onclick="switchTab('reps')">${ICO.reps} View all ${active.length} reps</button>
       </div>
     </div>
   `;
+
+  if(typeof lbRows!=='undefined'&&!lbLoaded){
+    lbInit().then(()=>renderHome()).catch(()=>{});
+  }
 }
+
 
 function dismissAnn(id){localStorage.setItem('tt_ann_dismissed_'+id,'1');renderHome();}
 async function acknowledgeReport(){
