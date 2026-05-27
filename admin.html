@@ -870,55 +870,30 @@ function doPost(e) {
 
     // Send email to admin recipients
     try {
-      const sh = getOrCreate('settings', ['key','value','updatedAt']);
-      const emailRow = sh.getDataRange().getValues().slice(1).find(r => r[0]==='reviewEmails');
-      const emailStr = emailRow ? String(emailRow[1]) : '';
+      var esh = getOrCreate('settings', ['key','value','updatedAt']);
+      var erow = esh.getDataRange().getValues().slice(1).find(function(r){return r[0]==='reviewEmails';});
+      var emailStr = erow ? String(erow[1]) : '';
       if (emailStr) {
-        const recipients = emailStr.split(',').join('\n').split('\n').map(function(e){return e.trim();}).filter(Boolean);
+        var parts = emailStr.split(','); var recipients = []; for(var pi=0;pi<parts.length;pi++){var pt=parts[pi].trim();if(pt)recipients.push(pt);}
         if (recipients.length) {
-          const dn = data.manager.charAt(0).toUpperCase() + data.manager.slice(1);
-          const weekFormatted = data.week || '';
-          const subject = 'Weekly Review \u2014 ' + dn + ' \u2014 w/c ' + weekFormatted;
-          const rd = data.reviewData || {};
-          // Build plain-text body from reviewData fields
-          const lines = ['Weekly Review submitted by ' + dn, 'Week: ' + weekFormatted, 'Submitted: ' + submittedAt, ''];
-          const fieldLabels = {
-            focusPeople:'Focus Reps', focusText:'Focus Notes', fieldThis:'On the Field',
-            lastWeekWire:'Last Week Wire', lastWeekSales:'Last Week Sales',
-            lastWeekGoalWire:'Wire Goal', lastWeekGoalSales:'Sales Goal',
-            convs:'Key Conversations', networks:'Networking', netGoals:'Network Goals',
-            additionalNotes:'Additional Notes', campaign:'Campaign'
-          };
-          Object.entries(rd).forEach(([k,v]) => {
-            if (!v || k==='pdfHtml' || k==='mapSnapshot' || k==='mapData') return;
-            const lbl = fieldLabels[k] || k.replace(/([A-Z])/g,' $1').replace(/^./,function(s){return s.toUpperCase();});
-            if (Array.isArray(v)) {
-              if (v.length) {
-                lines.push(lbl+':');
-                v.forEach(item => {
-                  if (typeof item === 'object') lines.push('  • '+Object.values(item).filter(Boolean).join(' — '));
-                  else lines.push('  • '+String(item));
-                });
+          var dn2 = data.manager.charAt(0).toUpperCase() + data.manager.slice(1);
+          var wf = data.week || '';
+          var subj = 'Weekly Review - ' + dn2 + ' - w/c ' + wf;
+          var rd2 = data.reviewData || {};
+          var pdfHtml = rd2.pdfHtml || '';
+          var bodyText = 'Weekly Review: ' + dn2 + ', Week: ' + wf;
+          recipients.forEach(function(to) {
+            try {
+              if (pdfHtml) {
+                MailApp.sendEmail({to:to, subject:subj, body:bodyText, htmlBody:pdfHtml});
+              } else {
+                MailApp.sendEmail(to, subj, bodyText);
               }
-            } else {
-              lines.push(lbl+': '+String(v));
-            }
+            } catch(me2) {}
           });
-          const body = lines.join('\n');
-          // Send HTML email if pdfHtml available, otherwise plain text
-          const pdfHtml = rd.pdfHtml || '';
-          if (pdfHtml) {
-            recipients.forEach(to => {
-              try { MailApp.sendEmail({to, subject, body, htmlBody: pdfHtml}); } catch(me) {}
-            });
-          } else {
-            recipients.forEach(to => {
-              try { MailApp.sendEmail(to, subject, body); } catch(me) {}
-            });
-          }
         }
       }
-    } catch(mailErr) { /* don't fail the save if email fails */ }
+    } catch(mailErr) {}
 
     result = { ok: true };
 
