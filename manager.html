@@ -533,25 +533,21 @@ select.field-input{cursor:pointer;appearance:none;}
 .rpt-search-input:focus{border-color:var(--accent);width:240px;}
 .rpt-search-input::placeholder{color:var(--subtle);}
 
-/* ── REPORTS SUMMARY STRIP — softer SaaS stat tiles ── */
-.rpt-summary{display:grid;gap:12px;margin-bottom:22px;}
+/* ── REPORTS SUMMARY STRIP ── */
+.rpt-summary{display:grid;gap:10px;margin-bottom:22px;}
 .rpt-summary.pay-grid{grid-template-columns:repeat(4,1fr);}
 .rpt-summary.basic-grid{grid-template-columns:repeat(3,1fr);}
-.rpt-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;box-shadow:var(--s1);transition:box-shadow .15s;}
-.rpt-stat:hover{box-shadow:var(--s2);}
-.rpt-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:10px 10px 0 0;}
-.rpt-stat-val{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1;margin-top:4px;}
-.rpt-stat-lbl{font-size:11px;color:var(--muted);margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;}
-.rpt-stat.teal-stat{background:var(--surface);border-top:none;}
-.rpt-stat.teal-stat::before{background:linear-gradient(90deg,#0f766e,#14b8a6);}
+.rpt-stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--s1);}
+.rpt-stat-icon{width:32px;height:32px;border-radius:6px;background:var(--niond-teal-primary-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rpt-stat-icon svg{width:15px;height:15px;stroke:var(--accent);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
+.rpt-stat-body{min-width:0;}
+.rpt-stat-lbl{font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rpt-stat-val{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--text);line-height:1.2;margin-top:1px;}
 .rpt-stat.teal-stat .rpt-stat-val{color:var(--accent);}
-.rpt-stat.teal-stat .rpt-stat-lbl{color:var(--muted);}
-[data-theme="dark"] .rpt-stat{background:var(--surface);border:1px solid var(--border);}
+[data-theme="dark"] .rpt-stat{background:var(--surface);border-color:var(--border);}
+[data-theme="dark"] .rpt-stat-icon{background:var(--accent-soft);}
 [data-theme="dark"] .rpt-stat .rpt-stat-val{color:var(--text);}
-[data-theme="dark"] .rpt-stat .rpt-stat-lbl{color:var(--muted);}
-[data-theme="dark"] .rpt-stat.teal-stat{background:var(--surface);border-color:var(--border);}
 [data-theme="dark"] .rpt-stat.teal-stat .rpt-stat-val{color:var(--accent);}
-[data-theme="dark"] .rpt-stat.teal-stat .rpt-stat-lbl{color:var(--muted);}
 
 /* ── MONTH ACCORDION — white cards matching dashboard ── */
 .month-accordion{margin-bottom:10px;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05);}
@@ -1877,15 +1873,15 @@ function buildPayProductionCard(week){
     </div>
     ${wire>0||take>0?`
     <div style="display:grid;grid-template-columns:1fr 1fr${pct!==null?' 1fr':''}; gap:10px;margin-bottom:${wire>0?'14px':'4px'};">
-      <div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:8px;padding:12px 14px;text-align:center;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;">
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Office Wire</div>
         <div style="font-size:18px;font-weight:800;color:var(--text);">£${wire>0?wire.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:8px;padding:12px 14px;text-align:center;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;">
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Manager's Take</div>
         <div style="font-size:18px;font-weight:800;color:var(--text);">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
-      ${pct!==null?`<div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent2);border-radius:8px;padding:12px 14px;text-align:center;">
+      ${pct!==null?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;">
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Take %</div>
         <div style="font-size:18px;font-weight:800;color:var(--accent);">${pct}%</div>
       </div>`:''}
@@ -1961,11 +1957,12 @@ function _renderPayReports(){
   });
   const weeks=Object.keys(allWeeks.reduce((a,w)=>{a[w]=1;return a;},{})).sort();
   const dateRange=weeks.length>1?`${fmtReportDate(weeks[0])} – ${fmtReportDate(weeks[weeks.length-1])}`:(weeks[0]?fmtReportDate(weeks[0]):'—');
+  const _si=(path)=>`<div class="rpt-stat-icon"><svg viewBox="0 0 16 16">${path}</svg></div>`;
   stripEl.innerHTML=`<div class="rpt-summary pay-grid">
-    <div class="rpt-stat"><div class="rpt-stat-val">${payReports.length}</div><div class="rpt-stat-lbl">Pay reports</div></div>
-    <div class="rpt-stat"><div class="rpt-stat-val">${weeksWithData}</div><div class="rpt-stat-lbl">Weeks with figures</div></div>
-    <div class="rpt-stat teal-stat"><div class="rpt-stat-val">£${totalWire>0?totalWire.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div><div class="rpt-stat-lbl">Total office wire</div></div>
-    <div class="rpt-stat teal-stat"><div class="rpt-stat-val">£${totalTake>0?totalTake.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div><div class="rpt-stat-lbl">Total your take</div></div>
+    <div class="rpt-stat">${_si('<rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 7h6M5 9.5h4"/>')}<div class="rpt-stat-body"><div class="rpt-stat-lbl">Pay reports</div><div class="rpt-stat-val">${payReports.length}</div></div></div>
+    <div class="rpt-stat">${_si('<rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/>')}<div class="rpt-stat-body"><div class="rpt-stat-lbl">Weeks with figures</div><div class="rpt-stat-val">${weeksWithData}</div></div></div>
+    <div class="rpt-stat teal-stat">${_si('<path d="M8 2v12M3.5 6.5l4.5-4.5 4.5 4.5"/>')}<div class="rpt-stat-body"><div class="rpt-stat-lbl">Total office wire</div><div class="rpt-stat-val">£${totalWire>0?totalWire.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div></div></div>
+    <div class="rpt-stat teal-stat">${_si('<circle cx="8" cy="8" r="5.5"/><path d="M8 5.5v5M5.5 8h5"/>')}<div class="rpt-stat-body"><div class="rpt-stat-lbl">Total your take</div><div class="rpt-stat-val">£${totalTake>0?totalTake.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div></div></div>
   </div>`;
 
   // Group by week then by month
@@ -2021,10 +2018,11 @@ function _renderSimpleReports(reports,listId,stripId,badgeClass,icon,iconBg,icon
   }
   // Summary strip
   const allWks=[...new Set(reports.map(r=>r.week))].sort();
+  const _si2=(path)=>`<div class="rpt-stat-icon"><svg viewBox="0 0 16 16">${path}</svg></div>`;
   stripEl.innerHTML=`<div class="rpt-summary basic-grid">
-    <div class="rpt-stat"><div class="rpt-stat-val">${reports.length}</div><div class="rpt-stat-lbl">Total reports</div></div>
-    <div class="rpt-stat"><div class="rpt-stat-val">${allWks.length}</div><div class="rpt-stat-lbl">Weeks covered</div></div>
-    <div class="rpt-stat"><div class="rpt-stat-val">${_monthKeyLabel(allWks[0]?allWks[0].slice(0,7):'')}</div><div class="rpt-stat-lbl">Earliest on record</div></div>
+    <div class="rpt-stat">${_si2('<rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 7h6M5 9.5h4"/>')}<div class="rpt-stat-body"><div class="rpt-stat-lbl">Total reports</div><div class="rpt-stat-val">${reports.length}</div></div></div>
+    <div class="rpt-stat">${_si2('<rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/>')}<div class="rpt-stat-body"><div class="rpt-stat-lbl">Weeks covered</div><div class="rpt-stat-val">${allWks.length}</div></div></div>
+    <div class="rpt-stat">${_si2('<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.5l2 2"/>')}<div class="rpt-stat-body"><div class="rpt-stat-lbl">Earliest on record</div><div class="rpt-stat-val" style="font-size:14px;">${_monthKeyLabel(allWks[0]?allWks[0].slice(0,7):'')}</div></div></div>
   </div>`;
 
   // Group by week then month
