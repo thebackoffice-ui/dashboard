@@ -509,8 +509,12 @@ select.field-input{cursor:pointer;appearance:none;}
 [data-theme="dark"] .rt-pay{color:#1ac8ce;background:rgba(26,200,206,.1);}
 [data-theme="dark"] .rt-prolog{color:#4ade80;background:rgba(74,222,128,.1);}
 [data-theme="dark"] .rt-planner{color:#fbbf24;background:rgba(251,191,36,.1);}
-.rh-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px;box-shadow:var(--s1);transition:border-color .15s;}
-.rh-row:hover{border-color:var(--border2);}
+
+/* rh-row — matches dashboard link-card rows */
+.rh-row{background:#fff;border-radius:10px;padding:13px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:box-shadow .15s;}
+.rh-row:hover{box-shadow:0 4px 14px rgba(0,0,0,.09);}
+[data-theme="dark"] .rh-row{background:var(--surface);box-shadow:var(--s1);}
+[data-theme="dark"] .rh-row:hover{box-shadow:var(--s2);}
 
 /* ── REPORTS SEARCH ── */
 .rpt-search-wrap{position:relative;display:flex;align-items:center;}
@@ -519,29 +523,38 @@ select.field-input{cursor:pointer;appearance:none;}
 .rpt-search-input:focus{border-color:var(--accent);width:240px;}
 .rpt-search-input::placeholder{color:var(--subtle);}
 
-/* ── REPORTS SUMMARY STRIP ── */
-.rpt-summary{display:grid;gap:10px;margin-bottom:20px;}
+/* ── REPORTS SUMMARY STRIP — matches dashboard stat tiles ── */
+.rpt-summary{display:grid;gap:12px;margin-bottom:22px;}
 .rpt-summary.pay-grid{grid-template-columns:repeat(4,1fr);}
 .rpt-summary.basic-grid{grid-template-columns:repeat(3,1fr);}
-.rpt-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--s1);}
-.rpt-stat-val{font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1;}
-.rpt-stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:500;}
-.rpt-stat.accent-stat{background:linear-gradient(135deg,rgba(15,118,110,.07),rgba(20,184,166,.04));border-color:var(--accent-border);}
-.rpt-stat.accent-stat .rpt-stat-val{color:var(--accent);}
+.rpt-stat{background:#abc9ff;border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;}
+.rpt-stat-val{font-size:28px;font-weight:800;letter-spacing:-.03em;color:#0c2060;line-height:1;}
+.rpt-stat-lbl{font-size:11px;color:#1a3870;margin-top:6px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;}
+.rpt-stat.teal-stat{background:#1d9ba4;}
+.rpt-stat.teal-stat .rpt-stat-val{color:#fff;}
+.rpt-stat.teal-stat .rpt-stat-lbl{color:rgba(255,255,255,.82);}
+[data-theme="dark"] .rpt-stat{background:var(--surface);border:1px solid var(--border);}
+[data-theme="dark"] .rpt-stat .rpt-stat-val{color:var(--text);}
+[data-theme="dark"] .rpt-stat .rpt-stat-lbl{color:var(--muted);}
+[data-theme="dark"] .rpt-stat.teal-stat{background:rgba(20,184,166,.15);border-color:rgba(20,184,166,.3);}
+[data-theme="dark"] .rpt-stat.teal-stat .rpt-stat-val{color:var(--accent);}
+[data-theme="dark"] .rpt-stat.teal-stat .rpt-stat-lbl{color:var(--muted);}
 
-/* ── MONTH ACCORDION ── */
-.month-accordion{margin-bottom:8px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);box-shadow:var(--s1);}
-.month-accordion.is-current{border-color:var(--accent-border);}
-.month-acc-hdr{display:flex;align-items:center;gap:10px;padding:11px 16px;background:var(--surface);cursor:pointer;user-select:none;transition:background .12s;}
-.month-acc-hdr:hover{background:var(--surface2);}
-.month-accordion.is-current .month-acc-hdr{background:linear-gradient(90deg,rgba(15,118,110,.05),transparent);}
-.month-acc-chevron{font-size:13px;color:var(--subtle);transition:transform .2s;flex-shrink:0;line-height:1;}
+/* ── MONTH ACCORDION — white cards matching dashboard ── */
+.month-accordion{margin-bottom:10px;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+[data-theme="dark"] .month-accordion{background:var(--surface);box-shadow:var(--s1);}
+.month-accordion.is-current{box-shadow:0 1px 3px rgba(0,0,0,.05),0 0 0 1.5px rgba(15,118,110,.35);}
+[data-theme="dark"] .month-accordion.is-current{box-shadow:var(--s1),0 0 0 1.5px var(--accent-border);}
+.month-acc-hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none;transition:background .12s;}
+.month-acc-hdr:hover{background:rgba(0,0,0,.025);}
+[data-theme="dark"] .month-acc-hdr:hover{background:var(--surface2);}
+.month-acc-chevron{font-size:14px;color:var(--subtle);transition:transform .2s;flex-shrink:0;line-height:1;font-weight:700;}
 .month-acc-hdr.open .month-acc-chevron{transform:rotate(90deg);}
-.month-acc-title{font-size:13px;font-weight:700;color:var(--text);flex:1;}
+.month-acc-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;flex:1;}
 .month-acc-meta{font-size:11px;color:var(--muted);font-weight:500;}
-.month-acc-body{border-top:1px solid var(--border);padding:10px 12px;background:var(--bg);display:none;}
+.month-acc-body{border-top:1px solid var(--border);padding:12px 14px;background:var(--bg);display:none;}
+[data-theme="dark"] .month-acc-body{background:var(--bg);}
 .month-acc-body.open{display:block;}
-.month-acc-body .rh-row{background:var(--surface);}
 .rpt-no-results{font-size:13px;color:var(--muted);text-align:center;padding:32px 0;}
 
 /* ── WEEKLY REVIEW ── */
@@ -1794,48 +1807,44 @@ function buildPayProductionCard(week){
   const take=parseFloat(pd.mgrTake)||0;
   const pct=wire>0?Math.round((take/wire)*100):null;
   const safeW=week.replace(/[^0-9-]/g,'');
-  return`<div style="background:linear-gradient(135deg,rgba(13,115,119,.06),rgba(13,115,119,.02));border:1px solid var(--accent-border);border-radius:var(--rlg);padding:18px 20px;margin-bottom:16px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:18px;">💰</span>
-        <div>
-          <div style="font-size:14px;font-weight:700;color:var(--text);">Production Overview</div>
-          <div style="font-size:12px;color:var(--muted);">${fmtReportDate(week)}${isCurrentWeek?' · <span style="color:var(--warning);font-weight:600;">This Week</span>':''}</div>
-        </div>
+  return`<div style="background:#fff;border-radius:10px;padding:18px 20px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${wire>0||take>0?'14px':'4px'};">
+      <div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;">Production Overview</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">${fmtReportDate(week)}${isCurrentWeek?` · <span style="color:var(--warning);font-weight:600;">This Week</span>`:''}</div>
       </div>
-      ${wire>0||take>0?`<div style="text-align:right;"><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Your take</div><div style="font-size:22px;font-weight:800;color:var(--accent);">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div></div>`:''}
+      ${wire>0||take>0?`<div style="text-align:right;"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">Your take</div><div style="font-size:26px;font-weight:800;color:#1d9ba4;letter-spacing:-.03em;">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div></div>`:''}
     </div>
     ${wire>0||take>0?`
-    <div style="display:grid;grid-template-columns:1fr 1fr${pct!==null?' 1fr':''}; gap:10px;margin-bottom:16px;">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-align:center;">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Office Wire</div>
-        <div style="font-size:20px;font-weight:700;color:var(--text);">£${wire>0?wire.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Total profit</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr${pct!==null?' 1fr':''}; gap:10px;margin-bottom:${wire>0?'14px':'4px'};">
+      <div style="background:#abc9ff;border-radius:8px;padding:12px 14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:#1a3870;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Office Wire</div>
+        <div style="font-size:18px;font-weight:800;color:#0c2060;">£${wire>0?wire.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-align:center;">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Manager's Take</div>
-        <div style="font-size:20px;font-weight:700;color:var(--accent);">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Your earnings</div>
+      <div style="background:#abc9ff;border-radius:8px;padding:12px 14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:#1a3870;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Manager's Take</div>
+        <div style="font-size:18px;font-weight:800;color:#0c2060;">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
-      ${pct!==null?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-align:center;">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Take %</div>
-        <div style="font-size:20px;font-weight:700;color:var(--success);">${pct}%</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px;">of office wire</div>
+      ${pct!==null?`<div style="background:#1d9ba4;border-radius:8px;padding:12px 14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Take %</div>
+        <div style="font-size:18px;font-weight:800;color:#fff;">${pct}%</div>
       </div>`:''}
     </div>
-    ${wire>0?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:8px 12px;margin-bottom:14px;">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;">Wire breakdown</div>
-      <div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;">
-        <div style="height:100%;width:${Math.min(pct||0,100)}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .4s;"></div>
+    ${wire>0?`<div style="background:#f0f3f6;border-radius:6px;padding:8px 12px;margin-bottom:4px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);">Take as % of wire</div>
+        <div style="font-size:11px;font-weight:700;color:#1d9ba4;">${pct||0}%</div>
+      </div>
+      <div style="height:6px;background:rgba(0,0,0,.08);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${Math.min(pct||0,100)}%;background:linear-gradient(90deg,#1d9ba4,#14b8a6);border-radius:3px;transition:width .4s;"></div>
       </div>
     </div>`:''}
-    `:'<div style="font-size:13px;color:var(--subtle);margin-bottom:14px;">No production figures uploaded for this week yet.</div>'}
-    <!-- Editable fields -->
-    <details style="margin-top:4px;">
-      <summary style="font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;">
-        <span style="font-size:14px;">✏️</span> Edit / update figures
+    `:'<div style="font-size:13px;color:var(--subtle);margin-bottom:10px;padding:4px 0;">No production figures uploaded for this week yet.</div>'}
+    <details style="margin-top:8px;">
+      <summary style="font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:4px 0;">
+        <span style="font-size:13px;">✏️</span> Edit / update figures
       </summary>
-      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div>
           <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Office Wire £</div>
           <input id="pd-wire-${safeW}" type="number" min="0" step="0.01" value="${pd.officeWire}" placeholder="0.00" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 11px;border-radius:var(--rsm);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" />
@@ -1845,15 +1854,15 @@ function buildPayProductionCard(week){
           <input id="pd-take-${safeW}" type="number" min="0" step="0.01" value="${pd.mgrTake}" placeholder="0.00" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 11px;border-radius:var(--rsm);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" />
         </div>
       </div>
-      <button id="pd-save-${safeW}" onclick="savePayDataForWeek('${week}')" style="margin-top:10px;background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:8px 20px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;">Save</button>
+      <button id="pd-save-${safeW}" onclick="savePayDataForWeek('${week}')" style="margin-top:10px;background:#0f766e;border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:600;padding:8px 20px;border-radius:20px;cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Save</button>
     </details>
   </div>`;
 }
 
 function renderReports(){
   _renderPayReports();
-  _renderSimpleReports(allReports.filter(r=>r.type==='Daily Planner'),'planner-reports-list','planner-summary-strip','rt-planner','📅');
-  _renderSimpleReports(allReports.filter(r=>r.type==='Pro-log'),'prolog-reports-list','prolog-summary-strip','rt-prolog','📋');
+  _renderSimpleReports(allReports.filter(r=>r.type==='Daily Planner'),'planner-reports-list','planner-summary-strip','rt-planner','📅','#FFF4E0','#FFA800');
+  _renderSimpleReports(allReports.filter(r=>r.type==='Pro-log'),'prolog-reports-list','prolog-summary-strip','rt-prolog','📋','#E0F7F4','#00BFA5');
 }
 
 function _weekToMonthKey(w){
@@ -1893,10 +1902,10 @@ function _renderPayReports(){
   const weeks=Object.keys(allWeeks.reduce((a,w)=>{a[w]=1;return a;},{})).sort();
   const dateRange=weeks.length>1?`${fmtReportDate(weeks[0])} – ${fmtReportDate(weeks[weeks.length-1])}`:(weeks[0]?fmtReportDate(weeks[0]):'—');
   stripEl.innerHTML=`<div class="rpt-summary pay-grid">
-    <div class="rpt-stat"><div class="rpt-stat-val">${payReports.length}</div><div class="rpt-stat-lbl">Pay reports total</div></div>
+    <div class="rpt-stat"><div class="rpt-stat-val">${payReports.length}</div><div class="rpt-stat-lbl">Pay reports</div></div>
     <div class="rpt-stat"><div class="rpt-stat-val">${weeksWithData}</div><div class="rpt-stat-lbl">Weeks with figures</div></div>
-    <div class="rpt-stat accent-stat"><div class="rpt-stat-val">£${totalWire>0?totalWire.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div><div class="rpt-stat-lbl">Total office wire</div></div>
-    <div class="rpt-stat accent-stat"><div class="rpt-stat-val">£${totalTake>0?totalTake.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div><div class="rpt-stat-lbl">Total your take</div></div>
+    <div class="rpt-stat teal-stat"><div class="rpt-stat-val">£${totalWire>0?totalWire.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div><div class="rpt-stat-lbl">Total office wire</div></div>
+    <div class="rpt-stat teal-stat"><div class="rpt-stat-val">£${totalTake>0?totalTake.toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}</div><div class="rpt-stat-lbl">Total your take</div></div>
   </div>`;
 
   // Group by week then by month
@@ -1922,8 +1931,8 @@ function _renderPayReports(){
         <div class="wk-hdr" style="margin-top:8px;">${fmtReportDate(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
         ${buildPayProductionCard(w)}
         ${byW[w].map(r=>`<div class="rh-row">
-          <span style="font-size:18px;">📊</span>
-          <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">Pay Report${r.campaign?` — ${esc(r.campaign)}`:''}</div>${isNow?`<div style="font-size:11px;color:var(--warning);margin-top:1px;">⚠ Review and let Elle know before 11am Friday</div>`:''}</div>
+          <div style="width:34px;height:34px;border-radius:8px;background:#E8F1FF;color:#2979FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;">📊</div>
+          <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--text);">Pay Report${r.campaign?` — ${esc(r.campaign)}`:''}</div>${isNow?`<div style="font-size:11px;color:var(--warning);margin-top:1px;">⚠ Review and let Elle know before 11am Friday</div>`:''}</div>
           <span class="rtype-badge rt-pay">Pay Report</span>
           <a href="${esc(r.url)}" target="_blank" class="view-btn ghost">View ↗</a>
         </div>`).join('')}
@@ -1942,7 +1951,7 @@ function _renderPayReports(){
 }
 
 // ── Simple (planner / prolog) Reports ─────────────────
-function _renderSimpleReports(reports,listId,stripId,badgeClass,icon){
+function _renderSimpleReports(reports,listId,stripId,badgeClass,icon,iconBg,iconColor){
   const stripEl=document.getElementById(stripId);
   const listEl=document.getElementById(listId);
   if(!reports.length){
@@ -1975,8 +1984,8 @@ function _renderSimpleReports(reports,listId,stripId,badgeClass,icon){
       return`<div class="rpt-week-block" data-week="${w}">
         <div class="wk-hdr" style="margin-top:8px;">${fmtReportDate(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
         ${byW[w].map(r=>`<div class="rh-row">
-          <span style="font-size:18px;">${icon}</span>
-          <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">${esc(r.type)}${r.campaign?` — ${esc(r.campaign)}`:''}</div></div>
+          <div style="width:34px;height:34px;border-radius:8px;background:${iconBg};color:${iconColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;">${icon}</div>
+          <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--text);">${esc(r.type)}${r.campaign?` — ${esc(r.campaign)}`:''}</div></div>
           <span class="rtype-badge ${badgeClass}">${esc(r.type)}</span>
           <a href="${esc(r.url)}" target="_blank" class="view-btn ghost">View ↗</a>
         </div>`).join('')}
