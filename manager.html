@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Back Office</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 /* ── Niond-style dashboard redesign ── */
 :root {
@@ -558,12 +559,13 @@ select.field-input{cursor:pointer;appearance:none;}
 .rpt-no-results{font-size:13px;color:var(--muted);text-align:center;padding:32px 0;}
 
 /* ── WEEKLY REVIEW ── */
-.wr-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);box-shadow:var(--s1);margin-bottom:16px;overflow:hidden;}
-.wr-section-hdr{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:10px;}
-.wr-section-hdr .wr-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.wr-section-hdr span{font-size:13px;font-weight:600;}
+.wr-section{background:#fff;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:14px;overflow:hidden;}
+[data-theme="dark"] .wr-section{background:var(--surface);box-shadow:var(--s1);}
+.wr-section-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.wr-section-hdr .wr-num{width:26px;height:26px;border-radius:50%;background:#0f766e;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.wr-section-hdr span{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;}
 .wr-section-body{padding:16px 18px;}
-.wr-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;margin-top:14px;}
+.wr-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;margin-top:16px;}
 .wr-label:first-child{margin-top:0;}
 .wr-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;border-radius:var(--rsm);outline:none;width:100%;transition:border-color .15s;}
 .wr-input:focus{border-color:var(--accent);}
@@ -572,9 +574,18 @@ textarea.wr-input{resize:vertical;min-height:80px;line-height:1.6;}
 select.wr-input{cursor:pointer;appearance:none;}
 .wr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .wr-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
-.wr-rep-pill{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .15s;user-select:none;}
-.wr-rep-pill.selected{background:var(--accent);color:#fff;}
-.wr-rep-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+
+/* Rep focus grid */
+.wr-rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:8px;}
+.wr-rep-card{background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:12px 10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;user-select:none;text-align:center;}
+.wr-rep-card:hover{border-color:var(--accent-border);background:var(--accent-soft);}
+.wr-rep-card.selected{border-color:#0f766e;background:rgba(15,118,110,.08);box-shadow:0 0 0 1px #0f766e;}
+.wr-rep-card-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2;}
+.wr-rep-card-pos{font-size:10px;font-weight:600;margin-top:1px;}
+.wr-selected-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
+.wr-selected-row{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;display:flex;align-items:center;gap:10px;}
+
+
 .wr-conv-row{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:grid;grid-template-columns:1fr 2fr;gap:8px;align-items:center;}
 .wr-focus-person{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;font-size:13px;display:flex;align-items:center;justify-content:space-between;}
 .wr-network-row{display:grid;grid-template-columns:1fr 80px 1fr 28px;gap:8px;align-items:center;margin-bottom:8px;}
@@ -588,16 +599,18 @@ select.wr-input{cursor:pointer;appearance:none;}
 .wr-remove-btn:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
 .wr-add-link{background:none;border:1px dashed var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:7px 14px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;width:100%;text-align:center;margin-top:4px;}
 .wr-add-link:hover{border-color:var(--accent);color:var(--accent);}
-.wr-submit-btn{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:600;padding:14px 32px;border-radius:var(--r);cursor:pointer;transition:opacity .15s;width:100%;}
+.wr-submit-btn{background:#0f766e;border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:700;padding:14px 32px;border-radius:20px;cursor:pointer;transition:opacity .15s;width:100%;letter-spacing:.02em;}
 .wr-submit-btn:hover{opacity:.88;}
 .wr-submit-btn:disabled{opacity:.4;cursor:not-allowed;}
 .wr-toggle-group{display:flex;gap:8px;}
-.wr-toggle{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;font-weight:500;padding:7px 14px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;}
-.wr-toggle.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-.wr-past-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;box-shadow:var(--s1);cursor:pointer;transition:all .15s;}
-.wr-past-card:hover{border-color:var(--border2);box-shadow:var(--s2);}
-.wr-past-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.wr-toggle{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;font-weight:500;padding:7px 14px;border-radius:20px;cursor:pointer;transition:all .15s;}
+.wr-toggle.active{background:#0f766e;border-color:#0f766e;color:#fff;}
+.wr-past-card{background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.05);cursor:pointer;transition:box-shadow .15s;}
+[data-theme="dark"] .wr-past-card{background:var(--surface);box-shadow:var(--s1);}
+.wr-past-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.09);}
+.wr-past-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;letter-spacing:-.01em;}
 .wr-past-sub{font-size:11px;color:var(--muted);}
+.wr-map-preview{border-radius:8px;border:1px solid var(--border);width:100%;max-height:180px;object-fit:contain;background:var(--bg);margin-top:8px;display:block;}
 
 /* ── CALENDAR ── */
 .cal-layout{display:flex;gap:16px;padding:20px;flex:1;overflow:hidden;min-height:0;background:var(--bg);}
@@ -2125,16 +2138,16 @@ function buildReviewText(data){
   if(data.personalProduction)lines.push(`Personal Production/Sales: ${data.personalProduction}`);
   lines.push(`Production last week: ${data.productionLastWeek||'—'}`);
   lines.push('');
-  lines.push('— Leader Gauges (last week avg):');
-  lines.push(`  Sales Avg: ${data.leaderSalesAvg||'—'} | Activity Avg: ${data.leaderActivityAvg||'—'} | Retention Avg: ${data.leaderRetentionAvg||'—'}`);
-  lines.push('— Trainee/Solo Gauges (last week avg):');
-  lines.push(`  Sales Avg: ${data.traineeSalesAvg||'—'} | Activity Avg: ${data.traineeActivityAvg||'—'}`);
+  lines.push('— Leader Gauges (last week):');
+  lines.push(`  ${data.leaderGaugesLW||'—'}`);
+  lines.push('— Trainee/Solo Gauges (last week):');
+  lines.push(`  ${data.traineeGaugesLW||'—'}`);
   lines.push('');
   lines.push('━━━ THIS WEEK GOALS ━━━');
   lines.push('— Leader Gauges (goals):');
-  lines.push(`  Sales Goal: ${data.leaderSalesGoal||'—'} | Activity Goal: ${data.leaderActivityGoal||'—'} | Retention Goal: ${data.leaderRetentionGoal||'—'}`);
+  lines.push(`  ${data.leaderGaugesGoal||'—'}`);
   lines.push('— Trainee/Solo Gauges (goals):');
-  lines.push(`  Sales Goal: ${data.traineeSalesGoal||'—'} | Activity Goal: ${data.traineeActivityGoal||'—'}`);
+  lines.push(`  ${data.traineeGaugesGoal||'—'}`);
   lines.push('');
   lines.push('━━━ RECRUITMENT ━━━');
   const rc=(k,lbl)=>lines.push(`  ${lbl}: Last week ${data[k+'LW']||'—'} | Goal this week ${data[k+'Goal']||'—'}`);
@@ -2177,8 +2190,8 @@ function renderReviewForm(){
   const active=sortedByPos(roster.filter(r=>!r.leaver));
   const wrap=document.getElementById('review-form-wrap');
   wrap.innerHTML=`
-  <div style="margin-bottom:20px;">
-    <div style="font-size:20px;font-weight:700;margin-bottom:4px;">Weekly Review</div>
+  <div style="margin-bottom:22px;">
+    <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.03em;margin-bottom:4px;">Weekly Review</div>
     <div style="font-size:13px;color:var(--muted);">${formatWeek(weekKey)}</div>
   </div>
 
@@ -2186,11 +2199,18 @@ function renderReviewForm(){
   <div class="wr-section">
     <div class="wr-section-hdr"><div class="wr-num">1</div><span>Key People to Focus On</span></div>
     <div class="wr-section-body">
-      <div class="wr-label">Select reps to focus on this week (ordered by position)</div>
-      <div class="wr-rep-pills" id="wr-focus-pills">
-        ${active.map(r=>`<div class="wr-rep-pill" data-id="${r.id}" data-name="${esc(r.name)}" data-pos="${esc(r.position||'')}" onclick="toggleFocusPerson(this)">${esc(r.name)} <span style="opacity:.6;font-size:10px;">${esc(r.position||'')}</span></div>`).join('')}
+      <div class="wr-label" style="margin-top:0;">Select reps — tap to highlight</div>
+      <div class="wr-rep-grid" id="wr-focus-grid">
+        ${active.map(r=>{
+          const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+          return`<div class="wr-rep-card" data-id="${r.id}" data-name="${esc(r.name)}" data-pos="${esc(r.position||'')}" onclick="toggleFocusPerson(this)">
+            <div class="av av34 ${posClass(r.position||'')}">${ini}</div>
+            <div class="wr-rep-card-name">${esc(r.name)}</div>
+            ${r.position?`<span class="pos-tag ${posClass(r.position)} wr-rep-card-pos">${esc(r.position)}</span>`:''}
+          </div>`;
+        }).join('')}
       </div>
-      <div id="wr-focus-selected" style="margin-top:10px;display:flex;flex-direction:column;gap:4px;"></div>
+      <div id="wr-focus-selected" class="wr-selected-list"></div>
     </div>
   </div>
 
@@ -2218,17 +2238,12 @@ function renderReviewForm(){
       </div>
       <div class="wr-label">Team production last week</div>
       <input class="wr-input" id="wr-productionLastWeek" type="text" placeholder="Overall production figure…"/>
-      <div class="wr-label" style="margin-top:18px;">Leaders Gauges — last week average</div>
-      <div class="wr-grid3">
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Sales avg</div><input class="wr-input" id="wr-leaderSalesAvg" type="text" placeholder="0"/></div>
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Activity avg</div><input class="wr-input" id="wr-leaderActivityAvg" type="text" placeholder="0"/></div>
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Retention avg</div><input class="wr-input" id="wr-leaderRetentionAvg" type="text" placeholder="0"/></div>
-      </div>
-      <div class="wr-label">Trainee / Solo Gauges — last week average</div>
-      <div class="wr-grid">
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Sales avg</div><input class="wr-input" id="wr-traineeSalesAvg" type="text" placeholder="0"/></div>
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Activity avg</div><input class="wr-input" id="wr-traineeActivityAvg" type="text" placeholder="0"/></div>
-      </div>
+
+      <div class="wr-label" style="margin-top:18px;">Leaders Gauges — last week</div>
+      <input class="wr-input" id="wr-leaderGaugesLW" type="text" placeholder="Leaders Gauges — last week"/>
+
+      <div class="wr-label">Trainee / Solo Gauges — last week</div>
+      <input class="wr-input" id="wr-traineeGaugesLW" type="text" placeholder="Trainee / Solo Gauges — last week"/>
     </div>
   </div>
 
@@ -2237,16 +2252,9 @@ function renderReviewForm(){
     <div class="wr-section-hdr"><div class="wr-num">4</div><span>Goals This Week</span></div>
     <div class="wr-section-body">
       <div class="wr-label">Leaders Gauges — goals</div>
-      <div class="wr-grid3">
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Sales goal</div><input class="wr-input" id="wr-leaderSalesGoal" type="text" placeholder="0"/></div>
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Activity goal</div><input class="wr-input" id="wr-leaderActivityGoal" type="text" placeholder="0"/></div>
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Retention goal</div><input class="wr-input" id="wr-leaderRetentionGoal" type="text" placeholder="0"/></div>
-      </div>
+      <input class="wr-input" id="wr-leaderGaugesGoal" type="text" placeholder="Leaders Gauges — goals"/>
       <div class="wr-label">Trainee / Solo Gauges — goals</div>
-      <div class="wr-grid">
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Sales goal</div><input class="wr-input" id="wr-traineeSalesGoal" type="text" placeholder="0"/></div>
-        <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Activity goal</div><input class="wr-input" id="wr-traineeActivityGoal" type="text" placeholder="0"/></div>
-      </div>
+      <input class="wr-input" id="wr-traineeGaugesGoal" type="text" placeholder="Trainee / Solo Gauges — goals"/>
     </div>
   </div>
 
@@ -2309,17 +2317,29 @@ function renderReviewForm(){
     </div>
   </div>
 
-  <!-- 8. Additional notes -->
+  <!-- 8. Team map snapshot -->
   <div class="wr-section">
-    <div class="wr-section-hdr"><div class="wr-num">8</div><span>Additional Notes</span></div>
+    <div class="wr-section-hdr"><div class="wr-num">8</div><span>Team Map Snapshot</span></div>
+    <div class="wr-section-body">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">A snapshot of your current team map will be included in the PDF automatically. Preview below.</div>
+      <div id="wr-map-preview-wrap">
+        <div style="font-size:12px;color:var(--subtle);font-style:italic;">Map preview will appear here — make sure your team map is up to date.</div>
+      </div>
+      <button onclick="captureMapPreview()" style="margin-top:10px;background:none;border:1px solid var(--accent-border);color:var(--accent);font-family:var(--font);font-size:12px;font-weight:600;padding:7px 16px;border-radius:20px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='var(--accent-soft)'" onmouseout="this.style.background='none'">↺ Refresh preview</button>
+    </div>
+  </div>
+
+  <!-- 9. Additional notes -->
+  <div class="wr-section">
+    <div class="wr-section-hdr"><div class="wr-num">9</div><span>Additional Notes</span></div>
     <div class="wr-section-body">
       <textarea class="wr-input" id="wr-additionalNotes" placeholder="Anything else worth noting…" style="min-height:80px;"></textarea>
     </div>
   </div>
 
-  <!-- 9. Campaign / events -->
+  <!-- 10. Campaign / events -->
   <div class="wr-section">
-    <div class="wr-section-hdr"><div class="wr-num">9</div><span>Campaign &amp; Event Expenses</span></div>
+    <div class="wr-section-hdr"><div class="wr-num">10</div><span>Campaign &amp; Event Expenses</span></div>
     <div class="wr-section-body">
       <div class="wr-label">Your campaign</div>
       <select class="wr-input" id="wr-campaign" onchange="checkVenueCampaign(this.value)" style="margin-bottom:14px;">
@@ -2353,14 +2373,15 @@ function renderReviewForm(){
   </div>
 
   <div style="padding:16px 0 40px;">
-    <button class="wr-submit-btn" onclick="submitReview()">Submit Review & Save</button>
-    <div style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px;">Saves to your past reviews. You can also set up email delivery in the Setup tab.</div>
+    <button class="wr-submit-btn" onclick="submitReview()">Submit Review &amp; Generate PDF</button>
+    <div style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px;">Saves locally · Generates a PDF · Emails your admin</div>
   </div>
   `;
 
   renderConvRows();renderNetworkRows();renderNetGoalRows();renderExpenseRows();
-  // init field toggle state
   setField(true);
+  // Auto-capture map preview after a short delay
+  setTimeout(captureMapPreview,400);
 }
 
 let wrOnField=true;
@@ -2390,13 +2411,41 @@ function toggleFocusPerson(el){
   el.classList.toggle('selected');
   if(el.classList.contains('selected')){wrFocusPeople.push({id,name,position:pos});}
   else{wrFocusPeople=wrFocusPeople.filter(x=>x.id!==id);}
-  // Show sorted selected list
   const sorted=sortedByPos(wrFocusPeople.map(x=>({...x})));
   const disp=document.getElementById('wr-focus-selected');
   if(sorted.length){
-    disp.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Selected (sorted by position):</div>`
-      +sorted.map(r=>`<div class="wr-focus-person"><span>${esc(r.name)}</span><span class="pos-tag ${posClass(r.position)}">${esc(r.position||'—')}</span></div>`).join('');
+    disp.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Selected (${sorted.length}):</div>`
+      +sorted.map(r=>{
+        const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+        return`<div class="wr-selected-row">
+          <div class="av av28 ${posClass(r.position||'')}">${ini}</div>
+          <div style="flex:1;font-size:13px;font-weight:500;">${esc(r.name)}</div>
+          <span class="pos-tag ${posClass(r.position)}">${esc(r.position||'—')}</span>
+        </div>`;
+      }).join('');
   }else{disp.innerHTML='';}
+}
+
+let wrMapSnapshot='';
+async function captureMapPreview(){
+  const wrap=document.getElementById('wr-map-preview-wrap');
+  if(!wrap)return;
+  const stage=document.getElementById('spider-nodes');
+  const svg=document.getElementById('spider-svg');
+  if(!stage||(!sp.nodes||!sp.nodes.length)){
+    wrap.innerHTML='<div style="font-size:12px;color:var(--subtle);font-style:italic;padding:8px 0;">No team map data yet — build your map on the Team Map tab first.</div>';
+    wrMapSnapshot='';return;
+  }
+  try{
+    const mapWrap=document.querySelector('.map-stage-wrap');
+    if(!mapWrap)return;
+    const canvas=await html2canvas(mapWrap,{scale:1.5,backgroundColor:'#f0f3f6',logging:false,useCORS:true});
+    wrMapSnapshot=canvas.toDataURL('image/png');
+    wrap.innerHTML=`<img src="${wrMapSnapshot}" class="wr-map-preview" alt="Team map snapshot"/>`;
+  }catch(e){
+    wrap.innerHTML='<div style="font-size:12px;color:var(--subtle);font-style:italic;padding:8px 0;">Could not capture map preview.</div>';
+    wrMapSnapshot='';
+  }
 }
 
 function renderConvRows(){
@@ -2479,7 +2528,7 @@ function calcPct(bookedId,showedId,pctElId){
 
 async function submitReview(){
   const btn=document.querySelector('.wr-submit-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Saving…';
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Generating PDF…';
   const g=id=>(document.getElementById(id)||{value:''}).value;
   const data={
     week:weekKey,submittedAt:new Date().toISOString(),
@@ -2488,10 +2537,10 @@ async function submitReview(){
     onField:wrOnField,
     personalProduction:wrOnField?g('wr-personalProduction'):'',
     productionLastWeek:g('wr-productionLastWeek'),
-    leaderSalesAvg:g('wr-leaderSalesAvg'),leaderActivityAvg:g('wr-leaderActivityAvg'),leaderRetentionAvg:g('wr-leaderRetentionAvg'),
-    traineeSalesAvg:g('wr-traineeSalesAvg'),traineeActivityAvg:g('wr-traineeActivityAvg'),
-    leaderSalesGoal:g('wr-leaderSalesGoal'),leaderActivityGoal:g('wr-leaderActivityGoal'),leaderRetentionGoal:g('wr-leaderRetentionGoal'),
-    traineeSalesGoal:g('wr-traineeSalesGoal'),traineeActivityGoal:g('wr-traineeActivityGoal'),
+    leaderGaugesLW:g('wr-leaderGaugesLW'),
+    traineeGaugesLW:g('wr-traineeGaugesLW'),
+    leaderGaugesGoal:g('wr-leaderGaugesGoal'),
+    traineeGaugesGoal:g('wr-traineeGaugesGoal'),
     prelimsBookedLW:g('wr-prelimsBookedLW'),prelimsBookedGoal:g('wr-prelimsBookedGoal'),
     prelimsShowedLW:g('wr-prelimsShowedLW'),prelimsShowedGoal:g('wr-prelimsShowedGoal'),
     secondBookedLW:g('wr-secondBookedLW'),secondBookedGoal:g('wr-secondBookedGoal'),
@@ -2506,24 +2555,182 @@ async function submitReview(){
     campaign:wrCampaign,
     expenses:reviewExpensesEnabled?wrExpenses.filter(e=>e.name):[],
     avgWire:reviewExpensesEnabled?g('wr-avgWire'):'',
+    mapSnapshot:wrMapSnapshot,
     mapData:JSON.stringify({nodes:sp.nodes,edges:sp.edges})
   };
+
+  // Capture fresh map snapshot if not done
+  if(!wrMapSnapshot)await captureMapPreview();
+  data.mapSnapshot=wrMapSnapshot;
+
   // Save locally
   savedReviews.push(data);
   localStorage.setItem('tt_reviews_'+managerName,JSON.stringify(savedReviews));
-  // Try to save to sheet
-  try{await api({action:'saveWeeklyReview',manager:managerName,review:data});}catch(e){/* ok if not implemented */}
-  btn.disabled=false;btn.textContent='Submit Review & Save';
-  showToast('Review saved ✓','success');
-  // Show confirmation
+
+  // Generate PDF HTML
+  const pdfHtml=buildReviewPDF(data);
+
+  // Open PDF in new tab for print/save
+  const pdfWin=window.open('','_blank');
+  if(pdfWin){
+    pdfWin.document.write(pdfHtml);
+    pdfWin.document.close();
+    setTimeout(()=>pdfWin.print(),800);
+  }
+
+  // Try to save to sheet + email admin
+  try{
+    btn.innerHTML='<span class="spinner"></span>Sending…';
+    await api({action:'saveWeeklyReview',manager:managerName,review:{...data,pdfHtml}});
+  }catch(e){/* sheet may not have this action yet */}
+
+  btn.disabled=false;btn.textContent='Submit Review & Generate PDF';
+  showToast('Review saved ✓ PDF generated','success');
   document.getElementById('review-form-wrap').innerHTML=`
     <div style="text-align:center;padding:60px 20px;">
-      <div style="font-size:40px;margin-bottom:16px;">✅</div>
-      <div style="font-size:18px;font-weight:700;margin-bottom:8px;">Review saved!</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">Your weekly review has been saved and can be found in Past Reviews.</div>
-      <button onclick="showPastReviews()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:600;padding:12px 28px;border-radius:var(--r);cursor:pointer;">View past reviews</button>
-      <button onclick="renderReviewForm()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:14px;padding:12px 28px;border-radius:var(--r);cursor:pointer;margin-left:10px;">Start new review</button>
+      <div style="font-size:44px;margin-bottom:16px;">✅</div>
+      <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:6px;">Review submitted!</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Your PDF has been opened in a new tab — save or print it from there.</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:28px;">It's also saved in Past Reviews for you to look back on.</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="showPastReviews()" style="background:#0f766e;border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:700;padding:11px 24px;border-radius:20px;cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">View past reviews</button>
+        <button onclick="renderReviewForm()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:13px;padding:11px 24px;border-radius:20px;cursor:pointer;">Start new review</button>
+      </div>
     </div>`;
+}
+
+function buildReviewPDF(data){
+  const dn=getMgrDisplay();
+  const wk=formatWeek(data.week||weekKey);
+  const submitted=data.submittedAt?new Date(data.submittedAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'—';
+  const showPct=(b,s)=>{if(!b||!s)return'';const p=Math.round((Number(s)/Number(b))*100);return` <span style="color:#0f766e;font-weight:700;">(${p}% show)</span>`;};
+  const row=(lbl,lw,goal,booked)=>`<tr><td style="padding:8px 12px;font-size:12px;color:#374151;border-bottom:1px solid #f3f4f6;">${lbl}</td><td style="padding:8px 12px;text-align:center;font-size:12px;font-weight:600;border-bottom:1px solid #f3f4f6;">${lw||'—'}</td><td style="padding:8px 12px;text-align:center;font-size:12px;font-weight:600;color:#0f766e;border-bottom:1px solid #f3f4f6;">${goal||'—'}${booked?showPct(booked,lw):''}</td></tr>`;
+
+  const focusPeopleHtml=(data.focusPeople||[]).map(r=>`
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf9;border:1px solid #99f6e4;border-radius:8px;padding:7px 12px;margin:4px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#0f766e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+      <div><div style="font-size:12px;font-weight:600;color:#0f1a1a;">${esc(r.name)}</div><div style="font-size:10px;color:#5a7878;">${esc(r.position||'')}</div></div>
+    </div>`).join('');
+
+  const convsHtml=(data.convs||[]).filter(c=>c.rep||c.note).map(c=>`
+    <div style="padding:8px 12px;border-left:3px solid #0f766e;background:#f9fafb;border-radius:0 6px 6px 0;margin-bottom:6px;">
+      <div style="font-size:12px;font-weight:700;color:#0f766e;margin-bottom:2px;">${esc(c.rep||'—')}</div>
+      <div style="font-size:12px;color:#374151;">${esc(c.note||'')}</div>
+    </div>`).join('');
+
+  const networksHtml=(data.networks||[]).map(n=>`
+    <tr><td style="padding:7px 10px;font-size:12px;border-bottom:1px solid #f3f4f6;">${esc(n.name)}</td><td style="padding:7px 10px;font-size:12px;border-bottom:1px solid #f3f4f6;color:#6b7280;">${esc(n.date||'')}</td><td style="padding:7px 10px;font-size:12px;border-bottom:1px solid #f3f4f6;">${esc(n.notes||'')}</td></tr>`).join('');
+
+  const netGoalsHtml=(data.netGoals||[]).map(n=>`
+    <tr><td style="padding:7px 10px;font-size:12px;border-bottom:1px solid #f3f4f6;">${esc(n.name)}</td><td style="padding:7px 10px;font-size:12px;border-bottom:1px solid #f3f4f6;color:#6b7280;">${esc(n.day||'')}</td><td style="padding:7px 10px;font-size:12px;border-bottom:1px solid #f3f4f6;">${esc(n.topic||'')}</td></tr>`).join('');
+
+  const expHtml=data.expenses&&data.expenses.length?data.expenses.map(e=>`
+    <tr><td style="padding:7px 10px;font-size:12px;border-bottom:1px solid #f3f4f6;">${esc(e.name)}</td><td style="padding:7px 10px;font-size:12px;font-weight:600;border-bottom:1px solid #f3f4f6;">£${e.cost}</td></tr>`).join(''):'';
+
+  const section=(title,content)=>`
+    <div style="margin-bottom:20px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+      <div style="background:#0f766e;padding:10px 16px;">
+        <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.05em;text-transform:uppercase;">${title}</div>
+      </div>
+      <div style="padding:14px 16px;">${content}</div>
+    </div>`;
+
+  const statTile=(val,lbl,teal=false)=>`
+    <div style="background:${teal?'#1d9ba4':'#abc9ff'};border-radius:8px;padding:12px 14px;text-align:center;">
+      <div style="font-size:18px;font-weight:800;color:${teal?'#fff':'#0c2060'};">${val}</div>
+      <div style="font-size:10px;font-weight:700;color:${teal?'rgba(255,255,255,.82)':'#1a3870'};text-transform:uppercase;letter-spacing:.07em;margin-top:3px;">${lbl}</div>
+    </div>`;
+
+  return`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Weekly Review — ${esc(dn)} — ${wk}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#f0f3f6;color:#0e1a1a;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+@page{size:A4;margin:12mm 14mm;}
+@media print{body{background:#fff;}.page-break{page-break-before:always;}}
+.page{max-width:760px;margin:0 auto;padding:24px;}
+table{width:100%;border-collapse:collapse;}
+</style>
+</head><body><div class="page">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#0f766e,#0d9488);border-radius:12px;padding:24px 28px;margin-bottom:24px;color:#fff;display:flex;align-items:flex-start;justify-content:space-between;">
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.8;margin-bottom:6px;">The Back Office</div>
+      <div style="font-size:26px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;">Weekly Review</div>
+      <div style="font-size:14px;opacity:.88;font-weight:500;">${wk}</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:18px;font-weight:800;">${esc(dn)}</div>
+      <div style="font-size:11px;opacity:.8;margin-top:4px;">Submitted ${submitted}</div>
+      ${data.campaign?`<div style="margin-top:6px;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;display:inline-block;">${esc(data.campaign)}</div>`:''}
+    </div>
+  </div>
+
+  <!-- Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+    ${statTile(data.focusPeople?data.focusPeople.length:'0','Focus reps')}
+    ${statTile(data.convs?data.convs.filter(c=>c.rep||c.note).length:'0','Key convos')}
+    ${statTile(data.productionLastWeek||'—','Team production',true)}
+    ${statTile(data.onField?'Yes':'No','On field',true)}
+  </div>
+
+  ${focusPeopleHtml?section('Key People to Focus On',`<div style="display:flex;flex-wrap:wrap;gap:4px;">${focusPeopleHtml}</div>`):''}
+
+  ${convsHtml?section('Key Conversations',convsHtml):''}
+
+  ${section('Last Week Summary',`
+    ${data.onField&&data.personalProduction?`<div style="margin-bottom:10px;padding:10px 12px;background:#f0fdf9;border-radius:8px;"><span style="font-size:11px;font-weight:700;color:#5a7878;text-transform:uppercase;letter-spacing:.05em;">Personal production</span><div style="font-size:14px;font-weight:700;margin-top:2px;">${esc(data.personalProduction)}</div></div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+      ${data.leaderGaugesLW?`<div style="background:#f9fafb;border-radius:8px;padding:10px 12px;"><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Leaders Gauges LW</div><div style="font-size:13px;font-weight:600;">${esc(data.leaderGaugesLW)}</div></div>`:''}
+      ${data.traineeGaugesLW?`<div style="background:#f9fafb;border-radius:8px;padding:10px 12px;"><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Trainee/Solo Gauges LW</div><div style="font-size:13px;font-weight:600;">${esc(data.traineeGaugesLW)}</div></div>`:''}
+    </div>
+  `)}
+
+  ${section('Goals This Week',`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      ${data.leaderGaugesGoal?`<div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:8px;padding:10px 12px;"><div style="font-size:10px;font-weight:700;color:#0f766e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Leaders Gauges Goal</div><div style="font-size:13px;font-weight:700;color:#0f766e;">${esc(data.leaderGaugesGoal)}</div></div>`:''}
+      ${data.traineeGaugesGoal?`<div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:8px;padding:10px 12px;"><div style="font-size:10px;font-weight:700;color:#0f766e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Trainee/Solo Gauges Goal</div><div style="font-size:13px;font-weight:700;color:#0f766e;">${esc(data.traineeGaugesGoal)}</div></div>`:''}
+    </div>
+  `)}
+
+  ${section('Recruitment Pipeline',`
+    <table>
+      <thead><tr style="background:#f9fafb;">
+        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Stage</th>
+        <th style="padding:8px 12px;text-align:center;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Last Week</th>
+        <th style="padding:8px 12px;text-align:center;font-size:11px;font-weight:700;color:#0f766e;text-transform:uppercase;letter-spacing:.05em;">Goal</th>
+      </tr></thead>
+      <tbody>
+        ${row('Prelims Booked',data.prelimsBookedLW,data.prelimsBookedGoal)}
+        ${row('Prelims Showed',data.prelimsShowedLW,data.prelimsShowedGoal,data.prelimsBookedLW)}
+        ${row('2nd Interviews Booked',data.secondBookedLW,data.secondBookedGoal)}
+        ${row('2nd Interviews Showed',data.secondShowedLW,data.secondShowedGoal,data.secondBookedLW)}
+        ${row('Offered Position',data.offeredLW,data.offeredGoal)}
+        ${row('Showed First Day',data.showedDay1LW,data.showedDay1Goal)}
+        ${row('Onboarded / Badged',data.onboardedLW,data.onboardedGoal)}
+      </tbody>
+    </table>
+  `)}
+
+  ${data.focusText?section('Focus for the Week',`<div style="font-size:13px;line-height:1.7;color:#374151;white-space:pre-wrap;">${esc(data.focusText)}</div>`):''}
+
+  ${networksHtml?section('Networking — Last Week',`<table><thead><tr style="background:#f9fafb;"><th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;">Name</th><th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;">Date</th><th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;">Takeaway</th></tr></thead><tbody>${networksHtml}</tbody></table>`):''}
+
+  ${netGoalsHtml?section('Networking Goals This Week',`<table><thead><tr style="background:#f9fafb;"><th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;">Who</th><th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;">When</th><th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;">Topic</th></tr></thead><tbody>${netGoalsHtml}</tbody></table>`):''}
+
+  ${data.additionalNotes?section('Additional Notes',`<div style="font-size:13px;line-height:1.7;color:#374151;white-space:pre-wrap;">${esc(data.additionalNotes)}</div>`):''}
+
+  ${expHtml?section('Event Expenses',`<table><thead><tr style="background:#f9fafb;"><th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;">Event</th><th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;">Cost</th></tr></thead><tbody>${expHtml}</tbody></table>${data.avgWire?`<div style="margin-top:10px;padding:10px 12px;background:#f0fdf9;border-radius:8px;font-size:12px;color:#0f766e;font-weight:600;">Avg wire per sale: £${data.avgWire}</div>`:''}`):''}
+
+  ${data.mapSnapshot?section('Team Map',`<img src="${data.mapSnapshot}" style="width:100%;border-radius:8px;border:1px solid #e5e7eb;" alt="Team Map"/>`):''}
+
+  <div style="margin-top:28px;padding-top:16px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:11px;color:#9ca3af;">The Back Office · Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+    <div style="font-size:11px;color:#9ca3af;">${esc(dn)}</div>
+  </div>
+</div></body></html>`;
 }
 
 // ── CALENDAR ──────────────────────────────────────────
