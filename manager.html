@@ -579,8 +579,8 @@ select.wr-input{cursor:pointer;appearance:none;}
 /* Rep focus grid */
 .wr-rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:8px;}
 .wr-rep-card{background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:12px 10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;user-select:none;text-align:center;}
-.wr-rep-card:hover{border-color:var(--accent-border);background:var(--accent-soft);}
-.wr-rep-card.selected{border-color:#0f766e;background:rgba(15,118,110,.08);box-shadow:0 0 0 1px #0f766e;}
+.wr-rep-card:hover{border-color:var(--accent-border);background:var(--surface2);}
+.wr-rep-card.selected{border-color:#0f766e;background:var(--surface2);box-shadow:0 0 0 2px #0f766e;}
 .wr-rep-card-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2;}
 .wr-rep-card-pos{font-size:10px;font-weight:600;margin-top:1px;}
 .wr-selected-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
@@ -2464,23 +2464,75 @@ function toggleFocusPerson(el){
 }
 
 let wrMapSnapshot='';
+function generateMapSVG(){
+  // Build a self-contained SVG from sp.nodes and sp.edges — no DOM capture needed
+  if(!sp.nodes||!sp.nodes.length)return'';
+  const NODE_W=110,NODE_H=36;
+  const pad=80;
+  const xs=sp.nodes.map(n=>n.x),ys=sp.nodes.map(n=>n.y);
+  const minX=Math.min(...xs)-pad,minY=Math.min(...ys)-pad;
+  const maxX=Math.max(...xs)+pad,maxY=Math.max(...ys)+pad;
+  const W=maxX-minX,H=maxY-minY;
+  const ox=-minX,oy=-minY;
+  // Position colour map (light theme values)
+  const posColors={
+    Trainee:{bg:'#a7ffdb',color:'#007a4d',border:'#00c97a'},
+    Solo:{bg:'#ffe0a0',color:'#b85c00',border:'#f08000'},
+    Leader:{bg:'#b3d4ff',color:'#1140cc',border:'#1d50ff'},
+    Core:{bg:'#d4b8ff',color:'#5b1fd6',border:'#6e2ff0'},
+    Junior:{bg:'#ffb8cc',color:'#c4002e',border:'#f0004d'},
+    JuniorPartner:{bg:'#ffb8cc',color:'#c4002e',border:'#f0004d'},
+    Manager:{bg:'#0f766e',color:'#ffffff',border:'#0d9488'},
+    default:{bg:'#e9eff0',color:'#3a5050',border:'#b0c4c4'}
+  };
+  function getPos(pos){
+    if(!pos)return posColors.default;
+    const k=pos.replace(/[^a-zA-Z]/g,'');
+    const cap=k.charAt(0).toUpperCase()+k.slice(1);
+    return posColors[cap]||posColors.default;
+  }
+  // Edges
+  function clipToBox(cx,cy,tx,ty){
+    const hw=NODE_W/2+2,hh=NODE_H/2+2;
+    const dx=tx-cx,dy=ty-cy;
+    if(Math.abs(dx)<0.01&&Math.abs(dy)<0.01)return{x:cx,y:cy};
+    const sx=dx===0?Infinity:hw/Math.abs(dx),sy=dy===0?Infinity:hh/Math.abs(dy);
+    const s=Math.min(sx,sy);
+    return{x:cx+dx*s,y:cy+dy*s};
+  }
+  const edgeLines=sp.edges.map(e=>{
+    const a=sp.nodes.find(n=>n.id===e.a),b=sp.nodes.find(n=>n.id===e.b);
+    if(!a||!b)return'';
+    const p1=clipToBox(a.x,a.y,b.x,b.y),p2=clipToBox(b.x,b.y,a.x,a.y);
+    return`<line x1="${(p1.x+ox).toFixed(1)}" y1="${(p1.y+oy).toFixed(1)}" x2="${(p2.x+ox).toFixed(1)}" y2="${(p2.y+oy).toFixed(1)}" stroke="rgba(15,118,110,.35)" stroke-width="1.5"/><circle cx="${(p2.x+ox).toFixed(1)}" cy="${(p2.y+oy).toFixed(1)}" r="3" fill="rgba(15,118,110,.7)"/>`;
+  }).join('');
+  // Nodes
+  const nodeRects=sp.nodes.map(n=>{
+    const c=getPos(n.position);
+    const nx=(n.x+ox-NODE_W/2).toFixed(1),ny=(n.y+oy-NODE_H/2).toFixed(1);
+    let lbl=n.label||'';if(lbl.length>16)lbl=lbl.slice(0,15)+'…';
+    return`<g>
+      <rect x="${nx}" y="${ny}" width="${NODE_W}" height="${NODE_H}" rx="4" fill="${c.bg}" stroke="${c.border}" stroke-width="1.5"/>
+      <text x="${(n.x+ox).toFixed(1)}" y="${(n.y+oy+5).toFixed(1)}" text-anchor="middle" font-family="DM Sans,Arial,sans-serif" font-size="11" font-weight="600" fill="${c.color}">${lbl.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text>
+    </g>`;
+  }).join('');
+  return`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:#f0f3f6;border-radius:8px;font-family:DM Sans,Arial,sans-serif;">${edgeLines}${nodeRects}</svg>`;
+}
+
 async function captureMapPreview(){
   const wrap=document.getElementById('wr-map-preview-wrap');
   if(!wrap)return;
-  const stage=document.getElementById('spider-nodes');
-  const svg=document.getElementById('spider-svg');
-  if(!stage||(!sp.nodes||!sp.nodes.length)){
+  if(!sp.nodes||!sp.nodes.length){
     wrap.innerHTML='<div style="font-size:12px;color:var(--subtle);font-style:italic;padding:8px 0;">No team map data yet — build your map on the Team Map tab first.</div>';
     wrMapSnapshot='';return;
   }
   try{
-    const mapWrap=document.querySelector('.map-stage-wrap');
-    if(!mapWrap)return;
-    const canvas=await html2canvas(mapWrap,{scale:1.5,backgroundColor:'#f0f3f6',logging:false,useCORS:true});
-    wrMapSnapshot=canvas.toDataURL('image/png');
-    wrap.innerHTML=`<img src="${wrMapSnapshot}" class="wr-map-preview" alt="Team map snapshot"/>`;
+    const svgStr=generateMapSVG();
+    if(!svgStr){wrap.innerHTML='<div style="font-size:12px;color:var(--subtle);font-style:italic;padding:8px 0;">Could not render map.</div>';wrMapSnapshot='';return;}
+    wrMapSnapshot='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svgStr)));
+    wrap.innerHTML=`<img src="${wrMapSnapshot}" class="wr-map-preview" alt="Team map snapshot" style="width:100%;border-radius:8px;display:block;"/>`;
   }catch(e){
-    wrap.innerHTML='<div style="font-size:12px;color:var(--subtle);font-style:italic;padding:8px 0;">Could not capture map preview.</div>';
+    wrap.innerHTML='<div style="font-size:12px;color:var(--subtle);font-style:italic;padding:8px 0;">Could not render map preview.</div>';
     wrMapSnapshot='';
   }
 }
@@ -2596,9 +2648,15 @@ async function submitReview(){
     mapData:JSON.stringify({nodes:sp.nodes,edges:sp.edges})
   };
 
-  // Capture fresh map snapshot if not done
-  if(!wrMapSnapshot)await captureMapPreview();
-  data.mapSnapshot=wrMapSnapshot;
+  // Always regenerate map SVG fresh at submit time for best quality
+  const freshSvg=generateMapSVG();
+  if(freshSvg){
+    data.mapSnapshot='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(freshSvg)));
+    data.mapSVG=freshSvg;
+  } else if(!wrMapSnapshot){
+    await captureMapPreview();
+    data.mapSnapshot=wrMapSnapshot;
+  }
 
   // Save locally in memory
   savedReviews.push(data);
@@ -2769,7 +2827,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111827;-webkit-prin
   ${data.additionalNotes?sec('Additional Notes',`<div style="font-size:13px;line-height:1.7;color:#374151;white-space:pre-wrap;">${esc(data.additionalNotes)}</div>`):''}
   ${expHtml?sec('Event Expenses',tblWrap([th('Event'),th('Cost')].join(''),expHtml)+(data.avgWire?`<div style="margin-top:10px;font-size:12px;color:#6b7280;">Avg wire per sale: <strong>£${data.avgWire}</strong></div>`:'')):''}
 
-  ${data.mapSnapshot&&data.mapSnapshot.startsWith('data:')?sec('Team Map',`<img src="${data.mapSnapshot}" style="width:100%;border-radius:6px;border:1px solid #e5e7eb;display:block;" alt="Team Map"/>`):''}
+  ${(data.mapSVG||(data.mapSnapshot&&data.mapSnapshot.startsWith('data:')))?sec('Team Map', data.mapSVG ? `<div style="width:100%;overflow:hidden;border-radius:6px;border:1px solid #e5e7eb;">${data.mapSVG}</div>` : `<img src="${data.mapSnapshot}" style="width:100%;border-radius:6px;border:1px solid #e5e7eb;display:block;" alt="Team Map"/>`):''}
 
   <div style="margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;">
     <div style="font-size:10px;color:#d1d5db;">The Back Office · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
