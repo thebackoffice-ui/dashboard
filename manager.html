@@ -6,6 +6,7 @@
 <title>The Back Office</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 /* ── Niond-style dashboard redesign ── */
 :root {
@@ -2110,13 +2111,40 @@ function viewSavedReview(idx){
   const rev=savedReviews[idx];
   if(!rev)return;
   const el=document.getElementById('past-reviews-list');
+  const pdfHtml=buildReviewPDF(rev);
+  // Build an inline preview using the same PDF HTML rendered in an iframe-like container
+  const previewContent=pdfHtml.replace(/^[\s\S]*<body[^>]*>/i,'').replace(/<\/body[\s\S]*$/i,'');
   el.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:20px 24px;box-shadow:var(--s1);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
       <div><div style="font-size:17px;font-weight:700;">Review — ${formatWeek(rev.week||weekKey)}</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Submitted ${rev.submittedAt?new Date(rev.submittedAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'—'}</div></div>
-      <button onclick="renderPastReviews()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--rsm);cursor:pointer;">← Back</button>
+      <div style="display:flex;gap:8px;">
+        <button onclick="downloadSavedReviewPDF(${idx})" style="background:#0f766e;border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:700;padding:7px 16px;border-radius:var(--rsm);cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">⬇ Download PDF</button>
+        <button onclick="renderPastReviews()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--rsm);cursor:pointer;">← Back</button>
+      </div>
     </div>
-    <pre style="white-space:pre-wrap;font-family:var(--font);font-size:13px;line-height:1.7;color:var(--text);">${esc(buildReviewText(rev))}</pre>
+    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:24px;color:#111827;font-family:'DM Sans',sans-serif;">${previewContent}</div>
   </div>`;
+}
+
+async function downloadSavedReviewPDF(idx){
+  const rev=savedReviews[idx];
+  if(!rev)return;
+  const pdfHtml=buildReviewPDF(rev);
+  const pdfContainer=document.createElement('div');
+  pdfContainer.style.cssText='position:fixed;left:-9999px;top:0;width:794px;background:#fff;font-family:DM Sans,sans-serif;';
+  pdfContainer.innerHTML=pdfHtml.replace(/^[\s\S]*<body[^>]*>/i,'').replace(/<\/body[\s\S]*$/i,'');
+  document.body.appendChild(pdfContainer);
+  const safeManagerName=getMgrDisplay().replace(/[^a-z0-9]/gi,'_');
+  const safeWeek=(rev.week||weekKey).replace(/-/g,'');
+  await html2pdf().set({
+    margin:[10,12,10,12],
+    filename:`Weekly_Review_${safeManagerName}_${safeWeek}.pdf`,
+    image:{type:'jpeg',quality:0.97},
+    html2canvas:{scale:2,useCORS:true,logging:false,backgroundColor:'#ffffff'},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+    pagebreak:{mode:['avoid-all','css','legacy']}
+  }).from(pdfContainer).save();
+  document.body.removeChild(pdfContainer);
 }
 
 function buildReviewText(data){
@@ -2570,13 +2598,23 @@ async function submitReview(){
   // Generate PDF HTML
   const pdfHtml=buildReviewPDF(data);
 
-  // Open PDF in new tab for print/save
-  const pdfWin=window.open('','_blank');
-  if(pdfWin){
-    pdfWin.document.write(pdfHtml);
-    pdfWin.document.close();
-    setTimeout(()=>pdfWin.print(),800);
-  }
+  // Build a hidden element and use html2pdf to download directly
+  btn.innerHTML='<span class="spinner"></span>Building PDF…';
+  const pdfContainer=document.createElement('div');
+  pdfContainer.style.cssText='position:fixed;left:-9999px;top:0;width:794px;background:#fff;font-family:DM Sans,sans-serif;';
+  pdfContainer.innerHTML=pdfHtml.replace(/^[\s\S]*<body[^>]*>/i,'').replace(/<\/body[\s\S]*$/i,'');
+  document.body.appendChild(pdfContainer);
+  const safeManagerName=getMgrDisplay().replace(/[^a-z0-9]/gi,'_');
+  const safeWeek=(data.week||weekKey).replace(/-/g,'');
+  await html2pdf().set({
+    margin:[10,12,10,12],
+    filename:`Weekly_Review_${safeManagerName}_${safeWeek}.pdf`,
+    image:{type:'jpeg',quality:0.97},
+    html2canvas:{scale:2,useCORS:true,logging:false,backgroundColor:'#ffffff'},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+    pagebreak:{mode:['avoid-all','css','legacy']}
+  }).from(pdfContainer).save();
+  document.body.removeChild(pdfContainer);
 
   // Try to save to sheet + email admin
   try{
@@ -2590,7 +2628,7 @@ async function submitReview(){
     <div style="text-align:center;padding:60px 20px;">
       <div style="font-size:44px;margin-bottom:16px;">✅</div>
       <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:6px;">Review submitted!</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Your PDF has been opened in a new tab — save or print it from there.</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Your PDF has been downloaded automatically.</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:28px;">It's also saved in Past Reviews for you to look back on.</div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button onclick="showPastReviews()" style="background:#0f766e;border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:700;padding:11px 24px;border-radius:20px;cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">View past reviews</button>
