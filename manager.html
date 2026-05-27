@@ -812,22 +812,23 @@ select.wr-input{cursor:pointer;appearance:none;}
 .sc-hdr-pos{margin-top:3px;}
 .sc-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:background .12s;flex-shrink:0;}
 .sc-close:hover{background:var(--surface2);}
-.sc-body{padding:18px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
-.sc-sec-title{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-.sc-timeline{display:flex;flex-direction:column;position:relative;}
-.sc-timeline::before{content:'';position:absolute;left:10px;top:4px;bottom:4px;width:1.5px;background:var(--border);}
-.sc-tl-row{display:flex;align-items:flex-start;gap:12px;padding-bottom:14px;position:relative;}
-.sc-tl-row:last-child{padding-bottom:0;}
-.sc-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--surface);}
-.sc-dot.pos{background:rgba(15,118,110,.12);color:#0f766e;}
+.sc-body{padding:20px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:22px;}
+.sc-sec-title{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.sc-timeline{display:flex;flex-direction:column;}
+.sc-tl-row{display:flex;align-items:flex-start;gap:14px;position:relative;}
+.sc-tl-left{position:relative;flex-shrink:0;display:flex;flex-direction:column;align-items:center;width:22px;}
+.sc-tl-row:not(:last-child) .sc-tl-left::after{content:'';width:1.5px;flex:1;min-height:14px;background:var(--border);margin-top:4px;}
+.sc-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;box-shadow:0 0 0 3px var(--surface);}
+.sc-dot.pos{background:rgba(15,118,110,.13);color:#0f766e;}
 .sc-dot.flag-risk{background:rgba(220,38,38,.1);color:#dc2626;}
 .sc-dot.flag-ok{background:rgba(22,163,74,.1);color:#16a34a;}
 .sc-dot.flag-warn{background:rgba(249,115,22,.1);color:#f97316;}
 .sc-dot.flag-watch{background:rgba(13,107,97,.1);color:#0d6b61;}
-.sc-tl-body{flex:1;min-width:0;padding-top:1px;}
-.sc-tl-label{font-size:13px;font-weight:600;color:var(--text);}
-.sc-tl-date{font-size:11px;color:var(--muted);margin-top:1px;}
-.sc-empty-msg{font-size:12px;color:var(--subtle);padding:10px 0;}
+.sc-tl-body{flex:1;min-width:0;padding-top:2px;padding-bottom:16px;}
+.sc-tl-row:last-child .sc-tl-body{padding-bottom:0;}
+.sc-tl-label{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;}
+.sc-tl-date{font-size:11px;color:var(--muted);margin-top:2px;}
+.sc-empty-msg{font-size:12px;color:var(--subtle);padding:4px 0 8px;}
 /* Notes inside scorecard */
 .sc-note-list{display:flex;flex-direction:column;gap:6px;}
 .sc-note-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
@@ -995,7 +996,6 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       <button class="nav-item" onclick="switchTab('leaderboard')" id="nav-leaderboard"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h6M10 15v3M7 18h6"/><path d="M5 3v5a5 5 0 0 0 10 0V3"/><path d="M5 6H3a2 2 0 1 0 0 4h2M15 6h2a2 2 0 1 0 0 4h-2" stroke-linecap="round"/></svg></span>Leaderboard</button>
       <button class="nav-item" onclick="switchTab('map')" id="nav-map"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 4l6 2 6-2 6 2v13l-6-2-6 2-6-2z" stroke-linejoin="round"/><path d="M7 6v13M13 4v13" stroke-linecap="round"/></svg></span>Team Map</button>
       <button class="nav-item" onclick="switchTab('notifications')" id="nav-notifications"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 0 1 6 6c0 3.5 1.5 5 1.5 5h-15S4 11.5 4 8a6 6 0 0 1 6-6z" stroke-linejoin="round"/><path d="M8.5 17a1.5 1.5 0 0 0 3 0" stroke-linecap="round"/></svg></span>Notifications<span id="notif-badge" class="nav-badge" style="display:none;">0</span></button>
-      <button class="nav-item" onclick="switchTab('paytrend')" id="nav-paytrend"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 14l4-5 4 3 5-7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Pay Trend</button>
       <button class="nav-item" onclick="switchTab('notes')" id="nav-notes"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h10a1 1 0 0 1 1 1v10l-4 4H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke-linejoin="round"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/></svg></span>Notes</button>
     </div>
     <div class="sidebar-footer">
@@ -1076,6 +1076,32 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
         </div>
       </div>
       <div class="page-scroll"><div class="page-wrap">
+
+        <!-- Pay trend chart — always visible at top of reports -->
+        <div class="ptc-card" style="margin-bottom:20px;">
+          <div class="ptc-card-hdr">
+            <div>
+              <div class="ptc-card-title">Pay Trend</div>
+              <div class="ptc-card-sub" id="rpt-ptc-sub">Office Wire vs Manager's Take</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+              <div class="ptc-legend">
+                <div class="ptc-leg"><div class="ptc-leg-dot" style="background:#5C9DFF;"></div>Wire</div>
+                <div class="ptc-leg"><div class="ptc-leg-dot" style="background:#26C6B0;"></div>Take</div>
+              </div>
+              <div class="ptc-range-pills" id="rpt-ptc-pills">
+                <button class="ptc-rpill active" onclick="rptPtcSetRange(this,6)">6w</button>
+                <button class="ptc-rpill" onclick="rptPtcSetRange(this,12)">12w</button>
+                <button class="ptc-rpill" onclick="rptPtcSetRange(this,0)">All</button>
+              </div>
+            </div>
+          </div>
+          <div class="ptc-chart-wrap" style="height:220px;">
+            <canvas id="rpt-ptc-canvas" class="ptc-canvas" style="height:100%;"></canvas>
+          </div>
+          <div class="ptc-stats" id="rpt-ptc-stats"></div>
+        </div>
+
         <div class="report-tabs">
           <button class="rtab-btn active" onclick="switchReportTab('pay')">💰 Pay Reports</button>
           <button class="rtab-btn" onclick="switchReportTab('planner')">📅 Daily Planners</button>
@@ -1235,40 +1261,6 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
     </div>
 
     <!-- PAY TREND -->
-    <div class="tab-content" id="ptab-paytrend">
-      <div class="topbar">
-        <span class="topbar-title">Pay Trend</span>
-        <div class="topbar-right">
-          <div class="ptc-range-pills" id="ptc-range-pills">
-            <button class="ptc-rpill active" onclick="ptcSetRange(this,6)">6w</button>
-            <button class="ptc-rpill" onclick="ptcSetRange(this,12)">12w</button>
-            <button class="ptc-rpill" onclick="ptcSetRange(this,0)">All</button>
-          </div>
-        </div>
-      </div>
-      <div class="ptc-scroll">
-        <div class="ptc-page">
-          <!-- Chart card -->
-          <div class="ptc-card">
-            <div class="ptc-card-hdr">
-              <div>
-                <div class="ptc-card-title">Office Wire vs Manager's Take</div>
-                <div class="ptc-card-sub" id="ptc-sub">Weekly breakdown</div>
-              </div>
-              <div class="ptc-legend">
-                <div class="ptc-leg"><div class="ptc-leg-dot" style="background:#5C9DFF;"></div>Office Wire</div>
-                <div class="ptc-leg"><div class="ptc-leg-dot" style="background:#26C6B0;"></div>My Take</div>
-              </div>
-            </div>
-            <div class="ptc-chart-wrap" style="height:260px;">
-              <canvas id="ptc-canvas" class="ptc-canvas" style="height:100%;"></canvas>
-            </div>
-            <div class="ptc-stats" id="ptc-stats"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- NOTES -->
     <div class="tab-content" id="ptab-notes">
       <div class="topbar">
@@ -2183,6 +2175,8 @@ function renderReports(){
   _renderPayReports();
   _renderSimpleReports(allReports.filter(r=>r.type==='Daily Planner'),'planner-reports-list','planner-summary-strip','rt-planner','📅','#FFF4E0','#FFA800');
   _renderSimpleReports(allReports.filter(r=>r.type==='Pro-log'),'prolog-reports-list','prolog-summary-strip','rt-prolog','📋','#E0F7F4','#00BFA5');
+  // Inline pay chart at top of reports page
+  setTimeout(rptPtcRenderChart, 80);
 }
 
 function _weekToMonthKey(w){
@@ -3353,7 +3347,7 @@ function clearMap(){if(!confirm('Clear the map?'))return;sp.nodes=[];sp.edges=[]
 async function saveMap(){const md=JSON.stringify({nodes:sp.nodes,edges:sp.edges});try{await api({action:'saveMap',manager:managerName,mapData:md});showToast('Map saved ✓','success');}catch(e){showToast('Failed to save map','error');}}
 
 // ── Tab switching ─────────────────────────────────────
-const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications','paytrend','notes'];
+const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications','notes'];
 function switchTab(tab){
   TABS.forEach(id=>{
     const nav=document.getElementById(`nav-${id}`);
@@ -3367,7 +3361,7 @@ function switchTab(tab){
   if(tab==='leaderboard')lbInit();
   if(tab==='review'){showReviewForm();}
   if(tab==='notifications'){renderManagerNotifs();markAllNotifsRead();}
-  if(tab==='paytrend'){ptcRender();}
+  if(tab==='reports'){setTimeout(rptPtcRenderChart,80);}
   if(tab==='notes'){notesRenderFolders();notesRenderList();}
 }
 
@@ -3499,11 +3493,11 @@ function openScorecard(repId){
   const posHistory=rep.positionHistory||[];
   const posHtml=posHistory.length
     ? posHistory.map(ph=>`<div class="sc-tl-row">
-        <div class="sc-dot pos">★</div>
+        <div class="sc-tl-left"><div class="sc-dot pos">★</div></div>
         <div class="sc-tl-body"><div class="sc-tl-label">${esc(ph.position)}</div><div class="sc-tl-date">${esc(ph.date||'')}</div></div>
       </div>`).join('')
     : rep.position
-      ? `<div class="sc-tl-row"><div class="sc-dot pos">★</div><div class="sc-tl-body"><div class="sc-tl-label">Currently: ${esc(rep.position)}</div><div class="sc-tl-date">No change history recorded</div></div></div>`
+      ? `<div class="sc-tl-row"><div class="sc-tl-left"><div class="sc-dot pos">★</div></div><div class="sc-tl-body"><div class="sc-tl-label">Currently: ${esc(rep.position)}</div><div class="sc-tl-date">No change history recorded</div></div></div>`
       : `<div class="sc-empty-msg">No position history yet.</div>`;
 
   // Flag history
@@ -3519,7 +3513,7 @@ function openScorecard(repId){
   };
   const flagHtml=flagRows.length
     ? flagRows.map(f=>`<div class="sc-tl-row">
-        <div class="sc-dot ${flagDotClass(f)}">●</div>
+        <div class="sc-tl-left"><div class="sc-dot ${flagDotClass(f)}">●</div></div>
         <div class="sc-tl-body"><div class="sc-tl-label">${esc(f.label||f.id)}</div><div class="sc-tl-date">${esc(f.date||'')}</div></div>
       </div>`).join('')
     : `<div class="sc-empty-msg">No flags on record.</div>`;
@@ -3582,22 +3576,15 @@ function scAddNote(repId){
 }
 
 // ══════════════════════════════════════════════════════
-// PAY TREND CHART TAB
+// PAY TREND CHART TAB + REPORTS INLINE CHART
 // ══════════════════════════════════════════════════════
-let ptcRange=6;
-function ptcSetRange(btn,n){
-  document.querySelectorAll('.ptc-rpill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  ptcRange=n;
-  ptcRender();
-}
-
-function ptcGetData(){
+// Shared data fetcher — accepts explicit range
+function ptcGetDataN(n){
   const allPayWeeks=[...new Set([
     ...allReports.filter(r=>r.type==='Pay Report').map(r=>r.week),
     ...allPayData.map(p=>p.week)
   ])].filter(Boolean).sort();
-  const weeks=ptcRange>0?allPayWeeks.slice(-ptcRange):allPayWeeks;
+  const weeks=n>0?allPayWeeks.slice(-n):allPayWeeks;
   return weeks.map(wk=>{
     const rep=allReports.find(r=>r.type==='Pay Report'&&r.week===wk);
     const pd=allPayData.find(p=>p.week===wk);
@@ -3607,13 +3594,19 @@ function ptcGetData(){
   });
 }
 
-function ptcRender(){
-  const data=ptcGetData();
-  const sub=document.getElementById('ptc-sub');
-  if(sub)sub.textContent=data.length?`${data.length} week${data.length!==1?'s':''} of data`:'No pay data yet';
-
-  // Summary stats
-  const statsEl=document.getElementById('ptc-stats');
+// Reports-page inline chart
+let rptPtcRange=6;
+function rptPtcSetRange(btn,n){
+  document.querySelectorAll('#rpt-ptc-pills .ptc-rpill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  rptPtcRange=n;
+  rptPtcRenderChart();
+}
+function rptPtcRenderChart(){
+  const data=ptcGetDataN(rptPtcRange);
+  const sub=document.getElementById('rpt-ptc-sub');
+  if(sub)sub.textContent=data.length?`${data.length} week${data.length!==1?'s':''} of data · Wire vs Take`:'No pay data yet';
+  const statsEl=document.getElementById('rpt-ptc-stats');
   if(statsEl){
     const totalWire=data.reduce((s,d)=>s+d.wire,0);
     const totalTake=data.reduce((s,d)=>s+d.take,0);
@@ -3622,13 +3615,10 @@ function ptcRender(){
     statsEl.innerHTML=`
       <div class="ptc-stat"><div class="ptc-stat-lbl">Total Wire</div><div class="ptc-stat-val">${fmt(totalWire)}</div></div>
       <div class="ptc-stat hi"><div class="ptc-stat-lbl">Total Take</div><div class="ptc-stat-val">${fmt(totalTake)}</div></div>
-      <div class="ptc-stat"><div class="ptc-stat-lbl">Avg Take / week</div><div class="ptc-stat-val">${fmt(avgTake)}</div></div>`;
+      <div class="ptc-stat"><div class="ptc-stat-lbl">Avg / week</div><div class="ptc-stat-val">${fmt(avgTake)}</div></div>`;
   }
-
-  // Draw line chart
-  const canvas=document.getElementById('ptc-canvas');
-  if(!canvas||!data.length)return;
-  requestAnimationFrame(()=>ptcDraw(canvas,data));
+  const canvas=document.getElementById('rpt-ptc-canvas');
+  if(canvas&&data.length)requestAnimationFrame(()=>ptcDraw(canvas,data));
 }
 
 function ptcDraw(canvas,data){
