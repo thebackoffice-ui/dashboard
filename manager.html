@@ -1595,7 +1595,7 @@ function renderReps(){
             ${r.position?`<span class="pos-tag ${posClass(r.position)}">${esc(r.position)}</span>`:''}
             ${r.leaver?'<span class="leaver-tag">Leaver</span>':''}
             ${r.leader?(()=>{if(r.leader==='__mgr__')return`<span>→${esc(getMgrDisplay())}</span>`;const l=roster.find(x=>x.id===r.leader);return l?`<span>→${esc(l.name)}</span>`:''})():''}
-            ${flagInfo?`<span style="font-size:11px;font-weight:600;color:${flagInfo.color};">● ${esc(flagInfo.label)}</span>`:''}
+            ${flagInfo?`<span class="rep-flag-indicator" style="font-size:11px;font-weight:600;color:${flagInfo.color};">● ${esc(flagInfo.label)}</span>`:`<span class="rep-flag-indicator" style="display:none;font-size:11px;font-weight:600;"></span>`}
           </div>
         </div>
         <button class="expand-btn" id="eb-${r.id}">›</button>
@@ -1630,7 +1630,22 @@ function renderReps(){
   }).join('');
 }
 function toggleCard(id){const b=document.getElementById(`rb-${id}`);const e=document.getElementById(`eb-${id}`);const o=b.classList.toggle('open');e.textContent=o?'∨':'›';}
-function updateRep(id,f,v){const r=roster.find(x=>x.id===id);if(r){r[f]=v;if(f==='position'||f==='leader'||f==='flag')renderReps();}}
+function updateRep(id,f,v){const r=roster.find(x=>x.id===id);if(!r)return;r[f]=v;
+  // Update visual indicators in-place without collapsing the card
+  if(f==='position'){
+    const pos=v||'';
+    const av=document.querySelector(`#rc-${id} .av`);
+    if(av){av.className=`av av34 ${posClass(pos)}`;av.setAttribute('data-position',pos);}
+    const pt=document.querySelector(`#rc-${id} .pos-tag`);
+    if(pt){if(pos){pt.className=`pos-tag ${posClass(pos)}`;pt.textContent=pos;}else{pt.className='pos-tag';pt.textContent='';}}
+    refreshAddLeaderDropdown();
+  }
+  if(f==='flag'){
+    const fi=v?FLAGS.find(x=>x.id===v):null;
+    const fm=document.querySelector(`#rc-${id} .rep-flag-indicator`);
+    if(fm){fm.style.color=fi?fi.color:'transparent';fm.textContent=fi?`● ${fi.label}`:'';fm.style.display=fi?'':'none';}
+  }
+}
 function toggleLeaver(id){const r=roster.find(x=>x.id===id);if(!r)return;r.leaver=!r.leaver;renderReps();setTimeout(()=>{const b=document.getElementById(`rb-${id}`);if(b){b.classList.add('open');document.getElementById(`eb-${id}`).textContent='∨';}},0);}
 async function saveRep(id){const r=roster.find(x=>x.id===id);if(!r)return;try{await api({action:'saveRep',manager:managerName,rep:r});showToast(`${r.name} saved ✓`,'success');renderReps();renderHome();}catch(e){showToast('Save failed','error');}}
 function filterReps(){const q=(document.getElementById('rep-search').value||'').toLowerCase();const cards=document.querySelectorAll('.rep-card');let shown=0;cards.forEach(card=>{const name=(card.querySelector('.rep-name')||{textContent:''}).textContent.toLowerCase();const pos=(card.querySelector('.pos-tag')||{textContent:''}).textContent.toLowerCase();const match=!q||name.includes(q)||pos.includes(q);card.style.display=match?'':'none';if(match)shown++;});const empty=document.querySelector('#rep-list .empty-state');if(empty)empty.style.display=shown===0&&q?'block':'none';}
