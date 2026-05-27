@@ -290,7 +290,7 @@ select.form-input { cursor: pointer; }
           </select>
         </div>
         <div>
-          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Week (Monday date)</div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Date (of report week)</div>
           <input type="date" id="ul-week" class="search-input" style="width:100%;" />
         </div>
         <div id="ul-campaign-wrap">
@@ -839,6 +839,16 @@ function formatWeek(key) {
   const f=dt=>dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   return `w/c ${f(d)} – ${f(end)}`;
 }
+function fmtReportDate(key) {
+  if(!key||typeof key!=='string')return'—';
+  const parts=key.split('-');
+  if(parts.length!==3)return key;
+  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  if(isNaN(d))return key;
+  const day=d.getDate();
+  const suffix=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
+  return d.toLocaleDateString('en-GB',{weekday:'short',month:'short',day:'numeric'}).replace(/(\d+)/,day+suffix)+' '+d.getFullYear();
+}
 const currentWeek = getWeekKey(new Date());
 
 window.onload = () => {
@@ -1180,13 +1190,8 @@ let allUploadedReports = [];
 function getUploadWeekKey() {
   const val = document.getElementById('ul-week').value;
   if (!val) return null;
-  const parts = val.split('-');
-  const d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-  d.setDate(d.getDate() - (d.getDay() === 0 ? 6 : d.getDay() - 1));
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,'0');
-  const day = String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${day}`;
+  // Use the exact date selected — admin picks the Monday themselves
+  return val;
 }
 
 function handleTypeChange() {
@@ -1260,7 +1265,7 @@ function renderUploadHistory() {
     return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
       <span style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);padding:3px 8px;border-radius:20px;white-space:nowrap;">${esc(r.type)}</span>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:500;">${r.campaign?esc(r.campaign)+' — ':''}${formatWeek(r.week)}</div>
+        <div style="font-size:13px;font-weight:500;">${r.campaign?esc(r.campaign)+' — ':''}${fmtReportDate(r.week)}</div>
         <div style="font-size:11px;color:var(--muted);">→ ${esc(mgrList)}</div>
         ${payMeta}
       </div>
@@ -1531,7 +1536,7 @@ function renderReviews() {
     return `<div class="review-card" id="rev-${esc(r.id)}" onclick="toggleReview('${esc(r.id)}')">
       <div class="review-card-head">
         <div>
-          <div class="review-card-title">${esc(dn)} — ${formatWeek(r.week)}</div>
+          <div class="review-card-title">${esc(dn)} — ${fmtReportDate(r.week)}</div>
           <div class="review-card-meta">Submitted ${submittedDate}</div>
         </div>
         <span style="font-size:18px;color:var(--muted);transition:transform .2s;" id="rev-arrow-${esc(r.id)}">›</span>

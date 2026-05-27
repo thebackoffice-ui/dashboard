@@ -745,6 +745,12 @@ function getWeekKey(d){const dt=new Date(d);dt.setHours(0,0,0,0);dt.setDate(dt.g
 function fmtDate(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`;}
 function parseDate(s){if(!s||typeof s!=='string')return null;const p=s.split('-');if(p.length!==3)return null;const d=new Date(+p[0],+p[1]-1,+p[2]);return isNaN(d)?null:d;}
 function formatWeek(k){const d=parseDate(k);if(!d)return'—';const e=new Date(d);e.setDate(e.getDate()+6);const f=dt=>dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'});return`w/c ${f(d)} – ${f(e)}`;}
+function fmtReportDate(k){
+  const d=parseDate(k);if(!d)return'—';
+  const day=d.getDate();
+  const sfx=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
+  return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}).replace(/,/,'').replace(/(\d+)/,day+sfx);
+}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 const params=new URLSearchParams(window.location.search);
@@ -885,16 +891,28 @@ function renderHome(){
 
   const payReports=allReports.filter(r=>r.type==='Pay Report').sort((a,b)=>b.week.localeCompare(a.week));
   const latestPay=payReports[0]||null;
-  const isThisWeekPay=latestPay&&latestPay.week===weekKey;
+  const isThisWeekPay=latestPay&&(()=>{
+    const rep=parseDate(latestPay.week);
+    const mon=parseDate(weekKey);
+    if(!rep||!mon)return false;
+    const sun=new Date(mon);sun.setDate(sun.getDate()+6);
+    return rep>=mon&&rep<=sun;
+  })();
   const planners=allReports.filter(r=>r.type==='Daily Planner').sort((a,b)=>b.week.localeCompare(a.week));
   const latestPlanner=planners[0]||null;
   const prologs=allReports.filter(r=>r.type==='Pro-log').sort((a,b)=>b.week.localeCompare(a.week));
   const latestProlog=prologs[0]||null;
 
-  // 6-week wire data
-  const sixWeeks=[];
-  for(let i=5;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i*7);sixWeeks.push(getWeekKey(d));}
+  // 6-week wire data — use actual uploaded pay report dates
+  const allPayWeeks=[...new Set([
+    ...allReports.filter(r=>r.type==='Pay Report').map(r=>r.week),
+    ...allPayData.map(p=>p.week)
+  ])].filter(Boolean).sort();
+  const sixWeeks=allPayWeeks.slice(-6);
+  // Pad to 6 slots if fewer uploads exist
+  while(sixWeeks.length<6)sixWeeks.unshift('');
   const wireByWeek=sixWeeks.map(wk=>{
+    if(!wk)return{wk:'',wire:0,take:0};
     const pd=allPayData.find(p=>p.week===wk);
     const rep=allReports.find(r=>r.type==='Pay Report'&&r.week===wk);
     return{wk,wire:parseFloat((pd&&pd.officeWire)||rep?.officeWire||0)||0,take:parseFloat((pd&&pd.mgrTake)||rep?.mgrTake||0)||0};
@@ -914,7 +932,7 @@ function renderHome(){
     const cx=padL+i*groupStep+groupStep/2;
     const wireH=Math.max(Math.round((d.wire/maxWire)*innerH),d.wire>0?2:0);
     const takeH=Math.max(Math.round((d.take/maxWire)*innerH),d.take>0?2:0);
-    const shortWk=d.wk?d.wk.slice(5).replace('-','/'):'';
+    const shortWk=(()=>{if(!d.wk)return'';const dt=parseDate(d.wk);if(!dt)return'';return dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'});})();
     return `<rect x="${cx-bw-3}" y="${padT+innerH-wireH}" width="${bw}" height="${wireH}" rx="3" fill="#b8e0f5" opacity="0.9"/>
       <rect x="${cx+3}" y="${padT+innerH-takeH}" width="${bw}" height="${takeH}" rx="3" fill="#8eca44" opacity="0.9"/>
       <text x="${cx}" y="${padT+innerH+14}" text-anchor="middle" font-size="9" fill="#6b7d8a" font-family="DM Sans,sans-serif">${shortWk}</text>`;
@@ -1016,7 +1034,7 @@ function renderHome(){
         ${latestPay
           ?`<a href="${esc(latestPay.url)}" target="_blank" class="nd-link-row">
               <div class="nd-link-icon" style="background:#f0f1ff;color:#6366f1;">${ICO.pay}</div>
-              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub">${isThisWeekPay?'This week · '+latestPay.week:'Latest — '+formatWeek(latestPay.week)}</div></div>
+              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub">${isThisWeekPay?fmtReportDate(latestPay.week):'Latest — '+fmtReportDate(latestPay.week)}</div></div>
               <div class="nd-link-arrow">${ICO.chevron}</div>
             </a>`
           :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
@@ -1026,7 +1044,7 @@ function renderHome(){
         ${latestPlanner
           ?`<a href="${esc(latestPlanner.url)}" target="_blank" class="nd-link-row">
               <div class="nd-link-icon" style="background:#fef3c7;color:#d97706;">${ICO.cal}</div>
-              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">${esc(latestPlanner.campaign||formatWeek(latestPlanner.week))}</div></div>
+              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">${esc(latestPlanner.campaign||'')+' '+fmtReportDate(latestPlanner.week)}</div></div>
               <div class="nd-link-arrow">${ICO.chevron}</div>
             </a>`
           :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
@@ -1036,7 +1054,7 @@ function renderHome(){
         ${latestProlog
           ?`<a href="${esc(latestProlog.url)}" target="_blank" class="nd-link-row">
               <div class="nd-link-icon" style="background:#f0fdf4;color:#16a34a;">${ICO.doc}</div>
-              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">${esc(latestProlog.campaign||formatWeek(latestProlog.week))}</div></div>
+              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">${esc(latestProlog.campaign||'')+' '+fmtReportDate(latestProlog.week)}</div></div>
               <div class="nd-link-arrow">${ICO.chevron}</div>
             </a>`
           :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
@@ -1239,7 +1257,7 @@ function buildPayProductionCard(week){
         <span style="font-size:18px;">💰</span>
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--text);">Production Overview</div>
-          <div style="font-size:12px;color:var(--muted);">${formatWeek(week)}${isCurrentWeek?' · <span style="color:var(--warning);font-weight:600;">This Week</span>':''}</div>
+          <div style="font-size:12px;color:var(--muted);">${fmtReportDate(week)}${isCurrentWeek?' · <span style="color:var(--warning);font-weight:600;">This Week</span>':''}</div>
         </div>
       </div>
       ${wire>0||take>0?`<div style="text-align:right;"><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Your take</div><div style="font-size:22px;font-weight:800;color:var(--accent);">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div></div>`:''}
@@ -1302,7 +1320,7 @@ function renderReports(){
     const weeks=Object.keys(byW).sort((a,b)=>b.localeCompare(a));
     payEl.innerHTML=weeks.map(w=>{
       const isNow=w===weekKey;
-      return`<div class="wk-hdr">${formatWeek(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
+      return`<div class="wk-hdr">${fmtReportDate(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
       ${buildPayProductionCard(w)}
       ${byW[w].map(r=>`<div class="rh-row">
         <span style="font-size:18px;">📊</span>
@@ -1319,7 +1337,7 @@ function renderReports(){
     const weeks=Object.keys(byW).sort((a,b)=>b.localeCompare(a));
     el.innerHTML=weeks.map(w=>{
       const isNow=w===weekKey;
-      return`<div class="wk-hdr">${formatWeek(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
+      return`<div class="wk-hdr">${fmtReportDate(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
       ${byW[w].map(r=>`<div class="rh-row">
         <span style="font-size:18px;">${iconMap[r.type]||'📄'}</span>
         <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">${esc(r.type)}${r.campaign?` — ${esc(r.campaign)}`:''}</div>${isNow&&r.type==='Pay Report'?`<div style="font-size:11px;color:var(--warning);margin-top:1px;">⚠ Review and let Elle know before 11am Friday</div>`:''}</div>
