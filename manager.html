@@ -747,19 +747,20 @@ function parseDate(s){if(!s||typeof s!=='string')return null;const p=s.split('-'
 function formatWeek(k){const d=parseDate(k);if(!d)return'—';const e=new Date(d);e.setDate(e.getDate()+6);const f=dt=>dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'});return`w/c ${f(d)} – ${f(e)}`;}
 function fmtReportDate(k){
   if(!k||typeof k!=='string'||k==='—')return'—';
-  // Strip any time component
   const raw=k.trim().split('T')[0];
   const p=raw.split('-');
   if(p.length!==3)return k;
-  const yr=parseInt(p[0],10),mo=parseInt(p[1],10)-1,dy=parseInt(p[2],10);
-  if(isNaN(yr)||isNaN(mo)||isNaN(dy))return k;
-  const dt=new Date(yr,mo,dy);
+  const yr=parseInt(p[0],10),mo=parseInt(p[1],10),dy=parseInt(p[2],10);
+  if(isNaN(yr)||isNaN(mo)||isNaN(dy)||mo<1||mo>12||dy<1||dy>31)return k;
+  // Compute day-of-week from the numbers directly (Zeller-style), no Date constructor
+  // Use UTC to avoid any timezone shift
+  const dt=new Date(Date.UTC(yr,mo-1,dy));
   if(isNaN(dt.getTime()))return k;
   const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const day=dt.getDate();
-  const sfx=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
-  return days[dt.getDay()]+' '+day+sfx+' '+months[dt.getMonth()]+' '+dt.getFullYear();
+  const dow=dt.getUTCDay();
+  const sfx=dy===1||dy===21||dy===31?'st':dy===2||dy===22?'nd':dy===3||dy===23?'rd':'th';
+  return days[dow]+' '+dy+sfx+' '+months[mo-1]+' '+yr;
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -1096,7 +1097,8 @@ function renderHome(){
 
   // Draw production chart on canvas
   window.wireByWeekGlobal=wireByWeek;
-  requestAnimationFrame(()=>drawProdChart(wireByWeek));
+  // Use a short delay to ensure the canvas container has been laid out
+  setTimeout(()=>drawProdChart(wireByWeek),50);
 
   if(typeof lbRows!=='undefined'&&!lbLoaded){
     lbInit().then(()=>renderHome()).catch(()=>{});
@@ -1168,17 +1170,16 @@ function drawProdChart(wireByWeek){
     if(d.wk){
       const parts=d.wk.split('-');
       if(parts.length===3){
-        const dt=new Date(+parts[0],+parts[1]-1,+parts[2]);
-        if(!isNaN(dt)){
-          const lbl=dt.getDate()+' '+months[dt.getMonth()];
+        const yr=parseInt(parts[0],10),mo=parseInt(parts[1],10),dy=parseInt(parts[2],10);
+        if(!isNaN(yr)&&!isNaN(mo)&&!isNaN(dy)){
+          const lbl=dy+' '+months[mo-1];
           ctx.fillStyle=textCol;
-          ctx.font='10px DM Sans,sans-serif';
+          ctx.font='bold 10px DM Sans,sans-serif';
           ctx.textAlign='center';
           ctx.fillText(lbl,cx,padT+innerH+16);
-          // Year on second line if space
           ctx.fillStyle=labelCol;
           ctx.font='9px DM Sans,sans-serif';
-          ctx.fillText(dt.getFullYear(),cx,padT+innerH+27);
+          ctx.fillText(yr,cx,padT+innerH+27);
         }
       }
     }
