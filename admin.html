@@ -874,7 +874,7 @@ function doPost(e) {
       const emailRow = sh.getDataRange().getValues().slice(1).find(r => r[0]==='reviewEmails');
       const emailStr = emailRow ? String(emailRow[1]) : '';
       if (emailStr) {
-        const recipients = emailStr.split(/[\n,]+/).map(e=>e.trim()).filter(Boolean);
+        const recipients = emailStr.split(',').join('\n').split('\n').map(function(e){return e.trim();}).filter(Boolean);
         if (recipients.length) {
           const dn = data.manager.charAt(0).toUpperCase() + data.manager.slice(1);
           const weekFormatted = data.week || '';
