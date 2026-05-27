@@ -747,9 +747,11 @@ function parseDate(s){if(!s||typeof s!=='string')return null;const p=s.split('-'
 function formatWeek(k){const d=parseDate(k);if(!d)return'—';const e=new Date(d);e.setDate(e.getDate()+6);const f=dt=>dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'});return`w/c ${f(d)} – ${f(e)}`;}
 function fmtReportDate(k){
   const d=parseDate(k);if(!d)return'—';
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const day=d.getDate();
   const sfx=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
-  return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}).replace(/,/,'').replace(/(\d+)/,day+sfx);
+  return days[d.getDay()]+' '+day+sfx+' '+months[d.getMonth()]+' '+d.getFullYear();
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -932,7 +934,7 @@ function renderHome(){
     const cx=padL+i*groupStep+groupStep/2;
     const wireH=Math.max(Math.round((d.wire/maxWire)*innerH),d.wire>0?2:0);
     const takeH=Math.max(Math.round((d.take/maxWire)*innerH),d.take>0?2:0);
-    const shortWk=(()=>{if(!d.wk)return'';const dt=parseDate(d.wk);if(!dt)return'';return dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'});})();
+    const shortWk=(()=>{if(!d.wk)return'';const dt=parseDate(d.wk);if(!dt)return'';const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return dt.getDate()+' '+ms[dt.getMonth()];})();
     return `<rect x="${cx-bw-3}" y="${padT+innerH-wireH}" width="${bw}" height="${wireH}" rx="3" fill="#b8e0f5" opacity="0.9"/>
       <rect x="${cx+3}" y="${padT+innerH-takeH}" width="${bw}" height="${takeH}" rx="3" fill="#8eca44" opacity="0.9"/>
       <text x="${cx}" y="${padT+innerH+14}" text-anchor="middle" font-size="9" fill="#6b7d8a" font-family="DM Sans,sans-serif">${shortWk}</text>`;
@@ -1034,7 +1036,7 @@ function renderHome(){
         ${latestPay
           ?`<a href="${esc(latestPay.url)}" target="_blank" class="nd-link-row">
               <div class="nd-link-icon" style="background:#f0f1ff;color:#6366f1;">${ICO.pay}</div>
-              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub">${isThisWeekPay?fmtReportDate(latestPay.week):'Latest — '+fmtReportDate(latestPay.week)}</div></div>
+              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub">${fmtReportDate(latestPay.week)}</div></div>
               <div class="nd-link-arrow">${ICO.chevron}</div>
             </a>`
           :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
@@ -1044,7 +1046,7 @@ function renderHome(){
         ${latestPlanner
           ?`<a href="${esc(latestPlanner.url)}" target="_blank" class="nd-link-row">
               <div class="nd-link-icon" style="background:#fef3c7;color:#d97706;">${ICO.cal}</div>
-              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">${esc(latestPlanner.campaign||'')+' '+fmtReportDate(latestPlanner.week)}</div></div>
+              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">${latestPlanner.campaign?esc(latestPlanner.campaign)+' · '+fmtReportDate(latestPlanner.week):fmtReportDate(latestPlanner.week)}</div></div>
               <div class="nd-link-arrow">${ICO.chevron}</div>
             </a>`
           :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
@@ -1054,7 +1056,7 @@ function renderHome(){
         ${latestProlog
           ?`<a href="${esc(latestProlog.url)}" target="_blank" class="nd-link-row">
               <div class="nd-link-icon" style="background:#f0fdf4;color:#16a34a;">${ICO.doc}</div>
-              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">${esc(latestProlog.campaign||'')+' '+fmtReportDate(latestProlog.week)}</div></div>
+              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">${latestProlog.campaign?esc(latestProlog.campaign)+' · '+fmtReportDate(latestProlog.week):fmtReportDate(latestProlog.week)}</div></div>
               <div class="nd-link-arrow">${ICO.chevron}</div>
             </a>`
           :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
