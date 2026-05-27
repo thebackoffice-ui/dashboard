@@ -255,21 +255,43 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .sr-val{font-size:13px;font-weight:600;}
 
 /* ── PAGE CONTENT ── */
-.page-scroll{flex:1;overflow-y:auto;padding:24px;}
-.page-wrap{max-width:760px;margin:0 auto;}
+.page-scroll{flex:1;overflow-y:auto;padding:24px;background:var(--bg);}
+.page-wrap{max-width:800px;margin:0 auto;}
 .sec-lbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;}
 .divider{height:1px;background:var(--border);margin:20px 0;}
 
+/* ── CONSISTENT TAB CARD ── shared across all tabs */
+.tab-card{background:#fff;border-radius:10px;padding:22px 24px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:14px;}
+[data-theme="dark"] .tab-card{background:var(--surface);box-shadow:var(--s1);}
+.tab-card-title{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:4px;}
+.tab-card-sub{font-size:12px;color:var(--muted);margin-bottom:16px;}
+.tab-card-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.tab-card-hdr-left{}
+.pill-btn{background:#0f766e;color:#fff;border:none;font-family:var(--font);font-size:11px;font-weight:700;padding:7px 16px;border-radius:20px;cursor:pointer;letter-spacing:.04em;transition:opacity .15s;white-space:nowrap;}
+.pill-btn:hover{opacity:.82;}
+.pill-btn.outline{background:none;color:#0f766e;border:1.5px solid #0f766e;}
+.pill-btn.outline:hover{background:rgba(15,118,110,.06);}
+.pill-btn.soft{background:#f0fdfa;color:#0f766e;border:1px solid #99f6e4;}
+[data-theme="dark"] .pill-btn.soft{background:rgba(20,184,166,.1);color:var(--accent);border-color:rgba(20,184,166,.25);}
+.tab-section-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;margin-top:20px;}
+.tab-section-lbl:first-child{margin-top:0;}
+
+/* ── TOPBAR sub-line ── */
+.topbar-sub{font-size:12px;color:var(--muted);margin-top:1px;}
+.topbar-title-block{display:flex;flex-direction:column;gap:1px;}
+
 /* ── REP CARDS ── */
 .rep-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
-.rep-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--s1);transition:border-color .15s;}
+.rep-card{background:#fff;border:1px solid #edf0f2;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:border-color .15s,box-shadow .15s;}
+[data-theme="dark"] .rep-card{background:var(--surface);border-color:var(--border);}
+.rep-card:hover{border-color:var(--border2);box-shadow:0 4px 12px rgba(0,0,0,.07);}
 .rep-card.is-leaver{border-left:3px solid var(--warning);opacity:.65;}
-.rep-card-head{display:flex;align-items:center;padding:11px 14px;gap:10px;cursor:pointer;user-select:none;}
+.rep-card-head{display:flex;align-items:center;padding:12px 16px;gap:10px;cursor:pointer;user-select:none;}
 .rep-info{flex:1;min-width:0;}
-.rep-name{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rep-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .rep-meta{font-size:11px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:2px;}
 .expand-btn{background:none;border:none;color:var(--subtle);cursor:pointer;padding:4px;font-size:15px;line-height:1;font-family:var(--font);}
-.rep-card-body{padding:0 14px 14px;display:none;border-top:1px solid var(--border);}
+.rep-card-body{padding:0 16px 16px;display:none;border-top:1px solid var(--border);}
 .rep-card-body.open{display:block;}
 .rep-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
 .field-group{display:flex;flex-direction:column;gap:4px;}
@@ -313,7 +335,8 @@ select.field-input{cursor:pointer;appearance:none;}
 
 /* ── WEEKLY UPDATE ── */
 .week-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
-.week-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--s1);}
+.week-row{background:#fff;border:1px solid #edf0f2;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+[data-theme="dark"] .week-row{background:var(--surface);border-color:var(--border);}
 .week-row.is-leaver{opacity:.5;border-style:dashed;}
 .week-row-info{flex:1;min-width:0;}
 .week-row-name{font-weight:500;font-size:13px;}
@@ -328,8 +351,8 @@ select.field-input{cursor:pointer;appearance:none;}
 
 /* ── REPORTS TABS ── */
 .report-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
-.rtab-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font);font-size:13px;font-weight:500;padding:10px 18px;cursor:pointer;margin-bottom:-1px;transition:color .15s;}
-.rtab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.rtab-btn{background:none;border:none;border-bottom:2.5px solid transparent;color:var(--muted);font-family:var(--font);font-size:13px;font-weight:600;padding:11px 20px;cursor:pointer;margin-bottom:-1px;transition:color .15s;}
+.rtab-btn.active{color:#0f766e;border-bottom-color:#0f766e;}
 .rtab-btn:hover:not(.active){color:var(--text);}
 .rtab-panel{display:none;}
 .rtab-panel.active{display:block;}
@@ -342,12 +365,14 @@ select.field-input{cursor:pointer;appearance:none;}
 [data-theme="dark"] .rt-pay{color:#1ac8ce;background:rgba(26,200,206,.1);}
 [data-theme="dark"] .rt-prolog{color:#4ade80;background:rgba(74,222,128,.1);}
 [data-theme="dark"] .rt-planner{color:#fbbf24;background:rgba(251,191,36,.1);}
-.rh-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px;box-shadow:var(--s1);transition:border-color .15s;}
-.rh-row:hover{border-color:var(--border2);}
+.rh-row{background:#fff;border:1px solid #edf0f2;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:box-shadow .15s;}
+[data-theme="dark"] .rh-row{background:var(--surface);border-color:var(--border);}
+.rh-row:hover{box-shadow:0 4px 14px rgba(0,0,0,.1);}
 
 /* ── WEEKLY REVIEW ── */
-.wr-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);box-shadow:var(--s1);margin-bottom:16px;overflow:hidden;}
-.wr-section-hdr{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:10px;}
+.wr-section{background:#fff;border:1px solid #edf0f2;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:14px;overflow:hidden;}
+[data-theme="dark"] .wr-section{background:var(--surface);border-color:var(--border);}
+.wr-section-hdr{padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:10px;}
 .wr-section-hdr .wr-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .wr-section-hdr span{font-size:13px;font-weight:600;}
 .wr-section-body{padding:16px 18px;}
@@ -382,9 +407,10 @@ select.wr-input{cursor:pointer;appearance:none;}
 .wr-toggle-group{display:flex;gap:8px;}
 .wr-toggle{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;font-weight:500;padding:7px 14px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;}
 .wr-toggle.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-.wr-past-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;box-shadow:var(--s1);cursor:pointer;transition:all .15s;}
-.wr-past-card:hover{border-color:var(--border2);box-shadow:var(--s2);}
-.wr-past-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.wr-past-card{background:#fff;border:1px solid #edf0f2;border-radius:10px;padding:16px 18px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:all .15s;}
+[data-theme="dark"] .wr-past-card{background:var(--surface);border-color:var(--border);}
+.wr-past-card:hover{border-color:var(--border2);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.wr-past-title{font-size:14px;font-weight:700;margin-bottom:3px;}
 .wr-past-sub{font-size:11px;color:var(--muted);}
 
 /* ── CALENDAR ── */
@@ -475,33 +501,38 @@ select.wr-input{cursor:pointer;appearance:none;}
 .lb-camp-pill{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .lb-camp-pill:hover{background:var(--surface2);color:var(--text);}
 .lb-camp-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-.lb-stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--s1);text-align:center;}
-.lb-stat-val{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--text);}
+.lb-stat-card{background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04);text-align:center;}
+[data-theme="dark"] .lb-stat-card{background:var(--surface);box-shadow:var(--s1);}
+.lb-stat-val{font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--text);}
 .lb-stat-lbl{font-size:11px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
-.lb-podium{display:flex;gap:10px;align-items:flex-end;justify-content:center;padding:8px 0 16px;}
-.lb-podium-card{flex:1;border-radius:var(--rlg);padding:18px 14px 14px;text-align:center;box-shadow:var(--s1);transition:box-shadow .15s;position:relative;overflow:hidden;}
-.lb-podium-card:hover{box-shadow:var(--s2);}
-.lb-podium-1{background:linear-gradient(135deg,rgba(13,115,119,.12),rgba(26,200,206,.06));border:1px solid rgba(13,115,119,.25);min-height:160px;}
-.lb-podium-2{background:var(--surface);border:1px solid var(--border);min-height:130px;}
-.lb-podium-3{background:var(--surface);border:1px solid var(--border);min-height:110px;}
-.lb-crown{font-size:22px;margin-bottom:6px;}
-.lb-medal{width:28px;height:28px;border-radius:4px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
+.lb-podium{display:flex;gap:12px;align-items:flex-end;justify-content:center;padding:8px 0 20px;}
+.lb-podium-card{flex:1;border-radius:12px;padding:20px 16px 16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:box-shadow .15s;position:relative;overflow:hidden;}
+.lb-podium-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);}
+.lb-podium-1{background:linear-gradient(135deg,#e0fdf4,#ccfbf1);border:1.5px solid #5eead4;min-height:170px;}
+.lb-podium-2{background:#fff;border:1px solid #e8edf0;min-height:138px;}
+.lb-podium-3{background:#fff;border:1px solid #e8edf0;min-height:116px;}
+[data-theme="dark"] .lb-podium-1{background:linear-gradient(135deg,rgba(20,184,166,.15),rgba(20,184,166,.07));border-color:rgba(20,184,166,.35);}
+[data-theme="dark"] .lb-podium-2,[data-theme="dark"] .lb-podium-3{background:var(--surface);border-color:var(--border);}
+.lb-crown{font-size:24px;margin-bottom:8px;}
+.lb-medal{width:30px;height:30px;border-radius:6px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;}
 .lb-gold{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;}
 .lb-silver{background:linear-gradient(135deg,#f1f5f9,#e2e8f0);color:#475569;}
 .lb-bronze{background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#7c2d12;}
 .lb-p-name{font-size:14px;font-weight:700;margin-bottom:2px;}
-.lb-p-camp{font-size:10px;color:var(--subtle);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lb-p-score{font-size:28px;font-weight:900;letter-spacing:-.03em;color:var(--accent);}
-.lb-podium-1 .lb-p-score{font-size:34px;}
-.lb-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:12px;box-shadow:var(--s1);margin-bottom:6px;transition:all .15s;}
-.lb-row:hover{border-color:var(--border2);transform:translateX(3px);box-shadow:var(--s2);}
-.lb-row.lb-top{border-color:rgba(13,115,119,.2);background:linear-gradient(135deg,rgba(13,115,119,.03),var(--surface));}
-.lb-rank{width:38px;height:38px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--muted);}
-.lb-top .lb-rank{background:rgba(13,115,119,.1);border-color:rgba(13,115,119,.2);color:var(--accent);}
-.lb-row-name{font-size:14px;font-weight:600;letter-spacing:-.01em;margin-bottom:1px;}
+.lb-p-camp{font-size:10px;color:var(--subtle);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-p-score{font-size:30px;font-weight:900;letter-spacing:-.03em;color:var(--accent);}
+.lb-podium-1 .lb-p-score{font-size:36px;}
+.lb-row{background:#fff;border:1px solid #edf0f2;border-radius:10px;padding:12px 16px;display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:6px;transition:all .15s;}
+[data-theme="dark"] .lb-row{background:var(--surface);border-color:var(--border);}
+.lb-row:hover{border-color:var(--border2);transform:translateX(3px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.lb-row.lb-top{border-color:rgba(15,118,110,.2);background:linear-gradient(135deg,rgba(15,118,110,.04),#fff);}
+[data-theme="dark"] .lb-row.lb-top{background:linear-gradient(135deg,rgba(20,184,166,.07),var(--surface));}
+.lb-rank{width:38px;height:38px;border-radius:8px;background:#f4f7f8;border:1px solid #e8edf0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--muted);}
+.lb-top .lb-rank{background:rgba(15,118,110,.09);border-color:rgba(15,118,110,.2);color:var(--accent);}
+.lb-row-name{font-size:14px;font-weight:700;letter-spacing:-.01em;margin-bottom:1px;}
 .lb-row-camp{font-size:11px;color:var(--subtle);}
 .lb-score{font-size:24px;font-weight:900;letter-spacing:-.02em;text-align:right;color:var(--text);}
-.lb-bar-wrap{height:3px;background:var(--surface2);border-radius:2px;margin-top:4px;width:64px;margin-left:auto;}
+.lb-bar-wrap{height:3px;background:var(--surface2);border-radius:2px;margin-top:5px;width:64px;margin-left:auto;}
 .lb-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s cubic-bezier(.4,0,.2,1);}
 .lb-section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .lb-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
@@ -584,49 +615,72 @@ select.wr-input{cursor:pointer;appearance:none;}
 
     <!-- MY REPS -->
     <div class="tab-content" id="ptab-reps">
-      <div class="topbar"><span class="topbar-title">My Reps</span></div>
+      <div class="topbar">
+        <div class="topbar-title-block"><span class="topbar-title">My Reps</span><span class="topbar-sub" id="reps-sub">Your team roster</span></div>
+      </div>
       <div class="page-scroll"><div class="page-wrap">
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:20px;box-shadow:var(--s1);">
-          <div class="sec-lbl" style="margin-bottom:10px;">Add new rep</div>
+        <div class="tab-card">
+          <div class="tab-card-hdr">
+            <div><div class="tab-card-title">Add a rep</div><div class="tab-card-sub">New starters join your roster immediately</div></div>
+          </div>
           <div class="add-row"><input class="add-input" id="add-rep-name" type="text" placeholder="Full name…" onkeydown="if(event.key==='Enter')addRep()"/><button class="add-btn" onclick="addRep()">Add rep</button></div>
         </div>
-        <div style="position:relative;margin-bottom:14px;">
-          <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          <input id="rep-search" type="text" placeholder="Search by name or position…" oninput="filterReps()" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px 9px 34px;border-radius:var(--r);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+        <div class="tab-card" style="padding:16px 20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="tab-card-title" style="font-size:15px;margin-bottom:0;">Team Roster</div>
+            <div style="position:relative;">
+              <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="rep-search" type="text" placeholder="Search…" oninput="filterReps()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px 8px 32px;border-radius:20px;outline:none;transition:border-color .15s;width:200px;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+            </div>
+          </div>
+          <div class="rep-list" id="rep-list"><div class="empty-state"><strong>No reps yet</strong>Add your first rep above.</div></div>
         </div>
-        <div class="sec-lbl" style="margin-bottom:10px;">Team roster</div>
-        <div class="rep-list" id="rep-list"><div class="empty-state"><strong>No reps yet</strong>Add your first rep above.</div></div>
       </div></div>
     </div>
 
     <!-- WEEKLY UPDATE -->
     <div class="tab-content" id="ptab-weekly">
-      <div class="topbar"><span class="topbar-title">Weekly Update</span><div class="topbar-right"><span class="week-pill" id="week-pill2">—</span></div></div>
+      <div class="topbar">
+        <div class="topbar-title-block"><span class="topbar-title">Weekly Update</span><span class="topbar-sub">Confirm your team's headcount each week</span></div>
+        <div class="topbar-right"><span class="week-pill" id="week-pill2">—</span></div>
+      </div>
       <div class="page-scroll"><div class="page-wrap">
-        <div id="banner-done" class="banner-ok" style="display:none;"><strong>✓ Submitted this week</strong>You can update and resubmit any time.</div>
-        <div class="sec-lbl">Your team this week</div>
-        <div class="week-list" id="week-list"><div class="empty-state"><strong>No reps yet</strong>Add reps on My Reps first.</div></div>
-        <div class="submit-wrap"><button class="submit-btn" id="submit-btn" onclick="submitWeek()">Submit team for this week</button></div>
+        <div id="banner-done" style="display:none;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-left:4px solid #22c55e;border-radius:10px;padding:14px 18px;margin-bottom:16px;display:none;">
+          <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:2px;">✓ Submitted this week</div>
+          <div style="font-size:12px;color:#166534;">You can update and resubmit any time before Friday.</div>
+        </div>
+        <div class="tab-card" style="padding:20px 22px;">
+          <div class="tab-card-hdr" style="margin-bottom:16px;">
+            <div><div class="tab-card-title">Your team this week</div><div class="tab-card-sub">Mark anyone leaving this week before submitting</div></div>
+          </div>
+          <div class="week-list" id="week-list"><div class="empty-state"><strong>No reps yet</strong>Add reps on My Reps first.</div></div>
+          <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);">
+            <button class="submit-btn" id="submit-btn" onclick="submitWeek()">Submit team for this week</button>
+          </div>
+        </div>
       </div></div>
     </div>
 
     <!-- REPORTS -->
     <div class="tab-content" id="ptab-reports">
-      <div class="topbar"><span class="topbar-title">Reports</span></div>
+      <div class="topbar">
+        <div class="topbar-title-block"><span class="topbar-title">Reports</span><span class="topbar-sub">Pay reports, daily planners and pro-logs</span></div>
+      </div>
       <div class="page-scroll"><div class="page-wrap">
-        <div class="report-tabs">
-          <button class="rtab-btn active" onclick="switchReportTab('pay')">💰 Pay Reports</button>
-          <button class="rtab-btn" onclick="switchReportTab('planner')">📅 Daily Planners</button>
-          <button class="rtab-btn" onclick="switchReportTab('prolog')">📋 Pro-logs</button>
-        </div>
-        <div class="rtab-panel active" id="rtab-pay">
-          <div id="pay-reports-list"></div>
-        </div>
-        <div class="rtab-panel" id="rtab-planner">
-          <div id="planner-reports-list"></div>
-        </div>
-        <div class="rtab-panel" id="rtab-prolog">
-          <div id="prolog-reports-list"></div>
+        <div class="tab-card" style="padding:0;overflow:hidden;">
+          <div style="padding:18px 22px 0;border-bottom:1px solid var(--border);">
+            <div class="tab-card-title" style="margin-bottom:14px;">Your Reports</div>
+            <div style="display:flex;gap:0;">
+              <button class="rtab-btn active" onclick="switchReportTab('pay')" style="padding:10px 20px;font-size:13px;font-weight:600;">💰 Pay Reports</button>
+              <button class="rtab-btn" onclick="switchReportTab('planner')" style="padding:10px 20px;font-size:13px;font-weight:600;">📅 Daily Planners</button>
+              <button class="rtab-btn" onclick="switchReportTab('prolog')" style="padding:10px 20px;font-size:13px;font-weight:600;">📋 Pro-logs</button>
+            </div>
+          </div>
+          <div style="padding:20px 22px;">
+            <div class="rtab-panel active" id="rtab-pay"><div id="pay-reports-list"></div></div>
+            <div class="rtab-panel" id="rtab-planner"><div id="planner-reports-list"></div></div>
+            <div class="rtab-panel" id="rtab-prolog"><div id="prolog-reports-list"></div></div>
+          </div>
         </div>
       </div></div>
     </div>
@@ -634,10 +688,10 @@ select.wr-input{cursor:pointer;appearance:none;}
     <!-- WEEKLY REVIEW -->
     <div class="tab-content" id="ptab-review">
       <div class="topbar">
-        <span class="topbar-title">Weekly Review</span>
+        <div class="topbar-title-block"><span class="topbar-title">Weekly Review</span><span class="topbar-sub">Your weekly planning and reflection</span></div>
         <div class="topbar-right">
-          <button onclick="showReviewForm()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:7px 14px;border-radius:var(--rsm);cursor:pointer;" id="new-review-btn">+ New Review</button>
-          <button onclick="showPastReviews()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;font-weight:500;padding:7px 14px;border-radius:var(--rsm);cursor:pointer;" id="past-reviews-btn">Past Reviews</button>
+          <button onclick="showReviewForm()" class="pill-btn" id="new-review-btn">+ New Review</button>
+          <button onclick="showPastReviews()" class="pill-btn outline" id="past-reviews-btn">Past Reviews</button>
         </div>
       </div>
       <!-- Past reviews list -->
@@ -654,12 +708,11 @@ select.wr-input{cursor:pointer;appearance:none;}
     <!-- CALENDAR -->
     <div class="tab-content" id="ptab-calendar">
       <div class="topbar">
-        <span class="topbar-title">Calendar</span>
+        <div class="topbar-title-block"><span class="topbar-title">Calendar</span><span class="topbar-sub" id="cal-month-lbl">—</span></div>
         <div class="topbar-right">
           <button onclick="calPrev()" class="cal-nav-btn">‹</button>
-          <span class="cal-month" id="cal-month-lbl">—</span>
           <button onclick="calNext()" class="cal-nav-btn">›</button>
-          <button onclick="calToday()" style="background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);font-family:var(--font);font-size:12px;font-weight:600;padding:5px 12px;border-radius:var(--rsm);cursor:pointer;margin-left:4px;">Today</button>
+          <button onclick="calToday()" class="pill-btn soft" style="margin-left:4px;">Today</button>
         </div>
       </div>
       <div style="flex:1;overflow:auto;">
@@ -669,36 +722,47 @@ select.wr-input{cursor:pointer;appearance:none;}
 
     <!-- LEADERBOARD -->
     <div class="tab-content" id="ptab-leaderboard">
-      <div class="topbar"><span class="topbar-title">Leaderboard</span><div class="topbar-right"><span class="week-pill" id="lb-week-pill">—</span></div></div>
-      <div style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <div style="display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
-            <button class="lb-view-btn active" data-view="Week Total" onclick="lbSetView(this,'Week Total')">Week</button>
-            <button class="lb-view-btn" data-view="Mon" onclick="lbSetView(this,'Mon')">Mon</button>
-            <button class="lb-view-btn" data-view="Tue" onclick="lbSetView(this,'Tue')">Tue</button>
-            <button class="lb-view-btn" data-view="Wed" onclick="lbSetView(this,'Wed')">Wed</button>
-            <button class="lb-view-btn" data-view="Thu" onclick="lbSetView(this,'Thu')">Thu</button>
-            <button class="lb-view-btn" data-view="Fri" onclick="lbSetView(this,'Fri')">Fri</button>
+      <div class="topbar">
+        <div class="topbar-title-block"><span class="topbar-title">Leaderboard</span><span class="topbar-sub">National rankings this week</span></div>
+        <div class="topbar-right"><span class="week-pill" id="lb-week-pill">—</span></div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:20px;background:var(--bg);display:flex;flex-direction:column;gap:14px;">
+        <div class="tab-card" style="padding:16px 20px;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:20px;overflow:hidden;gap:0;">
+              <button class="lb-view-btn active" data-view="Week Total" onclick="lbSetView(this,'Week Total')" style="border-radius:20px 0 0 20px;border-right:1px solid var(--border);">Week</button>
+              <button class="lb-view-btn" data-view="Mon" onclick="lbSetView(this,'Mon')">Mon</button>
+              <button class="lb-view-btn" data-view="Tue" onclick="lbSetView(this,'Tue')">Tue</button>
+              <button class="lb-view-btn" data-view="Wed" onclick="lbSetView(this,'Wed')">Wed</button>
+              <button class="lb-view-btn" data-view="Thu" onclick="lbSetView(this,'Thu')">Thu</button>
+              <button class="lb-view-btn" data-view="Fri" onclick="lbSetView(this,'Fri')" style="border-radius:0 20px 20px 0;">Fri</button>
+            </div>
+            <div style="position:relative;flex:1;max-width:280px;">
+              <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="lb-search" type="text" placeholder="Search agent or campaign…" oninput="lbRender()" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 14px 8px 34px;border-radius:20px;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;" id="lb-campaign-pills"></div>
           </div>
-          <div style="position:relative;flex:1;max-width:280px;">
-            <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            <input id="lb-search" type="text" placeholder="Search agent or campaign…" oninput="lbRender()" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px 8px 32px;border-radius:var(--r);outline:none;" />
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="lb-campaign-pills"></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;" id="lb-stats-strip"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" id="lb-stats-strip"></div>
         <div id="lb-podium-wrap"></div>
-        <div id="lb-list"></div>
+        <div class="tab-card" style="padding:20px 22px;" id="lb-list-wrap">
+          <div id="lb-list"></div>
+        </div>
       </div>
     </div>
 
     <!-- MAP -->
     <div class="tab-content" id="ptab-map">
-      <div class="topbar"><span class="topbar-title">Team Map</span></div>
-      <div class="map-wrap">
-        <div class="map-toolbar">
-          <button class="tb-btn" onclick="rebuildMap()">↺ Rebuild</button>
-          <button class="tb-btn" onclick="saveMap()">Save layout</button>
+      <div class="topbar">
+        <div class="topbar-title-block"><span class="topbar-title">Team Map</span><span class="topbar-sub">Visualise your org structure</span></div>
+        <div class="topbar-right">
+          <button class="pill-btn" onclick="saveMap()">Save layout</button>
+          <button class="pill-btn outline" onclick="rebuildMap()">↺ Rebuild</button>
+        </div>
+      </div>
+      <div class="map-wrap" style="background:var(--bg);">
+        <div class="map-toolbar" style="background:#fff;border-radius:10px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:12px;">
           <button class="tb-btn red" onclick="clearMap()">Clear</button>
           <button class="tb-btn" onclick="resetZoom()">Reset view</button>
           <div id="spider-legend" style="display:flex;gap:6px;flex-wrap:wrap;margin-left:4px;"></div>
@@ -1266,6 +1330,10 @@ async function saveNotes(){const val=document.getElementById('notes-area').value
 
 // ── MY REPS ───────────────────────────────────────────
 function renderReps(){
+  const sub=document.getElementById('reps-sub');
+  const activeCount=roster.filter(r=>!r.leaver).length;
+  const leaverCount=roster.filter(r=>r.leaver).length;
+  if(sub)sub.textContent=`${activeCount} active${leaverCount?' · '+leaverCount+' leaver'+(leaverCount!==1?'s':''):''}`;
   const list=document.getElementById('rep-list');
   if(!roster.length){list.innerHTML='<div class="empty-state"><strong>No reps yet</strong>Add your first rep above.</div>';return;}
   const mgrEntry={id:'__mgr__',name:getMgrDisplay(),position:'Manager'};
@@ -2085,7 +2153,10 @@ function lbRender(){
   const maxScore=lbNum(rows[0][lbView])||1;
   const viewLabel=lbView==='Week Total'?'Full ranking':`${lbView} ranking`;
   document.getElementById('lb-list').innerHTML=`
-    <div class="lb-section-hdr"><span class="lb-section-title">${viewLabel}</span><span class="lb-count-badge">${rows.length} reps</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.02em;">${viewLabel}</div>
+      <span style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--muted);">${rows.length} reps</span>
+    </div>
     ${rows.map((r,i)=>{const score=lbNum(r[lbView]);const pct=Math.round((score/maxScore)*100);return`<div class="lb-row ${i===0?'lb-top':''}">
       <div class="lb-rank">${i+1}</div>
       <div><div class="lb-row-name">${esc(r.Agent)}</div><div class="lb-row-camp">${esc(r.Campaign||'—')}</div></div>
