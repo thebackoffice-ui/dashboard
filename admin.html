@@ -703,390 +703,231 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ── Apps Script source ─────────────────────────────────
-const APPS_SCRIPT_VERSION = '2.2.0'; // Update this when you change the script
+const APPS_SCRIPT_VERSION = '2.3.0';
 const APPS_SCRIPT = `// The Back Office — Google Apps Script v${APPS_SCRIPT_VERSION}
 // Extensions > Apps Script > paste > Deploy as Web App (Anyone)
 
 const SS = SpreadsheetApp.getActiveSpreadsheet();
 
+const TOKEN_SECRET = 'TBO_CHANGE_ME_TO_SOMETHING_RANDOM_2024';
+const TOKEN_TTL_MS = 8 * 60 * 60 * 1000;
+
 function getOrCreate(name, headers) {
   let sh = SS.getSheetByName(name);
   if (!sh) { sh = SS.insertSheet(name); sh.appendRow(headers); return sh; }
-  // Add any missing columns to existing sheets
-  const existing = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(),1)).getValues()[0];
-  for (let i = existing.length; i < headers.length; i++) {
-    sh.getRange(1, i+1).setValue(headers[i]);
-  }
+  const existing = sh.getRange(1,1,1,Math.max(sh.getLastColumn(),1)).getValues()[0];
+  for (let i = existing.length; i < headers.length; i++) { sh.getRange(1,i+1).setValue(headers[i]); }
   return sh;
 }
-
-function safeDate(val) {
-  // If Apps Script returns a Date object (when cell is formatted as Date),
-  // format it in the spreadsheet timezone to get the correct YYYY-MM-DD
-  if (val instanceof Date) {
-    return Utilities.formatDate(val, Session.getScriptTimeZone(), 'yyyy-MM-dd');
-  }
-  return String(val || '');
-}
+function safeDate(val) { if (val instanceof Date) { return Utilities.formatDate(val, Session.getScriptTimeZone(), 'yyyy-MM-dd'); } return String(val||''); }
+function makeToken(role) { const expires=Date.now()+TOKEN_TTL_MS; const payload=role+':'+expires; const sig=Utilities.computeHmacSha256Signature(payload,TOKEN_SECRET); const sigHex=sig.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return payload+':'+sigHex; }
+function verifyToken(token,requiredRole) { try { const parts=token.split(':'); if(parts.length!==3)return false; const role=parts[0],expires=parseInt(parts[1],10),sigHex=parts[2]; if(role!==requiredRole)return false; if(Date.now()>expires)return false; const payload=role+':'+expires; const expected=Utilities.computeHmacSha256Signature(payload,TOKEN_SECRET); const expectedHex=expected.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return sigHex===expectedHex; } catch(e){return false;} }
+function getPicFolder() { const folderName='BackOffice_ProfilePics'; const folders=DriveApp.getFoldersByName(folderName); if(folders.hasNext())return folders.next(); const folder=DriveApp.createFolder(folderName); folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW); return folder; }
 
 function doPost(e) {
   const data = JSON.parse(e.postData.contents);
   let result = {};
 
-  if (data.action === 'checkPassword') {
-    const mh = getOrCreate('managers', ['name']);
-    const rows = mh.getDataRange().getValues().slice(1);
-    const row = rows.find(r => r[0] === data.manager);
-    const storedPw = row && row.length > 1 ? String(row[1]) : '';
-    result = { ok: storedPw !== '' && storedPw === String(data.password) };
+  if (data.action === 'adminLogin') {
+    const sh=getOrCreate('settings',['key','value','updatedAt']); const rows=sh.getDataRange().getValues().slice(1); const row=rows.find(r=>r[0]==='adminPassword'); const storedPw=row?String(row[1]):'';
+    if (!storedPw) { const nr=sh.getDataRange().getValues(); let f=false; for(let i=1;i<nr.length;i++){if(nr[i][0]==='adminPassword'){sh.getRange(i+1,2,1,2).setValues([[data.password,new Date().toISOString()]]);f=true;break;}} if(!f)sh.appendRow(['adminPassword',data.password,new Date().toISOString()]); result={ok:true,token:makeToken('admin'),firstSetup:true};
+    } else if (storedPw===String(data.password)) { result={ok:true,token:makeToken('admin')};
+    } else { result={ok:false,error:'Incorrect password.'}; }
+
+  } else if (data.action === 'setAdminPassword') {
+    if (!verifyToken(data.token||'','admin')) return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Unauthorised'})).setMimeType(ContentService.MimeType.JSON);
+    const sh=getOrCreate('settings',['key','value','updatedAt']); const rows=sh.getDataRange().getValues(); let f=false; for(let i=1;i<rows.length;i++){if(rows[i][0]==='adminPassword'){sh.getRange(i+1,2,1,2).setValues([[data.newPassword,new Date().toISOString()]]);f=true;break;}} if(!f)sh.appendRow(['adminPassword',data.newPassword,new Date().toISOString()]); result={ok:true};
+
+  } else if (data.action === 'checkPassword') {
+    const mh=getOrCreate('managers',['name','password']); const rows=mh.getDataRange().getValues().slice(1); const row=rows.find(r=>r[0]===data.manager);
+    if (!row) { result={ok:false,error:'Manager not found.'};
+    } else { const sp=row.length>1?String(row[1]).trim():''; if(!sp){result={ok:false,noPassword:true,error:'No password set — contact your admin.'};} else if(sp===String(data.password)){result={ok:true};} else{result={ok:false,error:'Incorrect password.'};} }
 
   } else if (data.action === 'submit') {
-    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
-    const rows = sh.getDataRange().getValues();
-    for (let i = rows.length-1; i >= 1; i--) {
-      if (rows[i][1] === data.manager && rows[i][2] === data.week) sh.deleteRow(i+1);
-    }
-    const ts = new Date().toISOString();
-    data.rows.forEach(r => sh.appendRow([ts, data.manager, data.week, r.name, r.email||'', r.position||'', r.leaver?'yes':'no']));
-    const ph = getOrCreate('people', ['name','email','manager','firstSeen']);
-    const pRows = ph.getDataRange().getValues();
-    data.rows.forEach(r => {
-      if (!pRows.some(p => p[0].toLowerCase()===r.name.toLowerCase() && p[2]===data.manager))
-        ph.appendRow([r.name, r.email||'', data.manager, data.week]);
-    });
-    result = { ok: true };
+    const sh=getOrCreate('submissions',['timestamp','manager','week','name','email','position','leaver']); const rows=sh.getDataRange().getValues();
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][1]===data.manager&&rows[i][2]===data.week)sh.deleteRow(i+1);}
+    const ts=new Date().toISOString(); data.rows.forEach(r=>sh.appendRow([ts,data.manager,data.week,r.name,r.email||'',r.position||'',r.leaver?'yes':'no']));
+    const ph=getOrCreate('people',['name','email','manager','firstSeen']); const pRows=ph.getDataRange().getValues();
+    data.rows.forEach(r=>{if(!pRows.some(p=>p[0].toLowerCase()===r.name.toLowerCase()&&p[2]===data.manager))ph.appendRow([r.name,r.email||'',data.manager,data.week]);}); result={ok:true};
 
   } else if (data.action === 'getSubmission') {
-    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
-    const ah = getOrCreate('acks', ['manager','week','ackedAt']);
-    const rows = sh.getDataRange().getValues().slice(1);
-    const ackRows = ah.getDataRange().getValues().slice(1);
-    result.rows = rows.filter(r => r[1]===data.manager && r[2]===data.week)
-      .map(r => ({ name:r[3], email:r[4], position:r[5], leaver:r[6]==='yes' }));
-    result.acked = ackRows.some(r => r[0]===data.manager && r[1]===data.week);
+    const sh=getOrCreate('submissions',['timestamp','manager','week','name','email','position','leaver']); const ah=getOrCreate('acks',['manager','week','ackedAt']);
+    result.rows=sh.getDataRange().getValues().slice(1).filter(r=>r[1]===data.manager&&r[2]===data.week).map(r=>({name:r[3],email:r[4],position:r[5],leaver:r[6]==='yes'}));
+    result.acked=ah.getDataRange().getValues().slice(1).some(r=>r[0]===data.manager&&r[1]===data.week);
 
   } else if (data.action === 'getRoster') {
-    const rh = getOrCreate('roster', ['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt','managerNotes']);
-    result.roster = rh.getDataRange().getValues().slice(1)
-      .filter(r => r[1] === data.manager)
-      .map(r => ({
-        id:r[0], name:r[2], email:r[3], position:r[4], leader:r[5],
-        notes:r[6], flag:r[7], leaver:r[8]==='yes', addedOn:r[9],
-        managerNotes: (() => { try { return r[11] ? JSON.parse(r[11]) : []; } catch(e) { return []; } })()
-      }));
+    const rh=getOrCreate('roster',['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt','managerNotes']);
+    result.roster=rh.getDataRange().getValues().slice(1).filter(r=>r[1]===data.manager).map(r=>({id:r[0],name:r[2],email:r[3],position:r[4],leader:r[5],notes:r[6],flag:r[7],leaver:r[8]==='yes',addedOn:r[9],managerNotes:(()=>{try{return r[11]?JSON.parse(r[11]):[];}catch(e){return[];}})()}));
 
   } else if (data.action === 'saveRep') {
-    const rh = getOrCreate('roster', ['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt','managerNotes']);
-    const r = data.rep;
-    const managerNotesJson = r.managerNotes && r.managerNotes.length ? JSON.stringify(r.managerNotes) : '';
-    const row = [r.id, data.manager, r.name||'', r.email||'', r.position||'', r.leader||'', r.notes||'', r.flag||'', r.leaver?'yes':'no', r.addedOn||'', new Date().toISOString(), managerNotesJson];
-    const rows = rh.getDataRange().getValues();
-    let found = false;
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0]===r.id && rows[i][1]===data.manager) { rh.getRange(i+1,1,1,row.length).setValues([row]); found=true; break; }
-    }
-    if (!found) rh.appendRow(row);
-    result = { ok: true };
+    const rh=getOrCreate('roster',['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt','managerNotes']); const r=data.rep;
+    const mnJson=r.managerNotes&&r.managerNotes.length?JSON.stringify(r.managerNotes):'';
+    const row=[r.id,data.manager,r.name||'',r.email||'',r.position||'',r.leader||'',r.notes||'',r.flag||'',r.leaver?'yes':'no',r.addedOn||'',new Date().toISOString(),mnJson];
+    const rows=rh.getDataRange().getValues(); let f=false; for(let i=1;i<rows.length;i++){if(rows[i][0]===r.id&&rows[i][1]===data.manager){rh.getRange(i+1,1,1,row.length).setValues([row]);f=true;break;}} if(!f)rh.appendRow(row); result={ok:true};
 
   } else if (data.action === 'getAllData') {
-    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
-    const ph = getOrCreate('people', ['name','email','manager','firstSeen']);
-    const mh = getOrCreate('managers', ['name']);
-    const rh = getOrCreate('roster', ['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt','managerNotes']);
-    result = {
-      subs: sh.getDataRange().getValues().slice(1).map(r => ({ manager:r[1],week:r[2],name:r[3],email:r[4],position:r[5],leaver:r[6]==='yes' })),
-      people: ph.getDataRange().getValues().slice(1).map(r => ({ name:r[0],email:r[1],manager:r[2],firstSeen:r[3] })),
-      managers: mh.getDataRange().getValues().slice(1).map(r => r[0]).filter(Boolean),
-      roster: rh.getDataRange().getValues().slice(1).map(r => ({
-        id:r[0],manager:r[1],name:r[2],email:r[3],position:r[4],leader:r[5],
-        notes:r[6],flag:r[7],leaver:r[8]==='yes',addedOn:r[9],
-        managerNotes: (() => { try { return r[11] ? JSON.parse(r[11]) : []; } catch(e) { return []; } })()
-      }))
+    const sh=getOrCreate('submissions',['timestamp','manager','week','name','email','position','leaver']);
+    const ph=getOrCreate('people',['name','email','manager','firstSeen']); const mh=getOrCreate('managers',['name','password']);
+    const rh=getOrCreate('roster',['id','manager','name','email','position','leader','notes','flag','leaver','addedOn','updatedAt','managerNotes']);
+    const mgrRows=mh.getDataRange().getValues().slice(1);
+    result={
+      subs:sh.getDataRange().getValues().slice(1).map(r=>({manager:r[1],week:r[2],name:r[3],email:r[4],position:r[5],leaver:r[6]==='yes'})),
+      people:ph.getDataRange().getValues().slice(1).map(r=>({name:r[0],email:r[1],manager:r[2],firstSeen:r[3]})),
+      managers:mgrRows.map(r=>r[0]).filter(Boolean),
+      managerPasswordStatus:mgrRows.reduce((acc,r)=>{if(r[0])acc[r[0]]=!!(String(r[1]||'').trim());return acc;},{}),
+      roster:rh.getDataRange().getValues().slice(1).map(r=>({id:r[0],manager:r[1],name:r[2],email:r[3],position:r[4],leader:r[5],notes:r[6],flag:r[7],leaver:r[8]==='yes',addedOn:r[9],managerNotes:(()=>{try{return r[11]?JSON.parse(r[11]):[];}catch(e){return[];}})()}))
     };
 
   } else if (data.action === 'addManager') {
-    const mh = getOrCreate('managers', ['name','password']);
-    const existing = mh.getDataRange().getValues().slice(1).map(r => r[0]);
-    if (!existing.includes(data.name)) mh.appendRow([data.name, data.password||'']);
-    result = { ok: true };
+    const mh=getOrCreate('managers',['name','password']); const existing=mh.getDataRange().getValues().slice(1).map(r=>r[0]);
+    if(!existing.includes(data.name))mh.appendRow([data.name,'']); result={ok:true};
 
   } else if (data.action === 'setPassword') {
-    const mh = getOrCreate('managers', ['name','password']);
-    const rows = mh.getDataRange().getValues();
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0] === data.manager) { mh.getRange(i+1,2).setValue(data.password); result = { ok:true }; break; }
-    }
+    const mh=getOrCreate('managers',['name','password']); const rows=mh.getDataRange().getValues();
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){mh.getRange(i+1,2).setValue(data.password);result={ok:true};break;}}
 
   } else if (data.action === 'removeManager') {
-    const mh = getOrCreate('managers', ['name','password']);
-    const rows = mh.getDataRange().getValues();
-    for (let i = rows.length-1; i >= 1; i--) { if (rows[i][0]===data.name) mh.deleteRow(i+1); }
-    result = { ok: true };
+    const mh=getOrCreate('managers',['name','password']); const rows=mh.getDataRange().getValues();
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.name)mh.deleteRow(i+1);} result={ok:true};
 
   } else if (data.action === 'saveMap') {
-    const mh = getOrCreate('maps', ['manager','mapData','updatedAt']);
-    const rows = mh.getDataRange().getValues();
-    let found = false;
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0]===data.manager) { mh.getRange(i+1,2,1,2).setValues([[data.mapData, new Date().toISOString()]]); found=true; break; }
-    }
-    if (!found) mh.appendRow([data.manager, data.mapData, new Date().toISOString()]);
-    result = { ok: true };
+    const mh=getOrCreate('maps',['manager','mapData','updatedAt']); const rows=mh.getDataRange().getValues(); let f=false;
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){mh.getRange(i+1,2,1,2).setValues([[data.mapData,new Date().toISOString()]]);f=true;break;}} if(!f)mh.appendRow([data.manager,data.mapData,new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'loadMap') {
-    const mh = getOrCreate('maps', ['manager','mapData','updatedAt']);
-    const row = mh.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
-    result = { mapData: row ? row[1] : null };
+    const mh=getOrCreate('maps',['manager','mapData','updatedAt']); const row=mh.getDataRange().getValues().slice(1).find(r=>r[0]===data.manager); result={mapData:row?row[1]:null};
 
   } else if (data.action === 'saveReport') {
-    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']);
-    const r = data.report;
-    rh.appendRow([r.id, r.type, r.url, r.campaign||'', String(r.week||''), (r.managers||[]).join(','), r.uploadedAt||'', r.officeWire||'', r.mgrTake||'']);
-    result = { ok: true };
+    const rh=getOrCreate('reports',['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']); const r=data.report;
+    rh.appendRow([r.id,r.type,r.url,r.campaign||'',String(r.week||''),(r.managers||[]).join(','),r.uploadedAt||'',r.officeWire||'',r.mgrTake||'']); result={ok:true};
 
   } else if (data.action === 'getAllReports') {
-    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']);
-    result = { reports: rh.getDataRange().getValues().slice(1).map(r => ({ id:r[0],type:r[1],url:r[2],campaign:r[3],week:safeDate(r[4]),managers:r[5]?String(r[5]).split(','):[],uploadedAt:r[6]||'',officeWire:r[7]!=null?String(r[7]):'',mgrTake:r[8]!=null?String(r[8]):'' })) };
+    const rh=getOrCreate('reports',['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']);
+    result={reports:rh.getDataRange().getValues().slice(1).map(r=>({id:r[0],type:r[1],url:r[2],campaign:r[3],week:safeDate(r[4]),managers:r[5]?String(r[5]).split(','):[],uploadedAt:r[6]||'',officeWire:r[7]!=null?String(r[7]):'',mgrTake:r[8]!=null?String(r[8]):''}))};
 
   } else if (data.action === 'getReports') {
-    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']);
-    result = { reports: rh.getDataRange().getValues().slice(1)
-      .filter(r => r[5] && r[5].split(',').map(m=>m.trim()).includes(data.manager))
-      .map(r => ({ id:r[0],type:r[1],url:r[2],campaign:r[3],week:safeDate(r[4]),managers:r[5]?String(r[5]).split(','):[],uploadedAt:r[6]||'',officeWire:r[7]!=null?String(r[7]):'',mgrTake:r[8]!=null?String(r[8]):'' })) };
+    const rh=getOrCreate('reports',['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']);
+    result={reports:rh.getDataRange().getValues().slice(1).filter(r=>r[5]&&r[5].split(',').map(m=>m.trim()).includes(data.manager)).map(r=>({id:r[0],type:r[1],url:r[2],campaign:r[3],week:safeDate(r[4]),managers:r[5]?String(r[5]).split(','):[],uploadedAt:r[6]||'',officeWire:r[7]!=null?String(r[7]):'',mgrTake:r[8]!=null?String(r[8]):''}))};
 
   } else if (data.action === 'deleteReport') {
-    const rh = getOrCreate('reports', ['id','type','url','campaign','week','managers','uploadedAt']);
-    const rows = rh.getDataRange().getValues();
-    for (let i = rows.length-1; i >= 1; i--) { if (rows[i][0]===data.id) { rh.deleteRow(i+1); break; } }
-    result = { ok: true };
+    const rh=getOrCreate('reports',['id','type','url','campaign','week','managers','uploadedAt']); const rows=rh.getDataRange().getValues();
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.id){rh.deleteRow(i+1);break;}} result={ok:true};
 
   } else if (data.action === 'savePayData') {
-    const ph = getOrCreate('pay_data', ['manager','week','officeWire','mgrTake','updatedAt']);
-    const rows = ph.getDataRange().getValues();
-    let found = false;
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0]===data.manager && rows[i][1]===data.week) {
-        ph.getRange(i+1,3,1,3).setValues([[data.officeWire||'', data.mgrTake||'', new Date().toISOString()]]);
-        found=true; break;
-      }
-    }
-    if (!found) ph.appendRow([data.manager, String(data.week||''), data.officeWire||'', data.mgrTake||'', new Date().toISOString()]);
-    result = { ok: true };
+    const ph=getOrCreate('pay_data',['manager','week','officeWire','mgrTake','updatedAt']); const rows=ph.getDataRange().getValues(); let f=false;
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager&&rows[i][1]===data.week){ph.getRange(i+1,3,1,3).setValues([[data.officeWire||'',data.mgrTake||'',new Date().toISOString()]]);f=true;break;}}
+    if(!f)ph.appendRow([data.manager,String(data.week||''),data.officeWire||'',data.mgrTake||'',new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'getPayData') {
-    const ph = getOrCreate('pay_data', ['manager','week','officeWire','mgrTake','updatedAt']);
-    const rows = ph.getDataRange().getValues().slice(1).filter(r => r[0]===data.manager);
-    result = { payData: rows.map(r => ({ week:safeDate(r[1]), officeWire:r[2]!=null?String(r[2]):'', mgrTake:r[3]!=null?String(r[3]):'' })) };
+    const ph=getOrCreate('pay_data',['manager','week','officeWire','mgrTake','updatedAt']);
+    result={payData:ph.getDataRange().getValues().slice(1).filter(r=>r[0]===data.manager).map(r=>({week:safeDate(r[1]),officeWire:r[2]!=null?String(r[2]):'',mgrTake:r[3]!=null?String(r[3]):''}))};
 
   } else if (data.action === 'ackReport') {
-    const ah = getOrCreate('acks', ['manager','week','ackedAt']);
-    const rows = ah.getDataRange().getValues();
-    let found = false;
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0]===data.manager && rows[i][1]===data.week) { ah.getRange(i+1,3).setValue(new Date().toISOString()); found=true; break; }
-    }
-    if (!found) ah.appendRow([data.manager, data.week, new Date().toISOString()]);
-    result = { ok: true };
+    const ah=getOrCreate('acks',['manager','week','ackedAt']); const rows=ah.getDataRange().getValues(); let f=false;
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager&&rows[i][1]===data.week){ah.getRange(i+1,3).setValue(new Date().toISOString());f=true;break;}} if(!f)ah.appendRow([data.manager,data.week,new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'getCalEvents') {
-    const ch = getOrCreate('cal_events', ['manager','events','updatedAt']);
-    const row = ch.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
-    try { result = { events: row ? JSON.parse(row[1]) : [] }; } catch(e) { result = { events: [] }; }
+    const ch=getOrCreate('cal_events',['manager','events','updatedAt']); const row=ch.getDataRange().getValues().slice(1).find(r=>r[0]===data.manager);
+    try{result={events:row?JSON.parse(row[1]):[]};}catch(e){result={events:[]};}
 
   } else if (data.action === 'saveCalEvents') {
-    const ch = getOrCreate('cal_events', ['manager','events','updatedAt']);
-    const rows = ch.getDataRange().getValues();
-    const evJson = JSON.stringify(data.events||[]);
-    let found = false;
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0]===data.manager) { ch.getRange(i+1,2,1,2).setValues([[evJson, new Date().toISOString()]]); found=true; break; }
-    }
-    if (!found) ch.appendRow([data.manager, evJson, new Date().toISOString()]);
-    result = { ok: true };
+    const ch=getOrCreate('cal_events',['manager','events','updatedAt']); const rows=ch.getDataRange().getValues(); const evJson=JSON.stringify(data.events||[]); let f=false;
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){ch.getRange(i+1,2,1,2).setValues([[evJson,new Date().toISOString()]]);f=true;break;}} if(!f)ch.appendRow([data.manager,evJson,new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'getAnnouncement') {
-    const ah = getOrCreate('announcements', ['id','title','message','active','createdAt']);
-    const rows = ah.getDataRange().getValues().slice(1);
-    const active = rows.filter(r => r[3]==='yes').sort((a,b) => b[4].localeCompare(a[4]));
-    result = { announcement: active.length ? { id:active[0][0], title:active[0][1], message:active[0][2] } : null };
+    const ah=getOrCreate('announcements',['id','title','message','active','createdAt']);
+    const active=ah.getDataRange().getValues().slice(1).filter(r=>r[3]==='yes').sort((a,b)=>b[4].localeCompare(a[4]));
+    result={announcement:active.length?{id:active[0][0],title:active[0][1],message:active[0][2]}:null};
 
   } else if (data.action === 'saveAnnouncement') {
-    const ah = getOrCreate('announcements', ['id','title','message','active','createdAt']);
-    const rows = ah.getDataRange().getValues();
-    for (let i = 1; i < rows.length; i++) ah.getRange(i+1,4).setValue('no');
-    if (data.title) ah.appendRow(['ann'+Date.now(), data.title, data.message||'', 'yes', new Date().toISOString()]);
-    result = { ok: true };
+    const ah=getOrCreate('announcements',['id','title','message','active','createdAt']); const rows=ah.getDataRange().getValues();
+    for(let i=1;i<rows.length;i++)ah.getRange(i+1,4).setValue('no');
+    if(data.title)ah.appendRow(['ann'+Date.now(),data.title,data.message||'','yes',new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'getNotes') {
-    const nh = getOrCreate('notes', ['manager','notes','updatedAt']);
-    const row = nh.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
-    result = { notes: row ? row[1] : '' };
+    const nh=getOrCreate('notes',['manager','notes','updatedAt']); const row=nh.getDataRange().getValues().slice(1).find(r=>r[0]===data.manager); result={notes:row?row[1]:''};
 
   } else if (data.action === 'saveNotes') {
-    const nh = getOrCreate('notes', ['manager','notes','updatedAt']);
-    const rows = nh.getDataRange().getValues();
-    let found = false;
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0]===data.manager) { nh.getRange(i+1,2,1,2).setValues([[data.notes, new Date().toISOString()]]); found=true; break; }
-    }
-    if (!found) nh.appendRow([data.manager, data.notes, new Date().toISOString()]);
-    result = { ok: true };
+    const nh=getOrCreate('notes',['manager','notes','updatedAt']); const rows=nh.getDataRange().getValues(); let f=false;
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){nh.getRange(i+1,2,1,2).setValues([[data.notes,new Date().toISOString()]]);f=true;break;}} if(!f)nh.appendRow([data.manager,data.notes,new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'getLastWeekCount') {
-    const sh = getOrCreate('submissions', ['timestamp','manager','week','name','email','position','leaver']);
-    const parts = data.currentWeek.split('-');
-    const cur = new Date(+parts[0],+parts[1]-1,+parts[2]);
-    cur.setDate(cur.getDate()-7);
-    const y=cur.getFullYear(),m=String(cur.getMonth()+1).padStart(2,'0'),d=String(cur.getDate()).padStart(2,'0');
-    const prevWeek = y+'-'+m+'-'+d;
-    const rows = sh.getDataRange().getValues().slice(1);
-    result = { count: rows.filter(r => r[1]===data.manager && r[2]===prevWeek && r[6]!=='yes').length };
+    const sh=getOrCreate('submissions',['timestamp','manager','week','name','email','position','leaver']);
+    const pts=data.currentWeek.split('-'); const cur=new Date(+pts[0],+pts[1]-1,+pts[2]); cur.setDate(cur.getDate()-7);
+    const pw=cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0')+'-'+String(cur.getDate()).padStart(2,'0');
+    result={count:sh.getDataRange().getValues().slice(1).filter(r=>r[1]===data.manager&&r[2]===pw&&r[6]!=='yes').length};
 
   } else if (data.action === 'saveWeeklyReview') {
-    const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
-    const rows = rh.getDataRange().getValues();
-    // Remove existing review for same manager+week
-    for (let i = rows.length-1; i >= 1; i--) {
-      if (rows[i][1]===data.manager && rows[i][2]===data.week) rh.deleteRow(i+1);
-    }
-    const reviewId = data.id||('wr'+Date.now());
-    const submittedAt = new Date().toISOString();
-    rh.appendRow([reviewId, data.manager, data.week, JSON.stringify(data.reviewData), submittedAt]);
-
-    // Send email to admin recipients
-    try {
-      var esh = getOrCreate('settings', ['key','value','updatedAt']);
-      var erow = esh.getDataRange().getValues().slice(1).find(function(r){return r[0]==='reviewEmails';});
-      var emailStr = erow ? String(erow[1]) : '';
-      if (emailStr) {
-        var parts = emailStr.split(','); var recipients = []; for(var pi=0;pi<parts.length;pi++){var pt=parts[pi].trim();if(pt)recipients.push(pt);}
-        if (recipients.length) {
-          var dn2 = data.manager.charAt(0).toUpperCase() + data.manager.slice(1);
-          var wf = data.week || '';
-          var subj = 'Weekly Review - ' + dn2 + ' - w/c ' + wf;
-          var rd2 = data.reviewData || {};
-          var pdfHtml = rd2.pdfHtml || '';
-          var bodyText = 'Weekly Review: ' + dn2 + ', Week: ' + wf;
-          recipients.forEach(function(to) {
-            try {
-              if (pdfHtml) {
-                MailApp.sendEmail({to:to, subject:subj, body:bodyText, htmlBody:pdfHtml});
-              } else {
-                MailApp.sendEmail(to, subj, bodyText);
-              }
-            } catch(me2) {}
-          });
-        }
-      }
-    } catch(mailErr) {}
-
-    result = { ok: true };
+    const rh=getOrCreate('weekly_reviews',['id','manager','week','reviewData','submittedAt']); const rows=rh.getDataRange().getValues();
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][1]===data.manager&&rows[i][2]===data.week)rh.deleteRow(i+1);}
+    rh.appendRow([data.id||('wr'+Date.now()),data.manager,data.week,JSON.stringify(data.reviewData),new Date().toISOString()]);
+    try{var esh=getOrCreate('settings',['key','value','updatedAt']);var erow=esh.getDataRange().getValues().slice(1).find(function(r){return r[0]==='reviewEmails';});var es=erow?String(erow[1]):'';if(es){var recs=es.split(',').map(function(x){return x.trim();}).filter(Boolean);if(recs.length){var dn2=data.manager.charAt(0).toUpperCase()+data.manager.slice(1);var subj='Weekly Review - '+dn2+' - w/c '+(data.week||'');var ph2=(data.reviewData||{}).pdfHtml||'';recs.forEach(function(to){try{if(ph2){MailApp.sendEmail({to:to,subject:subj,body:'Weekly Review: '+dn2,htmlBody:ph2});}else{MailApp.sendEmail(to,subj,'Weekly Review: '+dn2);}}catch(me2){}});}}}catch(mailErr){}
+    result={ok:true};
 
   } else if (data.action === 'getManagerReviews') {
-    const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
-    result = { reviews: rh.getDataRange().getValues().slice(1)
-      .filter(r => r[1]===data.manager)
-      .map(r => ({
-        id:r[0], manager:r[1], week:r[2],
-        reviewData: (() => { try { return JSON.parse(r[3]); } catch(e) { return {}; } })(),
-        submittedAt:r[4]
-      })) };
+    const rh=getOrCreate('weekly_reviews',['id','manager','week','reviewData','submittedAt']);
+    result={reviews:rh.getDataRange().getValues().slice(1).filter(r=>r[1]===data.manager).map(r=>({id:r[0],manager:r[1],week:r[2],reviewData:(()=>{try{return JSON.parse(r[3]);}catch(e){return{};}})(),submittedAt:r[4]}))};
 
   } else if (data.action === 'getAllWeeklyReviews') {
-    const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
-    result = { reviews: rh.getDataRange().getValues().slice(1).map(r => ({
-      id:r[0], manager:r[1], week:r[2],
-      reviewData: (() => { try { return JSON.parse(r[3]); } catch(e) { return {}; } })(),
-      submittedAt:r[4]
-    })) };
+    const rh=getOrCreate('weekly_reviews',['id','manager','week','reviewData','submittedAt']);
+    result={reviews:rh.getDataRange().getValues().slice(1).map(r=>({id:r[0],manager:r[1],week:r[2],reviewData:(()=>{try{return JSON.parse(r[3]);}catch(e){return{};}})(),submittedAt:r[4]}))};
 
   } else if (data.action === 'saveReviewEmails') {
-    const sh = getOrCreate('settings', ['key','value','updatedAt']);
-    const rows = sh.getDataRange().getValues();
-    let found = false;
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0]==='reviewEmails') { sh.getRange(i+1,2,1,2).setValues([[data.emails, new Date().toISOString()]]); found=true; break; }
-    }
-    if (!found) sh.appendRow(['reviewEmails', data.emails, new Date().toISOString()]);
-    result = { ok: true };
+    const sh=getOrCreate('settings',['key','value','updatedAt']); const rows=sh.getDataRange().getValues(); let f=false;
+    for(let i=1;i<rows.length;i++){if(rows[i][0]==='reviewEmails'){sh.getRange(i+1,2,1,2).setValues([[data.emails,new Date().toISOString()]]);f=true;break;}} if(!f)sh.appendRow(['reviewEmails',data.emails,new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'getReviewEmails') {
-    const sh = getOrCreate('settings', ['key','value','updatedAt']);
-    const row = sh.getDataRange().getValues().slice(1).find(r => r[0]==='reviewEmails');
-    result = { emails: row ? row[1] : '' };
+    const sh=getOrCreate('settings',['key','value','updatedAt']); const row=sh.getDataRange().getValues().slice(1).find(r=>r[0]==='reviewEmails'); result={emails:row?row[1]:''};
 
   } else if (data.action === 'saveProfilePic') {
-    const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
-    const rows = ph.getDataRange().getValues();
-    let found = false;
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0]===data.manager) { ph.getRange(i+1,2,1,2).setValues([[data.picData, new Date().toISOString()]]); found=true; break; }
+    const ph=getOrCreate('profile_pics',['manager','picUrl','updatedAt']); const rows=ph.getDataRange().getValues(); let picUrl='';
+    if(data.picData&&data.picData.startsWith('data:')){
+      const folder=getPicFolder(); const parts=data.picData.split(','); const mm=parts[0].match(/:(.*?);/); const mime=mm?mm[1]:'image/jpeg'; const ext=mime.split('/')[1]||'jpg';
+      const decoded=Utilities.newBlob(Utilities.base64Decode(parts[1]),mime);
+      const er=rows.slice(1).find(r=>r[0]===data.manager); if(er&&er[1]){try{const oid=er[1].match(/[-\\w]{25,}/);if(oid)DriveApp.getFileById(oid[0]).setTrashed(true);}catch(e){}}
+      const file=folder.createFile(decoded.setName('pic_'+data.manager+'_'+Date.now()+'.'+ext));
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);
+      picUrl='https://drive.google.com/uc?export=view&id='+file.getId();
     }
-    if (!found) ph.appendRow([data.manager, data.picData, new Date().toISOString()]);
-    result = { ok: true };
+    let f=false; for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){ph.getRange(i+1,2,1,2).setValues([[picUrl,new Date().toISOString()]]);f=true;break;}} if(!f&&picUrl)ph.appendRow([data.manager,picUrl,new Date().toISOString()]); result={ok:true,picUrl};
 
   } else if (data.action === 'getProfilePic') {
-    const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
-    const row = ph.getDataRange().getValues().slice(1).find(r => r[0]===data.manager);
-    result = { picData: row ? row[1] : null };
+    const ph=getOrCreate('profile_pics',['manager','picUrl','updatedAt']); const row=ph.getDataRange().getValues().slice(1).find(r=>r[0]===data.manager); result={picUrl:row?row[1]:null};
 
   } else if (data.action === 'getAllProfilePics') {
-    const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
-    const rows = ph.getDataRange().getValues().slice(1);
-    result = { pics: rows.map(r => ({ manager:r[0], picData:r[1] })) };
+    const ph=getOrCreate('profile_pics',['manager','picUrl','updatedAt']); result={pics:ph.getDataRange().getValues().slice(1).map(r=>({manager:r[0],picUrl:r[1]}))};
 
   } else if (data.action === 'saveNotification') {
-    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
-    const n = data.notification;
-    nh.appendRow([n.id, n.manager, n.title||'', n.message||'', n.sentAt||new Date().toISOString(), '']);
-    result = { ok: true };
+    const nh=getOrCreate('notifications',['id','manager','title','message','sentAt','readAt']); const n=data.notification;
+    nh.appendRow([n.id,n.manager,n.title||'',n.message||'',n.sentAt||new Date().toISOString(),'']); result={ok:true};
 
   } else if (data.action === 'getNotifications') {
-    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
-    result = { notifications: nh.getDataRange().getValues().slice(1)
-      .filter(r => r[1]===data.manager)
-      .map(r => ({ id:r[0], manager:r[1], title:r[2], message:r[3], sentAt:r[4]||'', readAt:r[5]||'' })) };
+    const nh=getOrCreate('notifications',['id','manager','title','message','sentAt','readAt']);
+    result={notifications:nh.getDataRange().getValues().slice(1).filter(r=>r[1]===data.manager).map(r=>({id:r[0],manager:r[1],title:r[2],message:r[3],sentAt:r[4]||'',readAt:r[5]||''}))};
 
   } else if (data.action === 'getAllNotifications') {
-    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
-    result = { notifications: nh.getDataRange().getValues().slice(1)
-      .map(r => ({ id:r[0], manager:r[1], title:r[2], message:r[3], sentAt:r[4]||'', readAt:r[5]||'' })) };
+    const nh=getOrCreate('notifications',['id','manager','title','message','sentAt','readAt']);
+    result={notifications:nh.getDataRange().getValues().slice(1).map(r=>({id:r[0],manager:r[1],title:r[2],message:r[3],sentAt:r[4]||'',readAt:r[5]||''}))};
 
   } else if (data.action === 'markNotifRead') {
-    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
-    const rows = nh.getDataRange().getValues();
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0]===data.id && rows[i][1]===data.manager) {
-        nh.getRange(i+1,6).setValue(new Date().toISOString()); break;
-      }
-    }
-    result = { ok: true };
+    const nh=getOrCreate('notifications',['id','manager','title','message','sentAt','readAt']); const rows=nh.getDataRange().getValues();
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.id&&rows[i][1]===data.manager){nh.getRange(i+1,6).setValue(new Date().toISOString());break;}} result={ok:true};
 
   } else if (data.action === 'deleteNotification') {
-    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
-    const rows = nh.getDataRange().getValues();
-    for (let i = rows.length-1; i >= 1; i--) {
-      if (rows[i][0]===data.id) { nh.deleteRow(i+1); break; }
-    }
-    result = { ok: true };
+    const nh=getOrCreate('notifications',['id','manager','title','message','sentAt','readAt']); const rows=nh.getDataRange().getValues();
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.id){nh.deleteRow(i+1);break;}} result={ok:true};
 
   } else if (data.action === 'getNotifTemplates') {
-    const th = getOrCreate('notif_templates', ['id','name','title','message','createdAt']);
-    result = { templates: th.getDataRange().getValues().slice(1)
-      .map(r => ({ id:r[0], name:r[1], title:r[2], message:r[3], createdAt:r[4]||'' })) };
+    const th=getOrCreate('notif_templates',['id','name','title','message','createdAt']);
+    result={templates:th.getDataRange().getValues().slice(1).map(r=>({id:r[0],name:r[1],title:r[2],message:r[3],createdAt:r[4]||''}))};
 
   } else if (data.action === 'saveNotifTemplate') {
-    const th = getOrCreate('notif_templates', ['id','name','title','message','createdAt']);
-    th.appendRow([data.template.id, data.template.name, data.template.title||'', data.template.message||'', new Date().toISOString()]);
-    result = { ok: true };
+    const th=getOrCreate('notif_templates',['id','name','title','message','createdAt']);
+    th.appendRow([data.template.id,data.template.name,data.template.title||'',data.template.message||'',new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'deleteNotifTemplate') {
-    const th = getOrCreate('notif_templates', ['id','name','title','message','createdAt']);
-    const rows = th.getDataRange().getValues();
-    for (let i = rows.length-1; i >= 1; i--) {
-      if (rows[i][0]===data.id) { th.deleteRow(i+1); break; }
-    }
-    result = { ok: true };
+    const th=getOrCreate('notif_templates',['id','name','title','message','createdAt']); const rows=th.getDataRange().getValues();
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.id){th.deleteRow(i+1);break;}} result={ok:true};
   }
 
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
@@ -1095,30 +936,48 @@ function doPost(e) {
 document.getElementById('apps-script-pre').textContent = APPS_SCRIPT;
 document.getElementById('apps-script-version-lbl').textContent = `v${APPS_SCRIPT_VERSION} — copy and redeploy whenever this changes`;
 
-// ── Admin Auth ─────────────────────────────────────────
-const ADMIN_PASSWORD = 'THEBACKOFFICE123';
+// ── Admin Auth (server-side token) ─────────────────────
 const ADMIN_SESSION_KEY = 'tt_admin_authed';
+const ADMIN_TOKEN_KEY   = 'tt_admin_token';
 
-function doAdminLogin() {
-  const val = document.getElementById('admin-pw-input').value;
+let adminToken = sessionStorage.getItem(ADMIN_TOKEN_KEY) || '';
+
+async function doAdminLogin() {
+  const val = document.getElementById('admin-pw-input').value.trim();
   const err = document.getElementById('admin-login-err');
-  if (val === ADMIN_PASSWORD) {
-    sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
-    document.getElementById('admin-login-screen').style.display = 'none';
-    document.getElementById('admin-main-wrap').style.display = 'block';
-    if (scriptUrl) { loadAll(); } else { showEmpty(); }
-    renderLinks();
-    const calInp=document.getElementById('cal-date');
-    if(calInp){const t=new Date();calInp.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}
-    const d=new Date();d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
-    const inp=document.getElementById('ul-week');
-    if(inp){inp.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-  } else {
-    err.classList.add('show');
-    document.getElementById('admin-pw-input').value = '';
-    document.getElementById('admin-pw-input').focus();
-    setTimeout(()=>err.classList.remove('show'), 3000);
+  const btn = document.querySelector('.admin-login-btn');
+  err.style.display = 'none';
+  if (!val) { err.textContent = 'Please enter a password.'; err.style.display = 'block'; return; }
+  if (!scriptUrl) { err.textContent = 'No Script URL saved — open the page source and set scriptUrl first.'; err.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Checking…';
+  try {
+    const res = await fetch(scriptUrl, { method:'POST', body: JSON.stringify({ action:'adminLogin', password: val }) });
+    const data = await res.json();
+    if (data.ok && data.token) {
+      adminToken = data.token;
+      sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+      sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+      document.getElementById('admin-login-screen').style.display = 'none';
+      document.getElementById('admin-main-wrap').style.display = 'block';
+      if (data.firstSetup) showToast('Admin password set for the first time ✓', 'success');
+      if (scriptUrl) { loadAll(); } else { showEmpty(); }
+      renderLinks();
+      const calInp=document.getElementById('cal-date');
+      if(calInp){const t=new Date();calInp.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}
+      const d=new Date();d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
+      const inp=document.getElementById('ul-week');
+      if(inp){inp.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+    } else {
+      err.textContent = data.error || 'Incorrect password.';
+      err.style.display = 'block';
+      document.getElementById('admin-pw-input').value = '';
+      document.getElementById('admin-pw-input').focus();
+    }
+  } catch(e) {
+    err.textContent = 'Login failed — check the Script URL is deployed correctly.';
+    err.style.display = 'block';
   }
+  btn.disabled = false; btn.textContent = 'Sign in';
 }
 
 function checkAdminAuth() {
@@ -1146,7 +1005,8 @@ function toggleTheme() {
 // ── State ──────────────────────────────────────────────
 let scriptUrl = localStorage.getItem('teamtracker_script_url')||'';
 let managers=[], allSubs=[], allPeople=[], allWeeks=[], viewWeekKey='', allRoster=[], managerPasswords={};
-let allProfilePics = {}; // manager -> base64 data
+let managerPasswordStatus = {}; // manager -> true if password set
+let allProfilePics = {}; // manager -> Drive URL
 let pushedCalEvents = [];
 let allWeeklyReviews = [];
 const MGR_BASE = window.location.href.replace('admin.html','manager.html');
@@ -1212,8 +1072,10 @@ async function loadAll() {
     ]);
     managers=data.managers||[]; allSubs=data.subs||[]; allPeople=data.people||[]; allRoster=data.roster||[];
     allUploadedReports=reportsData.reports||[];
-    (picsData.pics||[]).forEach(p => { if(p.picData) allProfilePics[p.manager] = p.picData; });
-    if (data.managerPasswords) managerPasswords=data.managerPasswords;
+    // FIX 3: pics now stored as Drive URLs not base64
+    (picsData.pics||[]).forEach(p => { if(p.picUrl) allProfilePics[p.manager] = p.picUrl; });
+    // FIX 2: password status from server
+    if (data.managerPasswordStatus) managerPasswordStatus = data.managerPasswordStatus;
 
     // FIX #12: Build week set including current week + 4 future weeks, not just submission weeks
     const ws=new Set();
@@ -1426,7 +1288,6 @@ function filterPeople() {
   ):window._peopleRows);
 }
 
-// ── Links / setup ──────────────────────────────────────
 function renderLinks() {
   const list=document.getElementById('link-list');
   if (!managers.length) { list.innerHTML='<div style="color:var(--muted);font-size:13px;">No managers added yet.</div>'; return; }
@@ -1434,15 +1295,23 @@ function renderLinks() {
     const url=`${MGR_BASE}?name=${encodeURIComponent(m)}`;
     const dn=m.charAt(0).toUpperCase()+m.slice(1);
     const pw=managerPasswords[m]||'';
+    const hasPassword = managerPasswordStatus[m] === true;
     const picSrc = allProfilePics[m];
     const picHtml = picSrc
       ? `<img src="${picSrc}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;border:2px solid var(--border);flex-shrink:0;" />`
       : `<div style="width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent-dark),var(--accent));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;">${dn.charAt(0)}</div>`;
-    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
+    const noPwBadge = !hasPassword
+      ? `<div style="display:inline-flex;align-items:center;gap:5px;background:var(--warning-soft);border:1px solid rgba(217,119,6,.3);color:var(--warning);font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-bottom:4px;">⚠ No password set — manager cannot log in</div>`
+      : '';
+    return `<div style="background:var(--surface2);border:1px solid ${!hasPassword?'rgba(217,119,6,.4)':'var(--border)'};border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
       <div style="display:flex;align-items:center;gap:12px;">
         ${picHtml}
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;font-size:14px;text-transform:capitalize;margin-bottom:2px;">${esc(dn)}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div style="font-weight:600;font-size:14px;text-transform:capitalize;">${esc(dn)}</div>
+            ${hasPassword ? '<span style="font-size:10px;font-weight:700;color:var(--success);background:var(--success-soft);border:1px solid rgba(5,150,105,.25);padding:2px 7px;border-radius:10px;">✓ Password set</span>' : ''}
+          </div>
+          ${noPwBadge}
           <input type="text" value="${esc(url)}" readonly onclick="this.select()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:monospace;font-size:11px;padding:5px 9px;border-radius:6px;outline:none;width:100%;" />
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0;">
@@ -1476,12 +1345,15 @@ async function uploadProfilePic(manager, input) {
   const file = input.files[0];
   if (!file) return;
   if (file.size > 2*1024*1024) { showToast('Image too large — max 2MB','error'); return; }
+  showToast('Uploading to Drive…','success',8000);
   const reader = new FileReader();
   reader.onload = async (e) => {
-    const picData = e.target.result;
+    const picData = e.target.result; // base64 — Apps Script saves to Drive and returns URL
     try {
-      await api({action:'saveProfilePic', manager, picData});
-      allProfilePics[manager] = picData;
+      const res = await api({action:'saveProfilePic', manager, picData});
+      if (res.picUrl) {
+        allProfilePics[manager] = res.picUrl; // store Drive URL locally
+      }
       renderLinks();
       renderOverview();
       showToast(`Profile picture updated for ${manager} ✓`,'success');
@@ -1552,7 +1424,9 @@ function showEmpty() {
 }
 
 async function api(payload) {
-  const res=await fetch(scriptUrl,{method:'POST',body:JSON.stringify(payload)});
+  // Attach admin token to every request so Apps Script can validate it
+  const body = JSON.stringify({ ...payload, token: adminToken });
+  const res = await fetch(scriptUrl, { method:'POST', body });
   return res.json();
 }
 
@@ -2176,6 +2050,8 @@ async function setPassword(manager) {
   try {
     await api({ action: 'setPassword', manager, password: pw });
     managerPasswords[manager] = pw;
+    managerPasswordStatus[manager] = true; // FIX 2: update local status immediately
+    renderLinks();
     showToast(`Password set for ${manager} ✓`, 'success');
   } catch(e) { showToast('Failed to save password', 'error'); }
 }

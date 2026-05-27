@@ -1435,7 +1435,13 @@ async function doLogin(){
   try{
     const res=await api({action:'checkPassword',manager:managerName,password:pw});
     if(res&&res.ok){sessionStorage.setItem('tt_authed_'+managerName,'1');btn.innerHTML='<span class="spinner"></span>Loading…';showApp();return;}
-    err.textContent=(res&&(res.message||res.error))||'Incorrect password.';err.classList.add('show');input.value='';input.focus();
+    // FIX 2: clear no-password message
+    if(res&&res.noPassword){
+      err.textContent='No password has been set for your account. Please ask your admin to set one.';
+    } else {
+      err.textContent=(res&&(res.message||res.error))||'Incorrect password.';
+    }
+    err.classList.add('show');input.value='';input.focus();
   }catch(e){err.textContent='Login failed — check Script URL is deployed correctly.';err.classList.add('show');}
   finally{btn.disabled=false;btn.textContent='Sign in';input.disabled=false;}
 }
@@ -1465,10 +1471,16 @@ function handleProfilePic(input){
   const reader=new FileReader();
   reader.onload=async e=>{
     const picData=e.target.result;
+    // Show preview immediately from local data
     const av=document.getElementById('sb-avatar');
     av.innerHTML=`<img src="${picData}" alt="profile" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>`;
     try{
-      await api({action:'saveProfilePic',manager:managerName,picData});
+      // FIX 3: server saves to Drive, returns picUrl
+      const res=await api({action:'saveProfilePic',manager:managerName,picData});
+      if(res&&res.picUrl){
+        // Update avatar to use stable Drive URL
+        av.innerHTML=`<img src="${res.picUrl}" alt="profile" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>`;
+      }
       showToast('Profile picture updated ✓','success');
     }catch(err){showToast('Picture saved locally — sheet sync failed','error');}
   };
@@ -1531,11 +1543,11 @@ async function loadAll(){
     if(prevRes.count!==undefined)lastWeekCount=prevRes.count;
     if(sRes.acked)ackDone=true;
     if(pdRes.payData)allPayData=pdRes.payData;
-    // Load profile pic from sheet and update avatar
-    if(picRes.picData){
+    // FIX 3: profile pic now a Drive URL not base64
+    if(picRes.picUrl){
       const av=document.getElementById('sb-avatar');
       const dn=rawName.trim().charAt(0).toUpperCase()+rawName.trim().slice(1);
-      av.innerHTML=`<img src="${picRes.picData}" alt="${dn}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>`;
+      av.innerHTML=`<img src="${picRes.picUrl}" alt="${dn}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>`;
     }
     // Load saved reviews from sheet
     if(revRes.reviews)savedReviews=revRes.reviews;
