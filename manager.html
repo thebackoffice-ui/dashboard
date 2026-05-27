@@ -918,9 +918,12 @@ function renderHome(){
   while(sixWeeks.length<6)sixWeeks.unshift('');
   const wireByWeek=sixWeeks.map(wk=>{
     if(!wk)return{wk:'',wire:0,take:0};
-    const pd=allPayData.find(p=>p.week===wk);
     const rep=allReports.find(r=>r.type==='Pay Report'&&r.week===wk);
-    return{wk,wire:parseFloat((pd&&pd.officeWire)||rep?.officeWire||0)||0,take:parseFloat((pd&&pd.mgrTake)||rep?.mgrTake||0)||0};
+    const pd=allPayData.find(p=>p.week===wk);
+    // Manager-saved edits override report values; report values are the source of truth
+    const wire=parseFloat((pd&&pd.officeWire!==''?pd.officeWire:null)||rep?.officeWire||0)||0;
+    const take=parseFloat((pd&&pd.mgrTake!==''?pd.mgrTake:null)||rep?.mgrTake||0)||0;
+    return{wk,wire,take};
   });
   // wireByWeek is ready — chart drawn after DOM update
 
@@ -1282,14 +1285,12 @@ function switchReportTab(tab){
 }
 
 function getPayDataForWeek(week){
-  // First check if report itself has officeWire/mgrTake
   const rep=allReports.find(r=>r.type==='Pay Report'&&r.week===week);
-  const fromReport={officeWire:rep?.officeWire||'',mgrTake:rep?.mgrTake||''};
-  // Then check if manager has saved edits
   const saved=allPayData.find(p=>p.week===week);
+  // Manager edits take priority; fall back to what admin uploaded on the report
   return{
-    officeWire: saved?.officeWire!==undefined&&saved.officeWire!=='' ? saved.officeWire : fromReport.officeWire,
-    mgrTake: saved?.mgrTake!==undefined&&saved.mgrTake!=='' ? saved.mgrTake : fromReport.mgrTake
+    officeWire:(saved&&saved.officeWire!==''?saved.officeWire:null)||(rep&&rep.officeWire)||'',
+    mgrTake:(saved&&saved.mgrTake!==''?saved.mgrTake:null)||(rep&&rep.mgrTake)||''
   };
 }
 
