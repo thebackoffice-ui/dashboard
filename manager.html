@@ -853,6 +853,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       <button class="nav-item" onclick="switchTab('calendar')" id="nav-calendar"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="13" rx="2"/><path d="M3 9h14M7 3v4M13 3v4" stroke-linecap="round"/></svg></span>Calendar</button>
       <button class="nav-item" onclick="switchTab('leaderboard')" id="nav-leaderboard"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h6M10 15v3M7 18h6"/><path d="M5 3v5a5 5 0 0 0 10 0V3"/><path d="M5 6H3a2 2 0 1 0 0 4h2M15 6h2a2 2 0 1 0 0 4h-2" stroke-linecap="round"/></svg></span>Leaderboard</button>
       <button class="nav-item" onclick="switchTab('map')" id="nav-map"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 4l6 2 6-2 6 2v13l-6-2-6 2-6-2z" stroke-linejoin="round"/><path d="M7 6v13M13 4v13" stroke-linecap="round"/></svg></span>Team Map</button>
+      <button class="nav-item" onclick="switchTab('notifications')" id="nav-notifications"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 0 1 6 6c0 3.5 1.5 5 1.5 5h-15S4 11.5 4 8a6 6 0 0 1 6-6z" stroke-linejoin="round"/><path d="M8.5 17a1.5 1.5 0 0 0 3 0" stroke-linecap="round"/></svg></span>Notifications<span id="notif-badge" class="nav-badge" style="display:none;">0</span></button>
     </div>
     <div class="sidebar-footer">
       <button class="theme-toggle" onclick="toggleTheme()"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 13A7 7 0 1 1 7 3a5 5 0 0 0 10 10z" stroke-linejoin="round"/></svg><span id="theme-lbl">Dark mode</span></button>
@@ -1073,6 +1074,16 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       </div>
     </div>
 
+    <!-- NOTIFICATIONS -->
+    <div class="tab-content" id="ptab-notifications">
+      <div class="topbar"><span class="topbar-title">Notifications</span><button onclick="markAllNotifsRead()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;font-weight:500;padding:5px 12px;border-radius:20px;cursor:pointer;margin-left:auto;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'">Mark all read</button></div>
+      <div style="padding:20px 24px;max-width:680px;">
+        <div id="notif-list-mgr" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="color:var(--muted);font-size:13px;text-align:center;padding:40px;">Loading notifications…</div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /content-area -->
 </div><!-- /app-shell -->
 
@@ -1224,11 +1235,11 @@ function posClass(pos){
 }
 
 // ── State ──────────────────────────────────────────────
-let roster=[],weekLeavers=new Set(),allReports=[],weekSubmitted=false,calEvents=[],announcement=null,notes='',lastWeekCount=0,ackDone=false,savedReviews=[],allPayData=[];
+let roster=[],weekLeavers=new Set(),allReports=[],weekSubmitted=false,calEvents=[],announcement=null,notes='',lastWeekCount=0,ackDone=false,savedReviews=[],allPayData=[],managerNotifs=[];
 
 async function loadAll(){
   try{
-    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes,pdRes,picRes,revRes]=await Promise.all([
+    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes,pdRes,picRes,revRes,notifRes]=await Promise.all([
       api({action:'getRoster',manager:managerName}),
       api({action:'getSubmission',manager:managerName,week:weekKey}),
       api({action:'loadMap',manager:managerName}),
@@ -1239,7 +1250,8 @@ async function loadAll(){
       api({action:'getLastWeekCount',manager:managerName,currentWeek:weekKey}),
       api({action:'getPayData',manager:managerName}),
       api({action:'getProfilePic',manager:managerName}),
-      api({action:'getManagerReviews',manager:managerName})
+      api({action:'getManagerReviews',manager:managerName}),
+      api({action:'getNotifications',manager:managerName})
     ]);
     if(rRes.roster)roster=rRes.roster;
     if(sRes.rows&&sRes.rows.length){weekSubmitted=true;document.getElementById('banner-done').style.display='block';weekLeavers=new Set(sRes.rows.filter(r=>r.leaver).map(r=>r.id).filter(Boolean));}
@@ -1259,6 +1271,9 @@ async function loadAll(){
     }
     // Load saved reviews from sheet
     if(revRes.reviews)savedReviews=revRes.reviews;
+    // Load notifications and update badge
+    if(notifRes.notifications)managerNotifs=notifRes.notifications;
+    updateNotifBadge();
     renderAll();
   }catch(e){console.error(e);showToast('Could not load data','error',5000);renderAll();}
 }
@@ -3057,7 +3072,7 @@ function clearMap(){if(!confirm('Clear the map?'))return;sp.nodes=[];sp.edges=[]
 async function saveMap(){const md=JSON.stringify({nodes:sp.nodes,edges:sp.edges});try{await api({action:'saveMap',manager:managerName,mapData:md});showToast('Map saved ✓','success');}catch(e){showToast('Failed to save map','error');}}
 
 // ── Tab switching ─────────────────────────────────────
-const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map'];
+const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications'];
 function switchTab(tab){
   TABS.forEach(id=>{
     const nav=document.getElementById(`nav-${id}`);
@@ -3070,6 +3085,7 @@ function switchTab(tab){
   if(tab==='calendar')renderCalendar();
   if(tab==='leaderboard')lbInit();
   if(tab==='review'){showReviewForm();}
+  if(tab==='notifications'){renderManagerNotifs();markAllNotifsRead();}
 }
 
 // ── LEADERBOARD ───────────────────────────────────────
@@ -3143,3 +3159,38 @@ else{checkAuth();}
 </script>
 </body>
 </html>
+<script>
+// ── Manager Notifications ─────────────────────────────
+function updateNotifBadge(){
+  const unread=managerNotifs.filter(n=>!n.readAt).length;
+  const badge=document.getElementById('notif-badge');
+  if(!badge)return;
+  if(unread>0){badge.textContent=unread>99?'99+':String(unread);badge.style.display='';}
+  else{badge.style.display='none';}
+}
+
+function renderManagerNotifs(){
+  const el=document.getElementById('notif-list-mgr');if(!el)return;
+  const sorted=[...managerNotifs].sort((a,b)=>b.sentAt.localeCompare(a.sentAt));
+  if(!sorted.length){el.innerHTML='<div style="color:var(--muted);font-size:14px;text-align:center;padding:48px;line-height:1.7;"><strong style="display:block;color:var(--text);font-size:16px;margin-bottom:6px;">No notifications yet</strong>Your manager will send you updates here.</div>';return;}
+  el.innerHTML=sorted.map(n=>{
+    const isRead=!!n.readAt;
+    const sent=n.sentAt?new Date(n.sentAt).toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    return`<div style="background:var(--surface);border:1px solid ${isRead?'var(--border)':'#0d9488'};border-radius:12px;padding:16px 18px;position:relative;box-shadow:${isRead?'none':'0 0 0 1px rgba(13,148,136,.2)'};">
+      ${!isRead?'<div style="position:absolute;top:14px;right:14px;width:8px;height:8px;background:#ef4444;border-radius:50%;"></div>':''}
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;padding-right:20px;">${esc(n.title)}</div>
+      ${n.message?`<div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">${esc(n.message)}</div>`:''}
+      <div style="font-size:11px;color:var(--subtle);">${sent}${isRead?'&nbsp;·&nbsp;<span style="color:var(--success);">✓ Read</span>':''}</div>
+    </div>`;
+  }).join('');
+}
+
+async function markAllNotifsRead(){
+  const unread=managerNotifs.filter(n=>!n.readAt);
+  if(!unread.length)return;
+  await Promise.allSettled(unread.map(n=>api({action:'markNotifRead',id:n.id,manager:managerName})));
+  managerNotifs.forEach(n=>{if(!n.readAt)n.readAt=new Date().toISOString();});
+  updateNotifBadge();
+  renderManagerNotifs();
+}
+</script>

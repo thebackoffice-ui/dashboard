@@ -163,6 +163,8 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
 .add-btn:hover { opacity: 0.85; }
 
 .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--accent-soft); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+.cal-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;flex-shrink:0;}
+.cal-swatch.selected{border-color:var(--text);transform:scale(1.12);}
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-state { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; }
 
@@ -246,6 +248,7 @@ select.form-input { cursor: pointer; }
     <button class="tab-btn" onclick="switchTab('upload')">Upload Reports</button>
     <button class="tab-btn" onclick="switchTab('calendar')">Calendar</button>
     <button class="tab-btn" onclick="switchTab('reviews')">Weekly Reviews</button>
+    <button class="tab-btn" onclick="switchTab('notifications')">Notifications</button>
     <button class="tab-btn" onclick="switchTab('setup')">Setup</button>
   </div>
 
@@ -357,6 +360,23 @@ select.form-input { cursor: pointer; }
           <div class="form-lbl">Notes (optional)</div>
           <input type="text" id="cal-notes" class="search-input" style="width:100%;" placeholder="Any extra detail…" />
         </div>
+        <div>
+          <div class="form-lbl">Colour</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;" id="cal-colour-picker">
+            <div class="cal-swatch selected" data-cat="personal" style="background:#2563ff;" title="Blue" onclick="selectCalColour(this,'personal')"></div>
+            <div class="cal-swatch" data-cat="work" style="background:#22c55e;" title="Green" onclick="selectCalColour(this,'work')"></div>
+            <div class="cal-swatch" data-cat="team" style="background:#ec4899;" title="Pink" onclick="selectCalColour(this,'team')"></div>
+            <div class="cal-swatch" data-cat="reminder" style="background:#f59e0b;" title="Yellow" onclick="selectCalColour(this,'reminder')"></div>
+            <div class="cal-swatch" data-cat="admin" style="background:#7c3aed;" title="Purple" onclick="selectCalColour(this,'admin')"></div>
+            <div class="cal-swatch" data-cat="orange" style="background:#f97316;" title="Orange" onclick="selectCalColour(this,'orange')"></div>
+            <div class="cal-swatch" data-cat="rose" style="background:#f43f5e;" title="Rose" onclick="selectCalColour(this,'rose')"></div>
+            <div class="cal-swatch" data-cat="cyan" style="background:#06b6d4;" title="Cyan" onclick="selectCalColour(this,'cyan')"></div>
+          </div>
+        </div>
+        <div>
+          <div class="form-lbl">Reminder / notification (optional)</div>
+          <input type="text" id="cal-reminder" class="search-input" style="width:100%;" placeholder="e.g. Don't forget to submit your weekly update" />
+        </div>
         <!-- Recurrence -->
         <div style="grid-column:span 2;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
@@ -436,6 +456,87 @@ select.form-input { cursor: pointer; }
         <div style="color:var(--muted);font-size:13px;">No reviews stored yet.</div>
       </div>
     </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="tab-panel" id="tab-notifications">
+
+    <!-- Compose -->
+    <div class="setup-card">
+      <h3>Send a notification</h3>
+      <p>Send a message directly to one or more managers. It appears in their Notifications tab with a red badge until read.</p>
+
+      <!-- Template picker -->
+      <div style="margin-bottom:14px;">
+        <div class="form-lbl" style="margin-bottom:6px;">Load a template (optional)</div>
+        <div style="display:flex;gap:8px;">
+          <select id="notif-template-select" class="search-input" style="flex:1;" onchange="loadNotifTemplate()">
+            <option value="">— choose template —</option>
+          </select>
+          <button onclick="saveNotifTemplate()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;font-weight:500;padding:7px 14px;border-radius:var(--radius-sm);cursor:pointer;white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'">Save as template</button>
+          <button onclick="deleteNotifTemplate()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;" title="Delete selected template" onmouseover="this.style.color='var(--danger)';this.style.borderColor='var(--danger)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border2)'">×</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-lbl">Title</label>
+        <input type="text" id="notif-title" class="form-input" placeholder="e.g. Reminder: Submit your weekly update" />
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">Message</label>
+        <textarea id="notif-message" class="form-input" style="min-height:80px;resize:vertical;" placeholder="Full message…"></textarea>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="form-lbl" style="margin-bottom:8px;">Send to managers</div>
+        <div style="margin-bottom:8px;display:flex;gap:8px;">
+          <button onclick="notifSelectAll()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;">Select all</button>
+          <button onclick="notifSelectNone()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;">Clear</button>
+        </div>
+        <div id="notif-manager-checkboxes" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
+        <button onclick="sendNotification()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:10px 20px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Send notification</button>
+        <div id="notif-status" style="font-size:12px;color:var(--muted);font-family:monospace;"></div>
+      </div>
+    </div>
+
+    <!-- Live notifications -->
+    <div class="setup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <h3 style="margin-bottom:0;">Live notifications</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="notif-filter-mgr" class="search-input" style="width:160px;" onchange="renderLiveNotifs()">
+            <option value="">All managers</option>
+          </select>
+          <button onclick="refreshLiveNotifs()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);cursor:pointer;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">↻ Refresh</button>
+        </div>
+      </div>
+      <p>All unread and recent notifications. Click × to delete one from a manager's inbox.</p>
+      <div id="live-notifs-list" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="color:var(--muted);font-size:13px;">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Templates manager -->
+    <div class="setup-card">
+      <h3>Notification templates</h3>
+      <p>Saved templates appear in the dropdown above. Add one below — title + body — and save it for reuse.</p>
+      <div class="form-row">
+        <label class="form-lbl">Template name</label>
+        <input type="text" id="tmpl-name" class="form-input" placeholder="e.g. Weekly reminder" />
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">Title</label>
+        <input type="text" id="tmpl-title" class="form-input" placeholder="Notification title" />
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">Message</label>
+        <textarea id="tmpl-body" class="form-input" style="min-height:70px;resize:vertical;" placeholder="Notification message…"></textarea>
+      </div>
+      <button onclick="createNotifTemplate()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:9px 18px;border-radius:var(--radius-sm);cursor:pointer;margin-top:8px;">Save template</button>
+      <div id="tmpl-status" style="font-size:12px;color:var(--muted);margin-left:10px;font-family:monospace;display:inline;"></div>
+    </div>
+
   </div>
 
   <!-- SETUP -->
@@ -873,6 +974,59 @@ function doPost(e) {
     const ph = getOrCreate('profile_pics', ['manager','picData','updatedAt']);
     const rows = ph.getDataRange().getValues().slice(1);
     result = { pics: rows.map(r => ({ manager:r[0], picData:r[1] })) };
+
+  } else if (data.action === 'saveNotification') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    const n = data.notification;
+    nh.appendRow([n.id, n.manager, n.title||'', n.message||'', n.sentAt||new Date().toISOString(), '']);
+    result = { ok: true };
+
+  } else if (data.action === 'getNotifications') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    result = { notifications: nh.getDataRange().getValues().slice(1)
+      .filter(r => r[1]===data.manager)
+      .map(r => ({ id:r[0], manager:r[1], title:r[2], message:r[3], sentAt:r[4]||'', readAt:r[5]||'' })) };
+
+  } else if (data.action === 'getAllNotifications') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    result = { notifications: nh.getDataRange().getValues().slice(1)
+      .map(r => ({ id:r[0], manager:r[1], title:r[2], message:r[3], sentAt:r[4]||'', readAt:r[5]||'' })) };
+
+  } else if (data.action === 'markNotifRead') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    const rows = nh.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0]===data.id && rows[i][1]===data.manager) {
+        nh.getRange(i+1,6).setValue(new Date().toISOString()); break;
+      }
+    }
+    result = { ok: true };
+
+  } else if (data.action === 'deleteNotification') {
+    const nh = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+    const rows = nh.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) {
+      if (rows[i][0]===data.id) { nh.deleteRow(i+1); break; }
+    }
+    result = { ok: true };
+
+  } else if (data.action === 'getNotifTemplates') {
+    const th = getOrCreate('notif_templates', ['id','name','title','message','createdAt']);
+    result = { templates: th.getDataRange().getValues().slice(1)
+      .map(r => ({ id:r[0], name:r[1], title:r[2], message:r[3], createdAt:r[4]||'' })) };
+
+  } else if (data.action === 'saveNotifTemplate') {
+    const th = getOrCreate('notif_templates', ['id','name','title','message','createdAt']);
+    th.appendRow([data.template.id, data.template.name, data.template.title||'', data.template.message||'', new Date().toISOString()]);
+    result = { ok: true };
+
+  } else if (data.action === 'deleteNotifTemplate') {
+    const th = getOrCreate('notif_templates', ['id','name','title','message','createdAt']);
+    const rows = th.getDataRange().getValues();
+    for (let i = rows.length-1; i >= 1; i--) {
+      if (rows[i][0]===data.id) { th.deleteRow(i+1); break; }
+    }
+    result = { ok: true };
   }
 
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
@@ -1243,12 +1397,13 @@ function copyLink(url,btn) {
 
 // ── Tabs ───────────────────────────────────────────────
 function switchTab(tab) {
-  const tabNames = ['overview','people','upload','calendar','reviews','setup'];
+  const tabNames = ['overview','people','upload','calendar','reviews','notifications','setup'];
   document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', tabNames[i] === tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`));
   if(tab==='upload'){renderUploadHistory();renderManagerCheckboxes();}
   if(tab==='calendar'){renderCalManagerCheckboxes();renderCalHistory();}
   if(tab==='reviews'){populateReviewFilters();renderReviews();}
+  if(tab==='notifications'){renderNotifManagerCheckboxes();refreshLiveNotifs();loadNotifTemplates();}
 }
 
 function showEmpty() {
@@ -1414,6 +1569,8 @@ async function pushCalendarEvent() {
   const date = document.getElementById('cal-date').value;
   const time = document.getElementById('cal-time').value;
   const notes = document.getElementById('cal-notes').value.trim();
+  const reminder = document.getElementById('cal-reminder').value.trim();
+  const category = getSelectedCalColour();
   const isRecurring = document.getElementById('cal-recurring').checked;
   const selectedMgrs = getCalCheckedManagers();
   const status = document.getElementById('cal-status');
@@ -1429,7 +1586,7 @@ async function pushCalendarEvent() {
   const groupId = isRecurring ? 'rg'+Date.now() : null;
   const newEvents = dates.map((d,i) => ({
     id: 'ev'+Date.now()+i,
-    title, date:d, time:time||'', notes:notes||'',
+    title, date:d, time:time||'', notes:notes||'', reminder:reminder||'', category:category||'personal',
     pushedAt: new Date().toISOString(),
     recurring: isRecurring,
     recurringGroupId: groupId,
@@ -1458,6 +1615,8 @@ async function pushCalendarEvent() {
     document.getElementById('cal-title').value = '';
     document.getElementById('cal-time').value = '';
     document.getElementById('cal-notes').value = '';
+    document.getElementById('cal-reminder').value = '';
+    document.querySelectorAll('#cal-colour-picker .cal-swatch').forEach(s => s.classList.toggle('selected', s.dataset.cat==='personal'));
     document.getElementById('cal-recurring').checked = false;
     document.getElementById('recurrence-options').style.display = 'none';
     calSelectNone();
@@ -1673,3 +1832,136 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 </script>
 </body>
 </html>
+<script>
+// ── Calendar colour picker ────────────────────────────
+const CAT_COLORS_ADM={personal:'#2563ff',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#7c3aed',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
+function selectCalColour(el,cat){document.querySelectorAll('#cal-colour-picker .cal-swatch').forEach(s=>s.classList.remove('selected'));el.classList.add('selected');}
+function getSelectedCalColour(){const s=document.querySelector('#cal-colour-picker .cal-swatch.selected');return s?s.dataset.cat:'personal';}
+
+// ── Notifications ────────────────────────────────────
+let allLiveNotifs=[];
+let notifTemplates=[];
+
+function renderNotifManagerCheckboxes(){
+  const wrap=document.getElementById('notif-manager-checkboxes');if(!wrap)return;
+  if(!managers.length){wrap.innerHTML='<div style="color:var(--muted);font-size:13px;">No managers added yet.</div>';return;}
+  wrap.innerHTML=managers.map(m=>{const dn=m.charAt(0).toUpperCase()+m.slice(1);
+    return`<label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;"><input type="checkbox" id="nm-${m}" value="${esc(m)}" style="cursor:pointer;accent-color:var(--accent);"/> ${esc(dn)}</label>`;
+  }).join('');
+  const filterSel=document.getElementById('notif-filter-mgr');
+  if(filterSel){const cur=filterSel.value;filterSel.innerHTML='<option value="">All managers</option>'+managers.map(m=>`<option value="${esc(m)}" ${m===cur?'selected':''}>${esc(m.charAt(0).toUpperCase()+m.slice(1))}</option>`).join('');}
+}
+function notifSelectAll(){managers.forEach(m=>{const cb=document.getElementById(`nm-${m}`);if(cb)cb.checked=true;});}
+function notifSelectNone(){managers.forEach(m=>{const cb=document.getElementById(`nm-${m}`);if(cb)cb.checked=false;});}
+function getNotifCheckedManagers(){return managers.filter(m=>{const cb=document.getElementById(`nm-${m}`);return cb&&cb.checked;});}
+
+async function sendNotification(){
+  const title=document.getElementById('notif-title').value.trim();
+  const message=document.getElementById('notif-message').value.trim();
+  const selectedMgrs=getNotifCheckedManagers();
+  const status=document.getElementById('notif-status');
+  if(!title){showToast('Add a title','error');return;}
+  if(!selectedMgrs.length){showToast('Select at least one manager','error');return;}
+  status.textContent='Sending…';
+  let ok=0,fail=[];
+  for(const mgr of selectedMgrs){
+    try{
+      await api({action:'saveNotification',notification:{id:'notif'+Date.now()+Math.random().toString(36).slice(2,6),manager:mgr,title,message,sentAt:new Date().toISOString()}});
+      ok++;
+    }catch(e){fail.push(mgr);}
+  }
+  status.textContent=fail.length?`Sent to ${ok}, failed: ${fail.join(', ')}`:`✓ Sent to ${ok} manager${ok!==1?'s':''}`;
+  if(!fail.length){
+    showToast(`Notification sent to ${ok} manager${ok!==1?'s':''} ✓`,'success');
+    document.getElementById('notif-title').value='';
+    document.getElementById('notif-message').value='';
+    notifSelectNone();
+    setTimeout(()=>status.textContent='',4000);
+    await refreshLiveNotifs();
+  }else{showToast(`Some sends failed: ${fail.join(', ')}`,'error',5000);}
+}
+
+async function refreshLiveNotifs(){
+  if(!scriptUrl)return;
+  try{const res=await api({action:'getAllNotifications'});allLiveNotifs=res.notifications||[];renderLiveNotifs();}catch(e){}
+}
+
+function renderLiveNotifs(){
+  const el=document.getElementById('live-notifs-list');if(!el)return;
+  const filter=(document.getElementById('notif-filter-mgr')||{}).value||'';
+  let notifs=[...allLiveNotifs].filter(n=>!filter||n.manager===filter);
+  notifs.sort((a,b)=>b.sentAt.localeCompare(a.sentAt));
+  if(!notifs.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;">No notifications sent yet.</div>';return;}
+  el.innerHTML=notifs.map(n=>{
+    const dn=(n.manager||'').charAt(0).toUpperCase()+(n.manager||'').slice(1);
+    const sent=n.sentAt?new Date(n.sentAt).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    const isRead=!!n.readAt;
+    const readStr=isRead?`<span style="font-size:11px;color:var(--success);font-weight:600;">✓ Read</span>`:`<span style="font-size:11px;color:var(--warning);font-weight:600;">● Unread</span>`;
+    return`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+          <span style="font-size:12px;font-weight:700;color:var(--accent);text-transform:capitalize;">${esc(dn)}</span>
+          ${readStr}
+          <span style="font-size:11px;color:var(--muted);margin-left:auto;">${sent}</span>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;">${esc(n.title)}</div>
+        ${n.message?`<div style="font-size:12px;color:var(--muted);">${esc(n.message)}</div>`:''}
+      </div>
+      <button onclick="deleteLiveNotif('${esc(n.id)}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0 4px;line-height:1;flex-shrink:0;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--muted)'">×</button>
+    </div>`;
+  }).join('');
+}
+
+async function deleteLiveNotif(id){
+  if(!confirm('Remove this notification?'))return;
+  try{await api({action:'deleteNotification',id});allLiveNotifs=allLiveNotifs.filter(n=>n.id!==id);renderLiveNotifs();showToast('Notification removed ✓','success');}
+  catch(e){showToast('Failed to remove','error');}
+}
+
+// ── Notification templates ────────────────────────────
+async function loadNotifTemplates(){
+  if(!scriptUrl)return;
+  try{const res=await api({action:'getNotifTemplates'});notifTemplates=res.templates||[];renderTemplateDropdown();}catch(e){}
+}
+function renderTemplateDropdown(){
+  const sel=document.getElementById('notif-template-select');if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— choose template —</option>'+notifTemplates.map(t=>`<option value="${esc(t.id)}" ${t.id===cur?'selected':''}>${esc(t.name)}</option>`).join('');
+}
+function loadNotifTemplate(){
+  const id=document.getElementById('notif-template-select').value;if(!id)return;
+  const tmpl=notifTemplates.find(t=>t.id===id);if(!tmpl)return;
+  document.getElementById('notif-title').value=tmpl.title||'';
+  document.getElementById('notif-message').value=tmpl.message||'';
+}
+async function saveNotifTemplate(){
+  const title=document.getElementById('notif-title').value.trim();
+  const message=document.getElementById('notif-message').value.trim();
+  if(!title){showToast('Fill in a title to save as template','error');return;}
+  const name=prompt('Template name:',title);if(!name)return;
+  const tmpl={id:'tmpl'+Date.now(),name,title,message,createdAt:new Date().toISOString()};
+  try{await api({action:'saveNotifTemplate',template:tmpl});notifTemplates.push(tmpl);renderTemplateDropdown();showToast('Template saved ✓','success');}
+  catch(e){showToast('Failed to save template','error');}
+}
+async function createNotifTemplate(){
+  const name=document.getElementById('tmpl-name').value.trim();
+  const title=document.getElementById('tmpl-title').value.trim();
+  const message=document.getElementById('tmpl-body').value.trim();
+  const status=document.getElementById('tmpl-status');
+  if(!name||!title){showToast('Name and title required','error');return;}
+  const tmpl={id:'tmpl'+Date.now(),name,title,message,createdAt:new Date().toISOString()};
+  try{
+    await api({action:'saveNotifTemplate',template:tmpl});notifTemplates.push(tmpl);renderTemplateDropdown();
+    document.getElementById('tmpl-name').value='';document.getElementById('tmpl-title').value='';document.getElementById('tmpl-body').value='';
+    status.textContent='✓ Saved';setTimeout(()=>status.textContent='',3000);showToast('Template created ✓','success');
+  }catch(e){showToast('Failed to create template','error');}
+}
+async function deleteNotifTemplate(){
+  const id=document.getElementById('notif-template-select').value;
+  if(!id){showToast('Select a template first','error');return;}
+  const tmpl=notifTemplates.find(t=>t.id===id);
+  if(!confirm(`Delete template "${tmpl?.name}"?`))return;
+  try{await api({action:'deleteNotifTemplate',id});notifTemplates=notifTemplates.filter(t=>t.id!==id);renderTemplateDropdown();showToast('Template deleted ✓','success');}
+  catch(e){showToast('Failed to delete','error');}
+}
+</script>
