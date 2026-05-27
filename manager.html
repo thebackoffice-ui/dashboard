@@ -197,6 +197,163 @@
   box-shadow:0 6px 14px rgba(0,0,0,.08)!important;
 }
 
+
+/* GLOBAL POSITION COLOUR SYSTEM */
+
+/* Trainee */
+.pos-Trainee,
+[data-position="Trainee"],
+[data-pos="Trainee"]{
+  background:#b7ffe3!important;
+  border-color:#00d68f!important;
+  color:#00a96e!important;
+}
+
+/* Solo */
+.pos-Solo,
+[data-position="Solo"],
+[data-pos="Solo"]{
+  background:#ffe3b3!important;
+  border-color:#ff9500!important;
+  color:#cc7700!important;
+}
+
+/* Leader */
+.pos-Leader,
+[data-position="Leader"],
+[data-pos="Leader"]{
+  background:#bfdcff!important;
+  border-color:#2563ff!important;
+  color:#1d4ed8!important;
+}
+
+/* Core */
+.pos-Core,
+[data-position="Core"],
+[data-pos="Core"]{
+  background:#dccbff!important;
+  border-color:#7c3aed!important;
+  color:#6d28d9!important;
+}
+
+/* Junior Partner+ */
+.pos-Junior,
+.pos-JuniorPartner,
+[data-position="Junior"],
+[data-position="Junior Partner"],
+[data-position="Junior Partner +"],
+[data-pos="Junior"]{
+  background:#ffc9d7!important;
+  border-color:#ff3366!important;
+  color:#e11d48!important;
+}
+
+/* Initial circles everywhere */
+.av.pos-Trainee,
+.nd-rep-av.pos-Trainee,
+.rep-avatar.pos-Trainee,
+.initial-circle.pos-Trainee,
+.dashboard-avatar.pos-Trainee,
+.mini-avatar.pos-Trainee{
+  background:#b7ffe3!important;
+  color:#00a96e!important;
+  border:2px solid #00d68f!important;
+}
+
+.av.pos-Solo,
+.nd-rep-av.pos-Solo,
+.rep-avatar.pos-Solo,
+.initial-circle.pos-Solo,
+.dashboard-avatar.pos-Solo,
+.mini-avatar.pos-Solo{
+  background:#ffe3b3!important;
+  color:#cc7700!important;
+  border:2px solid #ff9500!important;
+}
+
+.av.pos-Leader,
+.nd-rep-av.pos-Leader,
+.rep-avatar.pos-Leader,
+.initial-circle.pos-Leader,
+.dashboard-avatar.pos-Leader,
+.mini-avatar.pos-Leader{
+  background:#bfdcff!important;
+  color:#1d4ed8!important;
+  border:2px solid #2563ff!important;
+}
+
+.av.pos-Core,
+.nd-rep-av.pos-Core,
+.rep-avatar.pos-Core,
+.initial-circle.pos-Core,
+.dashboard-avatar.pos-Core,
+.mini-avatar.pos-Core{
+  background:#dccbff!important;
+  color:#6d28d9!important;
+  border:2px solid #7c3aed!important;
+}
+
+.av.pos-Junior,
+.av.pos-JuniorPartner,
+.nd-rep-av.pos-Junior,
+.nd-rep-av.pos-JuniorPartner,
+.rep-avatar.pos-Junior,
+.rep-avatar.pos-JuniorPartner,
+.initial-circle.pos-Junior,
+.initial-circle.pos-JuniorPartner,
+.dashboard-avatar.pos-Junior,
+.dashboard-avatar.pos-JuniorPartner,
+.mini-avatar.pos-Junior,
+.mini-avatar.pos-JuniorPartner{
+  background:#ffc9d7!important;
+  color:#e11d48!important;
+  border:2px solid #ff3366!important;
+}
+
+/* Team map + mini map cards */
+.map-node.pos-Trainee,
+.map-bubble.pos-Trainee,
+.mini-map-bubble.pos-Trainee{
+  background:#b7ffe3!important;
+  border:2px solid #00d68f!important;
+  color:#00a96e!important;
+}
+
+.map-node.pos-Solo,
+.map-bubble.pos-Solo,
+.mini-map-bubble.pos-Solo{
+  background:#ffe3b3!important;
+  border:2px solid #ff9500!important;
+  color:#cc7700!important;
+}
+
+.map-node.pos-Leader,
+.map-bubble.pos-Leader,
+.mini-map-bubble.pos-Leader{
+  background:#bfdcff!important;
+  border:2px solid #2563ff!important;
+  color:#1d4ed8!important;
+}
+
+.map-node.pos-Core,
+.map-bubble.pos-Core,
+.mini-map-bubble.pos-Core{
+  background:#dccbff!important;
+  border:2px solid #7c3aed!important;
+  color:#6d28d9!important;
+}
+
+.map-node.pos-Junior,
+.map-node.pos-JuniorPartner,
+.map-bubble.pos-Junior,
+.map-bubble.pos-JuniorPartner,
+.mini-map-bubble.pos-Junior,
+.mini-map-bubble.pos-JuniorPartner{
+  background:#ffc9d7!important;
+  border:2px solid #ff3366!important;
+  color:#e11d48!important;
+}
+
 </style>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -724,7 +881,25 @@ select.wr-input{cursor:pointer;appearance:none;}
 </style>
 </head>
 <body>
-<script>const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyeCMHtk4box-1rKwTt4UKF5UlpsyGWB2QISs522KkoQvJ3XzhjvvQ8wcOWU3bYJ7dc/exec';</script>
+<script>const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyeCMHtk4box-1rKwTt4UKF5UlpsyGWB2QISs522KkoQvJ3XzhjvvQ8wcOWU3bYJ7dc/exec';
+function applyPositionClasses(){
+  document.querySelectorAll('[data-position],[data-pos]').forEach(el=>{
+    const p=(el.dataset.position||el.dataset.pos||'').toLowerCase();
+
+    el.classList.remove('pos-Trainee','pos-Solo','pos-Leader','pos-Core','pos-Junior','pos-JuniorPartner');
+
+    if(p.includes('trainee')) el.classList.add('pos-Trainee');
+    else if(p.includes('solo')) el.classList.add('pos-Solo');
+    else if(p.includes('leader')) el.classList.add('pos-Leader');
+    else if(p.includes('core')) el.classList.add('pos-Core');
+    else if(p.includes('junior')) el.classList.add('pos-JuniorPartner');
+  });
+}
+
+setTimeout(applyPositionClasses,200);
+document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses,400));
+
+</script>
 
 <!-- LOGIN -->
 <div id="login-screen" class="login-wrap">
@@ -1545,7 +1720,7 @@ function renderReps(){
     const flagInfo=r.flag?FLAGS.find(f=>f.id===r.flag):null;
     return`<div class="rep-card ${r.leaver?'is-leaver':''}" id="rc-${r.id}">
       <div class="rep-card-head" onclick="toggleCard('${r.id}')">
-        <div class="av av34 ${posClass(r.Position||r.position||r.Pos||r.pos)}" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
+        <div data-position="${r.Position||r.position||r.Pos||r.pos||""}" class="av av34 ${posClass(r.Position||r.position||r.Pos||r.pos)}" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
         <div class="rep-info">
           <div class="rep-name">${esc(r.name)}</div>
           <div class="rep-meta">
@@ -1599,7 +1774,7 @@ function renderWeekly(){
   const active=roster.filter(r=>!r.leaver);
   if(!active.length){list.innerHTML='<div class="empty-state"><strong>No active reps</strong>Add reps on My Reps first.</div>';return;}
   list.innerHTML=active.map(r=>{const wl=weekLeavers.has(r.id);const c=pc(r.position||'default');const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);return`<div class="week-row ${wl?'is-leaver':''}" id="wr-${r.id}">
-    <div class="av av28 ${posClass(r.Position||r.position||r.Pos||r.pos)}" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
+    <div data-position="${r.Position||r.position||r.Pos||r.pos||""}" class="av av28 ${posClass(r.Position||r.position||r.Pos||r.pos)}" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
     <div class="week-row-info"><div class="week-row-name" style="${wl?'text-decoration:line-through;color:var(--subtle);':''}">${esc(r.name)}</div><div class="week-row-sub">${r.position||'—'}${r.email?` · ${esc(r.email)}`:''}</div></div>
     ${wl?'<span class="leaver-tag">Leaving</span>':''}
     <button class="leaver-toggle" onclick="toggleWeekLeaver('${r.id}')">${wl?'Undo':'Left this week'}</button>
