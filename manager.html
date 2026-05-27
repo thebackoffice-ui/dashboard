@@ -8,7 +8,7 @@
 <style>
 /* ── Niond-style dashboard redesign ── */
 :root {
-  --niond-bg: #f5f7f8;
+  --niond-bg: #f0f3f6;
   --niond-surface: #ffffff;
   --niond-border: #e8ecee;
   --niond-text: #0f1923;
@@ -27,7 +27,7 @@
   --niond-r: 8px;
   --niond-rsm: 5px;
 }
-.home-scroll { background: var(--niond-bg) !important; }
+.home-scroll { background: #f0f3f6 !important; padding: 24px 28px; }
 .nd-stat { background:var(--niond-surface); border:1px solid var(--niond-border); border-radius:var(--niond-r); padding:20px 22px; box-shadow:var(--niond-shadow); display:flex; flex-direction:column; gap:10px; transition:box-shadow .15s; }
 .nd-stat:hover { box-shadow:var(--niond-shadow-md); }
 .nd-stat-top { display:flex; align-items:center; justify-content:space-between; }
@@ -77,7 +77,7 @@
 .nd-section-lbl { font-size:10px; font-weight:800; color:var(--niond-muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
 [data-theme="dark"] .nd-stat,[data-theme="dark"] .nd-chart-card,[data-theme="dark"] .nd-links-card,[data-theme="dark"] .nd-lb-card,[data-theme="dark"] .nd-reps-card { background:var(--surface); border-color:var(--border); box-shadow:none; }
 [data-theme="dark"] .nd-lb-row:hover,[data-theme="dark"] .nd-rep-row:hover,[data-theme="dark"] .nd-link-row:hover { background:var(--surface2); }
-[data-theme="dark"] .home-scroll { background:var(--bg) !important; }
+[data-theme="dark"] .home-scroll { background:#0d1117 !important; }
 [data-theme="dark"] .nd-rank-1{background:rgba(254,249,195,.12);}[data-theme="dark"] .nd-rank-2{background:rgba(241,245,249,.08);}[data-theme="dark"] .nd-rank-3{background:rgba(255,247,237,.08);}
 [data-theme="dark"] .nd-stat-val,[data-theme="dark"] .nd-lb-name,[data-theme="dark"] .nd-rep-name,[data-theme="dark"] .nd-link-name,[data-theme="dark"] .nd-card-title { color:var(--text); }
 [data-theme="dark"] .sidebar { background:var(--sidebar); border-right-color:#1c2128; }
@@ -91,7 +91,7 @@
 [data-theme="dark"] .nav-item.active { background:#0f766e; color:#fff; box-shadow:0 2px 8px rgba(15,118,110,.4); }
 [data-theme="dark"] .theme-toggle { color:var(--muted); }
 [data-theme="dark"] .theme-toggle:hover { background:rgba(255,255,255,.06); color:var(--text); }
-[data-theme="dark"] .home-scroll { background:var(--bg) !important; }
+[data-theme="dark"] .home-scroll { background:#0d1117 !important; }
 [data-theme="dark"] .nd-card-sub,[data-theme="dark"] .nd-stat-lbl,[data-theme="dark"] .nd-lb-camp,[data-theme="dark"] .nd-rep-pos,[data-theme="dark"] .nd-link-sub { color:var(--muted); }
 [data-theme="dark"] .nd-link-row:hover,[data-theme="dark"] .nd-lb-row:hover,[data-theme="dark"] .nd-rep-row:hover { background:var(--surface2); }
 [data-theme="dark"] .nd-view-all-btn { background:rgba(104,64,176,0.12); color:#b090e8; border-top-color:var(--border); }
@@ -179,7 +179,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .tab-content.active{display:flex;}
 
 /* ── TOPBAR ── */
-.topbar{height:52px;border-bottom:1px solid var(--border);background:var(--surface);padding:0 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar{height:54px;border-bottom:1px solid var(--border);background:var(--surface);padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .topbar-title{font-size:16px;font-weight:600;letter-spacing:-.01em;}
 .topbar-right{display:flex;align-items:center;gap:10px;}
 .week-pill{font-size:11px;font-weight:600;background:#f0fdfa;color:#0f766e;border:1px solid #99f6e4;padding:4px 11px;border-radius:20px;}
@@ -893,13 +893,10 @@ const CAT_COLORS={personal:'#3b82f6',work:'#22c55e',team:'#ec4899',reminder:'#f5
 function renderHome(){
   const annSlot=document.getElementById('announcement-slot');
   if(announcement&&!localStorage.getItem('tt_ann_dismissed_'+announcement.id)){
-    annSlot.innerHTML=`<div class="nd-ann-banner">
+    annSlot.innerHTML=`<div style="background:linear-gradient(135deg,#0f766e,#0d9488);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:20px;color:#fff;box-shadow:0 4px 16px rgba(15,118,110,.25);">
       <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" style="flex-shrink:0;opacity:.9"><path d="M10 2l8 15H2L10 2z" stroke-linejoin="round"/><path d="M10 9v4M10 15h.01" stroke-linecap="round"/></svg>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:700;margin-bottom:1px;">${esc(announcement.title)}</div>
-        <div style="font-size:12px;opacity:.88;line-height:1.4;">${esc(announcement.message)}</div>
-      </div>
-      <button class="nd-ann-dismiss" onclick="dismissAnn('${announcement.id}')">&#x2715;</button>
+      <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;margin-bottom:1px;">${esc(announcement.title)}</div><div style="font-size:12px;opacity:.88;">${esc(announcement.message)}</div></div>
+      <button onclick="dismissAnn('${announcement.id}')" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto;">&#x2715;</button>
     </div>`;
   }else annSlot.innerHTML='';
 
@@ -911,219 +908,250 @@ function renderHome(){
   const flagged=roster.filter(r=>r.flag&&!r.leaver);
   const delta=active.length-lastWeekCount;
 
-  const deltaHtml=delta===0
-    ?`<span class="nd-stat-delta nd-delta-same"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h6" stroke-linecap="round"/></svg> Same as last week</span>`
-    :delta>0
-    ?`<span class="nd-stat-delta nd-delta-up"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3M3 6l3-3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg> +${delta} from last week</span>`
-    :`<span class="nd-stat-delta nd-delta-dn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3v6M3 6l3 3 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg> ${delta} from last week</span>`;
-
   const payReports=allReports.filter(r=>r.type==='Pay Report').sort((a,b)=>b.week.localeCompare(a.week));
   const latestPay=payReports[0]||null;
-  const isThisWeekPay=latestPay&&(()=>{
-    const rep=parseDate(latestPay.week);
-    const mon=parseDate(weekKey);
-    if(!rep||!mon)return false;
-    const sun=new Date(mon);sun.setDate(sun.getDate()+6);
-    return rep>=mon&&rep<=sun;
-  })();
+  const isThisWeekPay=latestPay&&(()=>{const rep=parseDate(latestPay.week);const mon=parseDate(weekKey);if(!rep||!mon)return false;const sun=new Date(mon);sun.setDate(sun.getDate()+6);return rep>=mon&&rep<=sun;})();
   const planners=allReports.filter(r=>r.type==='Daily Planner').sort((a,b)=>b.week.localeCompare(a.week));
   const latestPlanner=planners[0]||null;
   const prologs=allReports.filter(r=>r.type==='Pro-log').sort((a,b)=>b.week.localeCompare(a.week));
   const latestProlog=prologs[0]||null;
 
-  // 6-week wire data — use actual uploaded pay report dates
-  const allPayWeeks=[...new Set([
-    ...allReports.filter(r=>r.type==='Pay Report').map(r=>r.week),
-    ...allPayData.map(p=>p.week)
-  ])].filter(Boolean).sort();
+  // 6-week wire data from actual uploaded dates
+  const allPayWeeks=[...new Set([...allReports.filter(r=>r.type==='Pay Report').map(r=>r.week),...allPayData.map(p=>p.week)])].filter(Boolean).sort();
   const sixWeeks=allPayWeeks.slice(-6);
-  // Pad to 6 slots if fewer uploads exist
   while(sixWeeks.length<6)sixWeeks.unshift('');
   const wireByWeek=sixWeeks.map(wk=>{
     if(!wk)return{wk:'',wire:0,take:0};
     const rep=allReports.find(r=>r.type==='Pay Report'&&r.week===wk);
     const pd=allPayData.find(p=>p.week===wk);
-    // Manager-saved edits override report values; report values are the source of truth
     const wire=parseFloat((pd&&pd.officeWire!==''?pd.officeWire:null)||rep?.officeWire||0)||0;
     const take=parseFloat((pd&&pd.mgrTake!==''?pd.mgrTake:null)||rep?.mgrTake||0)||0;
     return{wk,wire,take};
   });
-  // wireByWeek is ready — chart drawn after DOM update
-
-  // Leaderboard snapshot
-  const lbSnap=(typeof lbRows!=='undefined'&&lbRows.length)?lbFiltered().slice(0,5):[];
-  const rankClass=i=>i===0?'nd-rank-1':i===1?'nd-rank-2':i===2?'nd-rank-3':'nd-rank-n';
-
-  // Reps snapshot
-  const repSnap=active.slice(0,5);
-  function ndC(pos){const m=isDark()?PCD:PC;return m[pos]||m.default;}
+  window.wireByWeekGlobal=wireByWeek;
 
   const curWire=wireByWeek[5]?.wire||0;
   const prevWire=wireByWeek[4]?.wire||0;
   const wireDiff=curWire-prevWire;
-  const wireColor=curWire>=prevWire?'#00BFA5':'#EF4444';
-  const wireDiffHtml=prevWire?`${wireDiff>=0?'&#9650;':'&#9660;'} £${Math.abs(wireDiff).toLocaleString('en-GB')} vs prev`:'&nbsp;';
+  const wireUp=curWire>=prevWire;
+  const wireDiffHtml=prevWire?`<span style="font-size:11px;font-weight:600;color:${wireUp?'#00BFA5':'#EF4444'};display:flex;align-items:center;gap:3px;margin-top:4px;">${wireUp?'▲':'▼'} £${Math.abs(wireDiff).toLocaleString('en-GB')} vs prev</span>`:'';
 
-  // SVG icons
+  // Leaderboard
+  const lbSnap=(typeof lbRows!=='undefined'&&lbRows.length)?lbFiltered().slice(0,5):[];
+  const repSnap=active.slice(0,5);
+  function ndC(pos){const m=isDark()?PCD:PC;return m[pos]||m.default;}
+
+  // Mini calendar
+  const today=fmtDate(new Date());
+  const now=new Date();
+  const mY=now.getFullYear(),mM=now.getMonth();
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS=['M','T','W','T','F','S','S'];
+  const first=new Date(mY,mM,1);
+  const startDow=first.getDay()===0?6:first.getDay()-1;
+  const dim=new Date(mY,mM+1,0).getDate();
+  const prev=new Date(mY,mM,0).getDate();
+  const cells=[];
+  for(let i=startDow-1;i>=0;i--)cells.push({d:fmtDate(new Date(mY,mM-1,prev-i)),o:true});
+  for(let d=1;d<=dim;d++)cells.push({d:fmtDate(new Date(mY,mM,d)),o:false});
+  let nd2=1;while(cells.length%7!==0)cells.push({d:fmtDate(new Date(mY,mM+1,nd2++)),o:true});
+  const calGrid=DAYS.map(d=>`<div style="text-align:center;font-size:10px;font-weight:700;color:var(--muted);padding:4px 0;">${d}</div>`).join('')
+    +cells.map(c=>{const isT=c.d===today;const ev=calEvents.filter(e=>e.date===c.d).length>0;const dayNum=parseInt(c.d.split('-')[2]);
+    return`<div style="text-align:center;padding:5px 2px;border-radius:50%;font-size:11px;cursor:default;${c.o?'color:var(--subtle);':'color:var(--text);'}${isT?'background:#0f766e;color:#fff;border-radius:50%;font-weight:700;':''}${ev&&!isT?'font-weight:700;':''}position:relative;">${dayNum}${ev&&!isT?'<div style="position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:3px;height:3px;background:#0f766e;border-radius:50%;"></div>':''}</div>`}).join('');
+
+  // SVGs
   const ICO={
-    users:`<svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path d="M4 17a7 7 0 0 1 12 0" stroke-linecap="round"/></svg>`,
-    warn:`<svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3L2 17h16L10 3z" stroke-linejoin="round"/><path d="M10 9v4M10 15h.01" stroke-linecap="round"/></svg>`,
-    check:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l4 4L14 4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    users:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path d="M4 17a7 7 0 0 1 12 0" stroke-linecap="round"/></svg>`,
+    warn:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3L2 17h16L10 3z" stroke-linejoin="round"/><path d="M10 9v4M10 15h.01" stroke-linecap="round"/></svg>`,
+    check:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 8l4 4L14 4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     clock:`<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>`,
-    pound:`<svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 5a4 4 0 0 0-7 2.5V11H4M4 14h12M6 11h6" stroke-linecap="round"/></svg>`,
-    pay:`<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="12" rx="2"/><path d="M14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM2 9h16" stroke-linecap="round"/></svg>`,
-    cal:`<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="13" rx="2"/><path d="M3 9h14M7 3v4M13 3v4" stroke-linecap="round"/></svg>`,
-    doc:`<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h8l4 4v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v5h5M7 11h6M7 14h4" stroke-linecap="round"/></svg>`,
-    chevron:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    trophy:`<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h6M10 15v3M7 18h6"/><path d="M5 3v5a5 5 0 0 0 10 0V3"/><path d="M5 6H3a2 2 0 1 0 0 4h2M15 6h2a2 2 0 1 0 0 4h-2" stroke-linecap="round"/></svg>`,
+    pound:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 5a4 4 0 0 0-7 2.5V11H4M4 14h12M6 11h6" stroke-linecap="round"/></svg>`,
+    pay:`<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="12" rx="2"/><path d="M14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM2 9h16" stroke-linecap="round"/></svg>`,
+    cal:`<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="13" rx="2"/><path d="M3 9h14M7 3v4M13 3v4" stroke-linecap="round"/></svg>`,
+    doc:`<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h8l4 4v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v5h5M7 11h6M7 14h4" stroke-linecap="round"/></svg>`,
+    chev:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     reps:`<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17a6 6 0 0 1 10 0M9 17a6 6 0 0 1 10 0" stroke-linecap="round"/></svg>`,
-    info:`<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"/><path d="M7 5v4M7 10h.01" stroke-linecap="round"/></svg>`,
   };
 
   document.getElementById('home-grid').innerHTML=`
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;">
-      <div class="nd-stat">
-        <div class="nd-stat-top">
-          <div><div class="nd-stat-lbl">Active Reps</div><div class="nd-stat-val">${active.length}</div></div>
-          <div class="nd-stat-icon" style="background:#E8F1FF;color:#2979FF;">${ICO.users}</div>
-        </div>${deltaHtml}
+
+    <!-- ROW 1: Stat tiles — coloured blocks like reference -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+
+      <div style="background:#E8F1FF;border-radius:10px;padding:20px 22px;cursor:default;position:relative;overflow:hidden;">
+        <div style="font-size:12px;font-weight:600;color:#2979FF;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Active Reps</div>
+        <div style="font-size:32px;font-weight:800;color:#1a2a4a;letter-spacing:-.03em;line-height:1;">${active.length}</div>
+        <div style="font-size:11px;font-weight:600;color:${delta>0?'#00BFA5':delta<0?'#EF4444':'#94A3B8'};margin-top:6px;display:flex;align-items:center;gap:3px;">${delta>0?'▲ +'+delta+' from last week':delta<0?'▼ '+delta+' from last week':'— Same as last week'}</div>
+        <div style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);opacity:.12;color:#2979FF;">${ICO.users.replace('width="18"','width="64"').replace('height="18"','height="64"')}</div>
       </div>
-      <div class="nd-stat">
-        <div class="nd-stat-top">
-          <div><div class="nd-stat-lbl">Flagged</div><div class="nd-stat-val">${flagged.length}</div></div>
-          <div class="nd-stat-icon" style="background:#FFF4E0;color:#FFA800;">${ICO.warn}</div>
-        </div>
-        <span class="nd-stat-delta" style="color:#d97706;">${leavers.length} leaver${leavers.length!==1?'s':''}</span>
+
+      <div style="background:#FFF4E0;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
+        <div style="font-size:12px;font-weight:600;color:#FFA800;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Flagged</div>
+        <div style="font-size:32px;font-weight:800;color:#3a1a00;letter-spacing:-.03em;line-height:1;">${flagged.length}</div>
+        <div style="font-size:11px;font-weight:600;color:#94A3B8;margin-top:6px;">${leavers.length} leaver${leavers.length!==1?'s':''}</div>
+        <div style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);opacity:.12;color:#FFA800;">${ICO.warn.replace('width="18"','width="64"').replace('height="18"','height="64"')}</div>
       </div>
-      <div class="nd-stat" style="cursor:${weekSubmitted?'default':'pointer'};" onclick="${weekSubmitted?'':String.raw`switchTab('weekly')`}">
-        <div class="nd-stat-top">
-          <div>
-            <div class="nd-stat-lbl">Weekly Update</div>
-            <div class="nd-stat-val" style="font-size:18px;color:${weekSubmitted?'#0f766e':'#d97706'};">${weekSubmitted?'Submitted':'Pending'}</div>
-          </div>
-          <div class="nd-stat-icon" style="background:${weekSubmitted?'#E0F7F4':'#FFF4E0'};color:${weekSubmitted?'#00BFA5':'#FFA800'};">${weekSubmitted?ICO.check:ICO.clock}</div>
-        </div>
-        <span class="nd-stat-delta ${weekSubmitted?'nd-delta-up':'nd-delta-dn'}">${weekSubmitted?ICO.check:ICO.clock} ${weekSubmitted?'Done for this week':'Tap to submit'}</span>
+
+      <div style="background:${weekSubmitted?'#E0F7F4':'#FFF4E0'};border-radius:10px;padding:20px 22px;cursor:${weekSubmitted?'default':'pointer'};position:relative;overflow:hidden;" onclick="${weekSubmitted?'':String.raw`switchTab('weekly')`}">
+        <div style="font-size:12px;font-weight:600;color:${weekSubmitted?'#00BFA5':'#FFA800'};margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Weekly Update</div>
+        <div style="font-size:22px;font-weight:800;color:${weekSubmitted?'#003a30':'#3a1a00'};letter-spacing:-.02em;line-height:1.1;">${weekSubmitted?'Submitted':'Pending'}</div>
+        <div style="font-size:11px;font-weight:600;color:${weekSubmitted?'#00BFA5':'#FFA800'};margin-top:6px;">${weekSubmitted?'Done for this week':'Tap to submit'}</div>
+        <div style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);opacity:.12;color:${weekSubmitted?'#00BFA5':'#FFA800'};">${(weekSubmitted?ICO.check:ICO.clock).replace(/width="1[68]"/,'width="64"').replace(/height="1[68]"/,'height="64"')}</div>
       </div>
-      <div class="nd-stat">
-        <div class="nd-stat-top">
-          <div><div class="nd-stat-lbl">Latest Wire</div><div class="nd-stat-val">${curWire?'£'+curWire.toLocaleString('en-GB'):'—'}</div></div>
-          <div class="nd-stat-icon" style="background:#F0E8FE;color:#8533F5;">${ICO.pound}</div>
-        </div>
-        <span class="nd-stat-delta" style="color:${wireColor};">${wireDiffHtml}</span>
+
+      <div style="background:#F0E8FE;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
+        <div style="font-size:12px;font-weight:600;color:#8533F5;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Latest Wire</div>
+        <div style="font-size:32px;font-weight:800;color:#1a0a30;letter-spacing:-.03em;line-height:1;">${curWire?'£'+curWire.toLocaleString('en-GB'):'—'}</div>
+        ${wireDiffHtml}
+        <div style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);opacity:.12;color:#8533F5;">${ICO.pound.replace('width="18"','width="64"').replace('height="18"','height="64"')}</div>
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 268px;gap:14px;margin-bottom:16px;">
-      <div class="nd-chart-card">
-        <div class="nd-card-hdr">
+    <!-- ROW 2: Chart (left) + Links (centre-right) + Calendar (far right) -->
+    <div style="display:grid;grid-template-columns:1fr 220px 220px;gap:14px;margin-bottom:20px;align-items:start;">
+
+      <!-- Production History -->
+      <div style="background:#fff;border-radius:10px;padding:22px 24px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
           <div>
-            <div class="nd-card-title">Production History</div>
-            <div class="nd-card-sub">Last 6 weeks — office wire &amp; manager take</div>
+            <div style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.02em;">Production History</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;">Office wire &amp; manager take — last 6 uploads</div>
           </div>
-          <button class="nd-export-btn" onclick="switchTab('reports')">View All</button>
+          <button onclick="switchTab('reports')" style="background:#0f766e;color:#fff;border:none;font-family:var(--font);font-size:11px;font-weight:700;padding:7px 16px;border-radius:20px;cursor:pointer;letter-spacing:.04em;transition:opacity .15s;" onmouseover="this.style.opacity='.82'" onmouseout="this.style.opacity='1'">View All</button>
         </div>
-        <div style="display:flex;gap:18px;align-items:center;padding:12px 20px 0;">
-          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#6b7d8a;">
+        <div style="display:flex;gap:16px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted);">
             <div style="width:10px;height:10px;border-radius:50%;background:#5C9DFF;"></div>Office Wire
           </div>
-          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#6b7d8a;">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted);">
             <div style="width:10px;height:10px;border-radius:50%;background:#26C6B0;"></div>Manager Take
           </div>
         </div>
-        <div style="padding:8px 14px 24px;">
-          <canvas id="prod-chart-canvas" height="160" style="width:100%;display:block;"></canvas>
-        </div>
+        <canvas id="prod-chart-canvas" height="160" style="width:100%;display:block;"></canvas>
       </div>
 
-      <div class="nd-links-card">
-        <div class="nd-card-hdr">
-          <div><div class="nd-card-title">This Week's Links</div><div class="nd-card-sub">Updated weekly</div></div>
-        </div>
+      <!-- This Week's Links — each as its own card -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;padding:4px 0 2px;">This Week's Links</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:2px;">Updated weekly</div>
+
         ${latestPay
-          ?`<a href="${esc(latestPay.url)}" target="_blank" class="nd-link-row">
-              <div class="nd-link-icon" style="background:#E8F1FF;color:#2979FF;">${ICO.pay}</div>
-              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub" id="pay-link-sub"></div></div>
-              <div class="nd-link-arrow">${ICO.chevron}</div>
+          ?`<a href="${esc(latestPay.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 14px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05)'">
+              <div style="width:34px;height:34px;border-radius:8px;background:#E8F1FF;color:#2979FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.pay}</div>
+              <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);">Pay Report</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">${fmtReportDate(latestPay.week)}</div></div>
+              <div style="color:var(--muted);">${ICO.chev}</div>
             </a>`
-          :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
-              <div class="nd-link-icon" style="background:#f0f4f5;color:#a0b0ba;">${ICO.pay}</div>
-              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub">Not uploaded yet</div></div>
+          :`<div style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 1px 3px rgba(0,0,0,.04);opacity:.55;">
+              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.pay}</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--muted);">Pay Report</div><div style="font-size:11px;color:var(--subtle);">Not uploaded yet</div></div>
             </div>`}
+
         ${latestPlanner
-          ?`<a href="${esc(latestPlanner.url)}" target="_blank" class="nd-link-row">
-              <div class="nd-link-icon" style="background:#FFF4E0;color:#FFA800;">${ICO.cal}</div>
-              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">${latestPlanner.campaign?esc(latestPlanner.campaign):''}</div></div>
-              <div class="nd-link-arrow">${ICO.chevron}</div>
+          ?`<a href="${esc(latestPlanner.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 14px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05)'">
+              <div style="width:34px;height:34px;border-radius:8px;background:#FFF4E0;color:#FFA800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.cal}</div>
+              <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);">Daily Planner</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">${esc(latestPlanner.campaign||'')}</div></div>
+              <div style="color:var(--muted);">${ICO.chev}</div>
             </a>`
-          :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
-              <div class="nd-link-icon" style="background:#f0f4f5;color:#a0b0ba;">${ICO.cal}</div>
-              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">Not uploaded yet</div></div>
+          :`<div style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 1px 3px rgba(0,0,0,.04);opacity:.55;">
+              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.cal}</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--muted);">Daily Planner</div><div style="font-size:11px;color:var(--subtle);">Not uploaded yet</div></div>
             </div>`}
+
         ${latestProlog
-          ?`<a href="${esc(latestProlog.url)}" target="_blank" class="nd-link-row">
-              <div class="nd-link-icon" style="background:#E0F7F4;color:#00BFA5;">${ICO.doc}</div>
-              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">${latestProlog.campaign?esc(latestProlog.campaign):''}</div></div>
-              <div class="nd-link-arrow">${ICO.chevron}</div>
+          ?`<a href="${esc(latestProlog.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 14px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05)'">
+              <div style="width:34px;height:34px;border-radius:8px;background:#E0F7F4;color:#00BFA5;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.doc}</div>
+              <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);">Pro-log</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">${esc(latestProlog.campaign||'')}</div></div>
+              <div style="color:var(--muted);">${ICO.chev}</div>
             </a>`
-          :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
-              <div class="nd-link-icon" style="background:#f0f4f5;color:#a0b0ba;">${ICO.doc}</div>
-              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">Not uploaded yet</div></div>
+          :`<div style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 1px 3px rgba(0,0,0,.04);opacity:.55;">
+              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.doc}</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--muted);">Pro-log</div><div style="font-size:11px;color:var(--subtle);">Not uploaded yet</div></div>
             </div>`}
-        ${isThisWeekPay?`<div style="margin:8px 12px;background:#fffbeb;border:1px solid rgba(217,119,6,.18);border-radius:4px;padding:7px 11px;font-size:11px;color:#b45309;display:flex;align-items:center;gap:6px;">${ICO.info} Advise changes by 11am Friday</div>`:''}
-        ${latestPay?`<div style="padding:8px 14px 12px;"><button class="ack-btn ${ackDone?'done':''}" id="ack-btn" onclick="acknowledgeReport()" style="font-size:11px;padding:5px 12px;">${ackDone?'Acknowledged &#10003;':'Mark as reviewed'}</button></div>`:''}
+
+        ${isThisWeekPay?`<div style="background:#FFFBEB;border-radius:8px;padding:9px 13px;font-size:11px;color:#B45309;font-weight:500;">⚠ Review pay report &amp; flag changes by 11am Friday</div>`:''}
+        ${latestPay?`<button class="ack-btn ${ackDone?'done':''}" id="ack-btn" onclick="acknowledgeReport()" style="font-size:11px;padding:7px 14px;border-radius:20px;align-self:flex-start;">${ackDone?'Acknowledged ✓':'Mark as reviewed'}</button>`:''}
+      </div>
+
+      <!-- Mini Calendar -->
+      <div style="background:#fff;border-radius:10px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);">${MONTHS[mM]} ${mY}</div>
+          <button onclick="switchTab('calendar')" style="background:none;border:none;font-family:var(--font);font-size:11px;font-weight:600;color:#0f766e;cursor:pointer;padding:0;">Full calendar →</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">
+          ${calGrid}
+        </div>
       </div>
     </div>
 
+    <!-- ROW 3: Leaderboard (left) + Agents (right) -->
     <div style="display:grid;grid-template-columns:1fr 268px;gap:14px;">
-      <div class="nd-lb-card">
-        <div class="nd-card-hdr">
-          <div><div class="nd-card-title">Top Agents</div><div class="nd-card-sub">National leaderboard — this week</div></div>
-          <button onclick="switchTab('leaderboard');setTimeout(lbInit,50);" style="background:#0f766e;color:#fff;border:none;font-family:var(--font);font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;cursor:pointer;letter-spacing:.04em;flex-shrink:0;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Full Board</button>
+
+      <!-- Top Agents leaderboard -->
+      <div style="background:#fff;border-radius:10px;padding:22px 24px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div>
+            <div style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.02em;">Top Agents</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;">National leaderboard — this week</div>
+          </div>
+          <button onclick="switchTab('leaderboard');setTimeout(lbInit,50);" style="background:#0f766e;color:#fff;border:none;font-family:var(--font);font-size:11px;font-weight:700;padding:7px 16px;border-radius:20px;cursor:pointer;letter-spacing:.04em;transition:opacity .15s;" onmouseover="this.style.opacity='.82'" onmouseout="this.style.opacity='1'">Full Board</button>
         </div>
-        ${lbSnap.length
-          ?lbSnap.map((r,i)=>{
-              const score=(typeof lbNum!=='undefined')?lbNum(r['Week Total']):(Number(r['Week Total'])||0);
-              const medals=['🥇','🥈','🥉'];
-              const rankHtml=i<3?`<div class="nd-rank-badge nd-rank-${i+1}" style="font-size:15px;">${medals[i]}</div>`:`<div class="nd-rank-badge nd-rank-n">${i+1}</div>`;
-              return `<div class="nd-lb-row">${rankHtml}<div style="min-width:0;"><div class="nd-lb-name">${esc(r.Agent)}</div><div class="nd-lb-camp">${esc(r.Campaign||'—')}</div></div><div class="nd-lb-score">${score.toLocaleString()}</div></div>`;
-            }).join('')
-          :`<div style="padding:28px 18px;text-align:center;">
-              <div style="color:var(--niond-muted,#6b7d8a);font-size:13px;margin-bottom:12px;">Leaderboard loads when you visit the full board</div>
-              <button onclick="switchTab('leaderboard');setTimeout(lbInit,50);" style="background:none;border:1px solid #e8ecee;color:#0f766e;font-family:var(--font);font-size:12px;font-weight:600;padding:8px 18px;border-radius:20px;cursor:pointer;">Load Leaderboard</button>
+        ${lbSnap.length?`
+          <div style="display:grid;grid-template-columns:40px 1fr 60px 80px;gap:0;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px;">
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;">#</div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;">Agent</div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;">Campaign</div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;text-align:right;">Score</div>
+          </div>
+          ${lbSnap.map((r,i)=>{
+            const score=(typeof lbNum!=='undefined')?lbNum(r['Week Total']):(Number(r['Week Total'])||0);
+            const medals=['🥇','🥈','🥉'];
+            const rankHtml=i<3?`<div style="font-size:16px;width:28px;text-align:center;">${medals[i]}</div>`:`<div style="width:28px;height:28px;background:var(--surface2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);">${i+1}</div>`;
+            return`<div style="display:grid;grid-template-columns:40px 1fr 60px 80px;gap:0;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;">
+              ${rankHtml}
+              <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.Agent)}</div>
+              <div style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.Campaign||'—')}</div>
+              <div style="font-size:15px;font-weight:800;color:#0f766e;text-align:right;letter-spacing:-.02em;">${score.toLocaleString()}</div>
+            </div>`;
+          }).join('')}`
+          :`<div style="padding:24px 0;text-align:center;">
+              <div style="color:var(--muted);font-size:13px;margin-bottom:12px;">Loads when you open the full board</div>
+              <button onclick="switchTab('leaderboard');setTimeout(lbInit,50);" style="background:none;border:1px solid var(--border2);color:#0f766e;font-family:var(--font);font-size:12px;font-weight:600;padding:8px 18px;border-radius:20px;cursor:pointer;">Load Leaderboard</button>
             </div>`}
       </div>
 
-      <div class="nd-reps-card">
-        <div class="nd-card-hdr">
-          <div><div class="nd-card-title">Agents</div><div class="nd-card-sub">${active.length} active · ${leavers.length} leaver${leavers.length!==1?'s':''}</div></div>
+      <!-- Agents snapshot -->
+      <div style="background:#fff;border-radius:10px;padding:22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;flex-direction:column;">
+        <div style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:4px;">Agents</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">${active.length} active · ${leavers.length} leaver${leavers.length!==1?'s':''}</div>
+        <div style="display:flex;flex-direction:column;gap:0;flex:1;">
+          ${repSnap.length?repSnap.map(r=>{
+            const c=ndC(r.position||'default');
+            const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+            const fi=r.flag?FLAGS.find(f=>f.id===r.flag):null;
+            return`<div onclick="switchTab('reps')" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .12s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
+              <div style="width:34px;height:34px;border-radius:50%;background:${c.f};color:${c.t};border:1.5px solid ${c.s}20;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${ini}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.name)}</div>
+                <div style="font-size:11px;color:var(--muted);">${esc(r.position||'—')}</div>
+              </div>
+              ${fi?`<div style="width:6px;height:6px;border-radius:50%;background:${fi.color};flex-shrink:0;"></div>`:''}
+              <div style="color:var(--subtle);">${ICO.chev}</div>
+            </div>`;
+          }).join(''):`<div style="padding:16px 0;color:var(--muted);font-size:13px;">No reps yet.</div>`}
         </div>
-        ${repSnap.length
-          ?repSnap.map(r=>{
-              const c=ndC(r.position||'default');
-              const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-              const fi=r.flag?FLAGS.find(f=>f.id===r.flag):null;
-              return `<div class="nd-rep-row" onclick="switchTab('reps')">
-                <div class="nd-rep-av" style="background:${c.f};color:${c.t};border:1px solid ${c.s};">${ini}</div>
-                <div style="min-width:0;flex:1;"><div class="nd-rep-name">${esc(r.name)}</div><div class="nd-rep-pos">${esc(r.position||'—')}</div></div>
-                ${fi?`<div class="nd-rep-flag" style="background:${fi.color};" title="${esc(fi.label)}"></div>`:''}
-              </div>`;
-            }).join('')
-          :`<div style="padding:18px 16px;color:#6b7d8a;font-size:13px;">No reps yet.</div>`}
-        <button class="nd-view-all-btn" onclick="switchTab('reps')">${ICO.reps} View all ${active.length} reps</button>
+        <button onclick="switchTab('reps')" style="margin-top:14px;background:#F0E8FE;border:none;color:#8533F5;font-family:var(--font);font-size:12px;font-weight:700;padding:10px;border-radius:8px;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.background='#E4D4FC'" onmouseout="this.style.background='#F0E8FE'">${ICO.reps} View all ${active.length} reps</button>
       </div>
     </div>
   `;
 
-  // Draw production chart on canvas
-  window.wireByWeekGlobal=wireByWeek;
-  // Use a short delay to ensure the canvas container has been laid out
-  setTimeout(()=>drawProdChart(wireByWeek),50);
+  setTimeout(()=>drawProdChart(wireByWeek),60);
 
   if(typeof lbRows!=='undefined'&&!lbLoaded){
     lbInit().then(()=>renderHome()).catch(()=>{});
   }
 }
+
 
 function drawProdChart(wireByWeek){
   const canvas=document.getElementById('prod-chart-canvas');
