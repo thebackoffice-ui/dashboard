@@ -719,11 +719,11 @@ function handleProfilePic(input){
 }
 
 // ── State ──────────────────────────────────────────────
-let roster=[],weekLeavers=new Set(),allReports=[],weekSubmitted=false,calEvents=[],announcement=null,notes='',lastWeekCount=0,ackDone=false,savedReviews=[];
+let roster=[],weekLeavers=new Set(),allReports=[],weekSubmitted=false,calEvents=[],announcement=null,notes='',lastWeekCount=0,ackDone=false,savedReviews=[],allPayData=[];
 
 async function loadAll(){
   try{
-    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes]=await Promise.all([
+    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes,pdRes]=await Promise.all([
       api({action:'getRoster',manager:managerName}),
       api({action:'getSubmission',manager:managerName,week:weekKey}),
       api({action:'loadMap',manager:managerName}),
@@ -731,7 +731,8 @@ async function loadAll(){
       api({action:'getCalEvents',manager:managerName}),
       api({action:'getAnnouncement'}),
       api({action:'getNotes',manager:managerName}),
-      api({action:'getLastWeekCount',manager:managerName,currentWeek:weekKey})
+      api({action:'getLastWeekCount',manager:managerName,currentWeek:weekKey}),
+      api({action:'getPayData',manager:managerName})
     ]);
     if(rRes.roster)roster=rRes.roster;
     if(sRes.rows&&sRes.rows.length){weekSubmitted=true;document.getElementById('banner-done').style.display='block';weekLeavers=new Set(sRes.rows.filter(r=>r.leaver).map(r=>r.id).filter(Boolean));}
@@ -742,6 +743,7 @@ async function loadAll(){
     if(notesRes.notes!==undefined)notes=notesRes.notes||'';
     if(prevRes.count!==undefined)lastWeekCount=prevRes.count;
     if(sRes.acked)ackDone=true;
+    if(pdRes.payData)allPayData=pdRes.payData;
     // Load saved reviews from localStorage
     try{savedReviews=JSON.parse(localStorage.getItem('tt_reviews_'+managerName)||'[]');}catch(e){savedReviews=[];}
     renderAll();
@@ -1011,9 +1013,125 @@ function switchReportTab(tab){
   document.querySelectorAll('.rtab-btn').forEach((b,i)=>{const tabs=['pay','planner','prolog'];b.classList.toggle('active',tabs[i]===tab);});
   document.querySelectorAll('.rtab-panel').forEach(p=>p.classList.toggle('active',p.id===`rtab-${tab}`));
 }
+
+function getPayDataForWeek(week){
+  // First check if report itself has officeWire/mgrTake
+  const rep=allReports.find(r=>r.type==='Pay Report'&&r.week===week);
+  const fromReport={officeWire:rep?.officeWire||'',mgrTake:rep?.mgrTake||''};
+  // Then check if manager has saved edits
+  const saved=allPayData.find(p=>p.week===week);
+  return{
+    officeWire: saved?.officeWire!==undefined&&saved.officeWire!=='' ? saved.officeWire : fromReport.officeWire,
+    mgrTake: saved?.mgrTake!==undefined&&saved.mgrTake!=='' ? saved.mgrTake : fromReport.mgrTake
+  };
+}
+
+async function savePayDataForWeek(week){
+  const wire=document.getElementById(`pd-wire-${week}`)?.value||'';
+  const take=document.getElementById(`pd-take-${week}`)?.value||'';
+  const btn=document.getElementById(`pd-save-${week}`);
+  if(btn){btn.textContent='Saving…';btn.disabled=true;}
+  try{
+    await api({action:'savePayData',manager:managerName,week,officeWire:wire,mgrTake:take});
+    // update local cache
+    const existing=allPayData.find(p=>p.week===week);
+    if(existing){existing.officeWire=wire;existing.mgrTake=take;}
+    else allPayData.push({week,officeWire:wire,mgrTake:take});
+    showToast('Production data saved ✓','success');
+    if(btn){btn.textContent='Saved ✓';btn.style.background='var(--success)';setTimeout(()=>{btn.textContent='Save';btn.style.background='';btn.disabled=false;},2000);}
+    renderReports();
+  }catch(e){
+    showToast('Save failed','error');
+    if(btn){btn.textContent='Save';btn.disabled=false;}
+  }
+}
+
+function buildPayProductionCard(week){
+  const pd=getPayDataForWeek(week);
+  const isCurrentWeek=week===weekKey;
+  const wire=parseFloat(pd.officeWire)||0;
+  const take=parseFloat(pd.mgrTake)||0;
+  const pct=wire>0?Math.round((take/wire)*100):null;
+  const safeW=week.replace(/[^0-9-]/g,'');
+  return`<div style="background:linear-gradient(135deg,rgba(13,115,119,.06),rgba(13,115,119,.02));border:1px solid var(--accent-border);border-radius:var(--rlg);padding:18px 20px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">💰</span>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);">Production Overview</div>
+          <div style="font-size:12px;color:var(--muted);">${formatWeek(week)}${isCurrentWeek?' · <span style="color:var(--warning);font-weight:600;">This Week</span>':''}</div>
+        </div>
+      </div>
+      ${wire>0||take>0?`<div style="text-align:right;"><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Your take</div><div style="font-size:22px;font-weight:800;color:var(--accent);">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div></div>`:''}
+    </div>
+    ${wire>0||take>0?`
+    <div style="display:grid;grid-template-columns:1fr 1fr${pct!==null?' 1fr':''}; gap:10px;margin-bottom:16px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Office Wire</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);">£${wire>0?wire.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Total profit</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Manager's Take</div>
+        <div style="font-size:20px;font-weight:700;color:var(--accent);">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Your earnings</div>
+      </div>
+      ${pct!==null?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Take %</div>
+        <div style="font-size:20px;font-weight:700;color:var(--success);">${pct}%</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">of office wire</div>
+      </div>`:''}
+    </div>
+    ${wire>0?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:8px 12px;margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;">Wire breakdown</div>
+      <div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${Math.min(pct||0,100)}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .4s;"></div>
+      </div>
+    </div>`:''}
+    `:'<div style="font-size:13px;color:var(--subtle);margin-bottom:14px;">No production figures uploaded for this week yet.</div>'}
+    <!-- Editable fields -->
+    <details style="margin-top:4px;">
+      <summary style="font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;">
+        <span style="font-size:14px;">✏️</span> Edit / update figures
+      </summary>
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Office Wire £</div>
+          <input id="pd-wire-${safeW}" type="number" min="0" step="0.01" value="${pd.officeWire}" placeholder="0.00" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 11px;border-radius:var(--rsm);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" />
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Manager's Take £</div>
+          <input id="pd-take-${safeW}" type="number" min="0" step="0.01" value="${pd.mgrTake}" placeholder="0.00" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 11px;border-radius:var(--rsm);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" />
+        </div>
+      </div>
+      <button id="pd-save-${safeW}" onclick="savePayDataForWeek('${week}')" style="margin-top:10px;background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:8px 20px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;">Save</button>
+    </details>
+  </div>`;
+}
+
 function renderReports(){
   const iconMap={'Pay Report':'📊','Pro-log':'📋','Daily Planner':'📅'};
   const tcMap={'Pay Report':'rt-pay','Pro-log':'rt-prolog','Daily Planner':'rt-planner'};
+  // Pay reports list — with production card
+  const payEl=document.getElementById('pay-reports-list');
+  const payReports=allReports.filter(r=>r.type==='Pay Report');
+  if(!payReports.length){
+    payEl.innerHTML='<div class="empty-state"><strong>None yet</strong>Will appear here when uploaded.</div>';
+  } else {
+    const byW={};payReports.forEach(r=>{if(!byW[r.week])byW[r.week]=[];byW[r.week].push(r);});
+    const weeks=Object.keys(byW).sort((a,b)=>b.localeCompare(a));
+    payEl.innerHTML=weeks.map(w=>{
+      const isNow=w===weekKey;
+      return`<div class="wk-hdr">${formatWeek(w)}${isNow?'<span class="now-badge">THIS WEEK</span>':''}</div>
+      ${buildPayProductionCard(w)}
+      ${byW[w].map(r=>`<div class="rh-row">
+        <span style="font-size:18px;">📊</span>
+        <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">Pay Report${r.campaign?` — ${esc(r.campaign)}`:''}</div>${isNow?`<div style="font-size:11px;color:var(--warning);margin-top:1px;">⚠ Review and let Elle know before 11am Friday</div>`:''}</div>
+        <span class="rtype-badge rt-pay">Pay Report</span>
+        <a href="${esc(r.url)}" target="_blank" class="view-btn ghost">View ↗</a>
+      </div>`).join('')}`;
+    }).join('');
+  }
   function renderList(reports,elId){
     const el=document.getElementById(elId);
     if(!reports.length){el.innerHTML='<div class="empty-state"><strong>None yet</strong>Will appear here when uploaded.</div>';return;}
@@ -1030,7 +1148,6 @@ function renderReports(){
       </div>`).join('')}`;
     }).join('');
   }
-  renderList(allReports.filter(r=>r.type==='Pay Report'),'pay-reports-list');
   renderList(allReports.filter(r=>r.type==='Daily Planner'),'planner-reports-list');
   renderList(allReports.filter(r=>r.type==='Pro-log'),'prolog-reports-list');
 }
