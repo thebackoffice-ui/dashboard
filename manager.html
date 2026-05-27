@@ -752,15 +752,9 @@ function fmtReportDate(k){
   if(p.length!==3)return k;
   const yr=parseInt(p[0],10),mo=parseInt(p[1],10),dy=parseInt(p[2],10);
   if(isNaN(yr)||isNaN(mo)||isNaN(dy)||mo<1||mo>12||dy<1||dy>31)return k;
-  // Compute day-of-week from the numbers directly (Zeller-style), no Date constructor
-  // Use UTC to avoid any timezone shift
-  const dt=new Date(Date.UTC(yr,mo-1,dy));
-  if(isNaN(dt.getTime()))return k;
-  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const dow=dt.getUTCDay();
   const sfx=dy===1||dy===21||dy===31?'st':dy===2||dy===22?'nd':dy===3||dy===23?'rd':'th';
-  return days[dow]+' '+dy+sfx+' '+months[mo-1]+' '+yr;
+  return dy+sfx+' '+months[mo-1]+' '+yr;
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 

@@ -841,15 +841,14 @@ function formatWeek(key) {
 }
 function fmtReportDate(key) {
   if(!key||typeof key!=='string')return'—';
-  const p=key.split('-');
+  const raw=key.trim().split('T')[0];
+  const p=raw.split('-');
   if(p.length!==3)return key;
-  const d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
-  if(isNaN(d))return key;
-  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const yr=parseInt(p[0],10),mo=parseInt(p[1],10),dy=parseInt(p[2],10);
+  if(isNaN(yr)||isNaN(mo)||isNaN(dy)||mo<1||mo>12||dy<1||dy>31)return key;
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const day=d.getDate();
-  const sfx=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
-  return days[d.getDay()]+' '+day+sfx+' '+months[d.getMonth()]+' '+d.getFullYear();
+  const sfx=dy===1||dy===21||dy===31?'st':dy===2||dy===22?'nd':dy===3||dy===23?'rd':'th';
+  return dy+sfx+' '+months[mo-1]+' '+yr;
 }
 const currentWeek = getWeekKey(new Date());
 
@@ -862,12 +861,12 @@ window.onload = () => {
   renderLinks();
   // Init calendar date
   const calInp=document.getElementById('cal-date');
-  if(calInp){ const t=new Date(); calInp.value=t.toISOString().split('T')[0]; }
-  // Init upload week
-  const d=new Date(); d.setHours(0,0,0,0);
+  if(calInp){const t=new Date();const cy=t.getFullYear(),cm=String(t.getMonth()+1).padStart(2,'0'),cd=String(t.getDate()).padStart(2,'0');calInp.value=cy+'-'+cm+'-'+cd;}
+  // Init upload week — use local date parts to avoid UTC timezone shift
+  const d=new Date();
   d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
   const inp=document.getElementById('ul-week');
-  if(inp) inp.value=d.toISOString().split('T')[0];
+  if(inp){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');inp.value=y+'-'+m+'-'+dy;}
 };
 
 async function loadAll() {
