@@ -977,43 +977,43 @@ function renderHome(){
 
   document.getElementById('home-grid').innerHTML=`
 
-    <!-- ROW 1: Stat tiles -->
+    <!-- ROW 1: Stat tiles — solid colour blocks -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
 
-      <div style="background:#fff;border-radius:10px;padding:20px 22px;cursor:default;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid #5C9DFF;">
-        <div style="font-size:11px;font-weight:700;color:#5C9DFF;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Active Reps</div>
-        <div style="font-size:34px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1;">${active.length}</div>
-        <div style="font-size:11px;font-weight:600;color:${delta>0?'#00BFA5':delta<0?'#EF4444':'#94A3B8'};margin-top:8px;display:flex;align-items:center;gap:3px;">${delta>0?'▲ +'+delta+' from last week':delta<0?'▼ '+delta+' from last week':'— Same as last week'}</div>
-        <div style="position:absolute;right:16px;top:18px;width:36px;height:36px;background:#EEF5FF;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#5C9DFF;">${ICO.users}</div>
+      <div style="background:#5C9DFF;border-radius:10px;padding:20px 22px;cursor:default;position:relative;overflow:hidden;">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.75);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Active Reps</div>
+        <div style="font-size:34px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1;">${active.length}</div>
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.8);margin-top:8px;">${delta>0?'▲ +'+delta+' from last week':delta<0?'▼ '+delta+' from last week':'— Same as last week'}</div>
+        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${ICO.users.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
 
-      <div style="background:#fff;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid #FFA800;">
-        <div style="font-size:11px;font-weight:700;color:#FFA800;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Flagged</div>
-        <div style="font-size:34px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1;">${flagged.length}</div>
-        <div style="font-size:11px;font-weight:600;color:#94A3B8;margin-top:8px;">${leavers.length} leaver${leavers.length!==1?'s':''}</div>
-        <div style="position:absolute;right:16px;top:18px;width:36px;height:36px;background:#FFF4E0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#FFA800;">${ICO.warn}</div>
+      <div style="background:#FFA800;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.75);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Flagged</div>
+        <div style="font-size:34px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1;">${flagged.length}</div>
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.8);margin-top:8px;">${leavers.length} leaver${leavers.length!==1?'s':''}</div>
+        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${ICO.warn.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
 
-      <div style="background:#fff;border-radius:10px;padding:20px 22px;cursor:${weekSubmitted?'default':'pointer'};position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid ${weekSubmitted?'#00BFA5':'#FFA800'};" onclick="${weekSubmitted?'':String.raw`switchTab('weekly')`}">
-        <div style="font-size:11px;font-weight:700;color:${weekSubmitted?'#00BFA5':'#FFA800'};margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Weekly Update</div>
-        <div style="font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1.1;">${weekSubmitted?'Submitted':'Pending'}</div>
-        <div style="font-size:11px;font-weight:600;color:${weekSubmitted?'#00BFA5':'#FFA800'};margin-top:8px;">${weekSubmitted?'Done for this week':'Tap to submit'}</div>
-        <div style="position:absolute;right:16px;top:18px;width:36px;height:36px;background:${weekSubmitted?'#E0F7F4':'#FFF4E0'};border-radius:8px;display:flex;align-items:center;justify-content:center;color:${weekSubmitted?'#00BFA5':'#FFA800'};">${weekSubmitted?ICO.check:ICO.clock}</div>
+      <div style="background:${weekSubmitted?'#00BFA5':'#FF6F00'};border-radius:10px;padding:20px 22px;cursor:${weekSubmitted?'default':'pointer'};position:relative;overflow:hidden;" onclick="${weekSubmitted?'':String.raw`switchTab('weekly')`}">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.75);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Weekly Update</div>
+        <div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.1;">${weekSubmitted?'Submitted':'Pending'}</div>
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.8);margin-top:8px;">${weekSubmitted?'Done for this week':'Tap to submit'}</div>
+        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${(weekSubmitted?ICO.check:ICO.clock).replace(/width="1[68]"/,'width="56"').replace(/height="1[68]"/,'height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
 
-      <div style="background:#fff;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid #8533F5;">
-        <div style="font-size:11px;font-weight:700;color:#8533F5;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Latest Wire</div>
-        <div style="font-size:34px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1;">${curWire?'£'+curWire.toLocaleString('en-GB'):'—'}</div>
-        ${wireDiffHtml}
-        <div style="position:absolute;right:16px;top:18px;width:36px;height:36px;background:#F0E8FE;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8533F5;">${ICO.pound}</div>
+      <div style="background:#8533F5;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.75);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Latest Wire</div>
+        <div style="font-size:34px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1;">${curWire?'£'+curWire.toLocaleString('en-GB'):'—'}</div>
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.8);margin-top:8px;">${prevWire?((wireDiff>=0?'▲ ':'▼ ')+'£'+Math.abs(wireDiff).toLocaleString('en-GB')+' vs prev week'):'&nbsp;'}</div>
+        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${ICO.pound.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
     </div>
 
     <!-- ROW 2: Chart (left) + Links (centre-right) + Calendar (far right) -->
-    <div style="display:grid;grid-template-columns:1fr 230px 240px;gap:14px;margin-bottom:20px;align-items:stretch;">
+    <div style="display:grid;grid-template-columns:1fr 220px 260px;gap:14px;margin-bottom:20px;align-items:start;">
 
       <!-- Production History -->
-      <div style="background:#fff;border-radius:10px;padding:22px 24px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;flex-direction:column;">
+      <div style="background:#fff;border-radius:10px;padding:22px 24px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
           <div>
             <div style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.02em;">Production History</div>
@@ -1029,13 +1029,13 @@ function renderHome(){
             <div style="width:10px;height:10px;border-radius:50%;background:#26C6B0;"></div>Manager Take
           </div>
         </div>
-        <canvas id="prod-chart-canvas" style="width:100%;display:block;flex:1;min-height:160px;"></canvas>
+        <canvas id="prod-chart-canvas" height="180" style="width:100%;display:block;"></canvas>
       </div>
 
       <!-- This Week's Links — each as its own card -->
-      <div style="display:flex;flex-direction:column;gap:10px;background:#fff;border-radius:10px;padding:20px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
-        <div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:2px;">This Week's Links</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Updated weekly</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;padding:0 2px 4px;">This Week's Links</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;padding:0 2px;">Updated weekly</div>
 
         ${latestPay
           ?`<a href="${esc(latestPay.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 14px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05)'">
