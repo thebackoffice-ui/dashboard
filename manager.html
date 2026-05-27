@@ -533,25 +533,19 @@ select.field-input{cursor:pointer;appearance:none;}
 .rpt-search-input:focus{border-color:var(--accent);width:240px;}
 .rpt-search-input::placeholder{color:var(--subtle);}
 
-/* ── REPORTS SUMMARY STRIP — softer SaaS stat tiles ── */
-.rpt-summary{display:grid;gap:12px;margin-bottom:22px;}
+/* ── REPORTS SUMMARY STRIP — clean stat tiles matching dashboard ── */
+.rpt-summary{display:grid;gap:10px;margin-bottom:22px;}
 .rpt-summary.pay-grid{grid-template-columns:repeat(4,1fr);}
 .rpt-summary.basic-grid{grid-template-columns:repeat(3,1fr);}
-.rpt-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;box-shadow:var(--s1);transition:box-shadow .15s;}
-.rpt-stat:hover{box-shadow:var(--s2);}
-.rpt-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:10px 10px 0 0;}
-.rpt-stat-val{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1;margin-top:4px;}
-.rpt-stat-lbl{font-size:11px;color:var(--muted);margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;}
-.rpt-stat.teal-stat{background:var(--surface);border-top:none;}
-.rpt-stat.teal-stat::before{background:linear-gradient(90deg,#0f766e,#14b8a6);}
+.rpt-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--niond-r);padding:16px 18px;box-shadow:var(--niond-shadow);transition:box-shadow .15s;}
+.rpt-stat:hover{box-shadow:var(--niond-shadow-md);}
+.rpt-stat-val{font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--niond-text);line-height:1.1;}
+.rpt-stat-lbl{font-size:11px;color:var(--niond-muted);margin-top:5px;font-weight:500;}
 .rpt-stat.teal-stat .rpt-stat-val{color:var(--accent);}
-.rpt-stat.teal-stat .rpt-stat-lbl{color:var(--muted);}
 [data-theme="dark"] .rpt-stat{background:var(--surface);border:1px solid var(--border);}
 [data-theme="dark"] .rpt-stat .rpt-stat-val{color:var(--text);}
 [data-theme="dark"] .rpt-stat .rpt-stat-lbl{color:var(--muted);}
-[data-theme="dark"] .rpt-stat.teal-stat{background:var(--surface);border-color:var(--border);}
 [data-theme="dark"] .rpt-stat.teal-stat .rpt-stat-val{color:var(--accent);}
-[data-theme="dark"] .rpt-stat.teal-stat .rpt-stat-lbl{color:var(--muted);}
 
 /* ── MONTH ACCORDION — white cards matching dashboard ── */
 .month-accordion{margin-bottom:10px;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05);}
@@ -1877,15 +1871,15 @@ function buildPayProductionCard(week){
     </div>
     ${wire>0||take>0?`
     <div style="display:grid;grid-template-columns:1fr 1fr${pct!==null?' 1fr':''}; gap:10px;margin-bottom:${wire>0?'14px':'4px'};">
-      <div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:8px;padding:12px 14px;text-align:center;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;">
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Office Wire</div>
         <div style="font-size:18px;font-weight:800;color:var(--text);">£${wire>0?wire.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:8px;padding:12px 14px;text-align:center;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;">
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Manager's Take</div>
         <div style="font-size:18px;font-weight:800;color:var(--text);">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
-      ${pct!==null?`<div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent2);border-radius:8px;padding:12px 14px;text-align:center;">
+      ${pct!==null?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;">
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Take %</div>
         <div style="font-size:18px;font-weight:800;color:var(--accent);">${pct}%</div>
       </div>`:''}
