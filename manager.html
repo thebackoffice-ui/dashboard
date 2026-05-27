@@ -432,11 +432,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 /* ── REP CARDS ── */
 .rep-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
 .rep-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--s1);transition:border-color .15s;}
+.leaver-quick-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.leaver-quick-btn:hover,.leaver-quick-btn.active{border-color:var(--warning);color:var(--warning);background:var(--warning-soft);}
 .rep-card.is-leaver{border-left:3px solid var(--warning);opacity:.65;}
 .rep-card-head{display:flex;align-items:center;padding:11px 14px;gap:10px;cursor:pointer;user-select:none;}
-.leaver-quick-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
-.leaver-quick-btn:hover{border-color:var(--warning);color:var(--warning);background:var(--warning-soft);}
-.leaver-quick-btn.active{border-color:var(--warning);color:var(--warning);background:var(--warning-soft);}
 .rep-info{flex:1;min-width:0;}
 .rep-name{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .rep-meta{font-size:11px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:2px;}
@@ -484,6 +483,19 @@ select.field-input{cursor:pointer;appearance:none;}
 .flag-Watch{color:#0d6b61;background:rgba(124,58,237,.09);border-color:rgba(124,58,237,.18);}
 
 /* ── WEEKLY UPDATE ── */
+.week-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.week-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--s1);}
+.week-row.is-leaver{opacity:.5;border-style:dashed;}
+.week-row-info{flex:1;min-width:0;}
+.week-row-name{font-weight:500;font-size:13px;}
+.week-row-sub{font-size:11px;color:var(--muted);}
+.leaver-toggle{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.leaver-toggle:hover,.week-row.is-leaver .leaver-toggle{border-color:var(--warning);color:var(--warning);background:var(--warning-soft);}
+.banner-ok{background:var(--success-soft);border:1px solid rgba(22,163,74,.2);border-left:3px solid var(--success);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--muted);}
+.banner-ok strong{color:var(--success);display:block;font-weight:600;margin-bottom:1px;}
+.submit-wrap{margin-top:20px;border-top:1px solid var(--border);padding-top:18px;}
+.submit-btn{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:500;padding:12px;border-radius:var(--r);cursor:pointer;width:100%;transition:opacity .15s;}
+.submit-btn:hover{opacity:.88;}.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
 
 /* ── REPORTS TABS ── */
 .report-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
@@ -571,9 +583,6 @@ select.wr-input{cursor:pointer;appearance:none;}
 .wr-rep-card{background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:12px 10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;user-select:none;text-align:center;}
 .wr-rep-card:hover{border-color:var(--accent-border);background:var(--surface2);}
 .wr-rep-card.selected{border-color:#0f766e;background:var(--surface2);box-shadow:0 0 0 2px #0f766e;}
-.wr-rep-card[data-pos]{background:var(--surface2) !important;color:var(--text) !important;border-color:var(--border) !important;}
-.wr-rep-card[data-pos]:hover{border-color:var(--accent-border) !important;}
-.wr-rep-card.selected[data-pos]{border-color:#0f766e !important;box-shadow:0 0 0 2px #0f766e !important;}
 .wr-rep-card-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2;}
 .wr-rep-card-pos{font-size:10px;font-weight:600;margin-top:1px;}
 .wr-rep-card .pos-tag{background:transparent !important;border-color:transparent !important;padding-left:0;padding-right:0;}
@@ -807,6 +816,96 @@ setTimeout(applyPositionClasses,200);
 document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses,400));
 
 </script>
+
+<!-- LOGIN -->
+<div id="login-screen" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">The <span>Back Office</span></div>
+    <div class="login-title">Welcome back 👋</div>
+    <div class="login-sub" id="login-sub">Sign in to your dashboard</div>
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input class="login-input" id="login-pw" type="password" placeholder="Enter your password" />
+    </div>
+    <button class="login-btn" id="login-btn">Sign in</button>
+    <div class="login-err" id="login-err">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-shell" class="app-shell" style="display:none;">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-header"><span class="sidebar-logo">The <span>Back Office</span></span></div>
+    <div class="sidebar-mgr">
+      <div class="profile-upload-wrap">
+        <div class="sidebar-avatar" id="sb-avatar">?</div>
+        <label class="profile-upload-btn" title="Upload profile picture" for="profile-pic-input">✎</label>
+        <input type="file" id="profile-pic-input" accept="image/*" style="display:none;" onchange="handleProfilePic(this)"/>
+      </div>
+      <div class="sidebar-name" id="sb-name">—</div>
+      <div class="sidebar-week" id="sb-week">—</div>
+    </div>
+    <div class="sidebar-nav">
+      <button class="nav-item active" onclick="switchTab('home')" id="nav-home"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9.5L10 3l7 6.5V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke-linejoin="round"/><path d="M7 19V12h6v7" stroke-linejoin="round"/></svg></span>Home</button>
+      <button class="nav-item" onclick="switchTab('reps')" id="nav-reps"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path d="M4 17a7 7 0 0 1 12 0" stroke-linecap="round"/></svg></span>My Reps</button>
+
+      <button class="nav-item" onclick="switchTab('reports')" id="nav-reports"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="11" width="3" height="6" rx="1"/><rect x="8.5" y="7" width="3" height="10" rx="1"/><rect x="14" y="3" width="3" height="14" rx="1"/></svg></span>Reports</button>
+      <button class="nav-item" onclick="switchTab('review')" id="nav-review"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H6a1 1 0 0 0-1 1v13l5-3 5 3V4a1 1 0 0 0-1-1z" stroke-linejoin="round"/></svg></span>Weekly Review</button>
+      <button class="nav-item" onclick="switchTab('calendar')" id="nav-calendar"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="13" rx="2"/><path d="M3 9h14M7 3v4M13 3v4" stroke-linecap="round"/></svg></span>Calendar</button>
+      <button class="nav-item" onclick="switchTab('leaderboard')" id="nav-leaderboard"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h6M10 15v3M7 18h6"/><path d="M5 3v5a5 5 0 0 0 10 0V3"/><path d="M5 6H3a2 2 0 1 0 0 4h2M15 6h2a2 2 0 1 0 0 4h-2" stroke-linecap="round"/></svg></span>Leaderboard</button>
+      <button class="nav-item" onclick="switchTab('map')" id="nav-map"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 4l6 2 6-2 6 2v13l-6-2-6 2-6-2z" stroke-linejoin="round"/><path d="M7 6v13M13 4v13" stroke-linecap="round"/></svg></span>Team Map</button>
+      <button class="nav-item" onclick="switchTab('notifications')" id="nav-notifications"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 0 1 6 6c0 3.5 1.5 5 1.5 5h-15S4 11.5 4 8a6 6 0 0 1 6-6z" stroke-linejoin="round"/><path d="M8.5 17a1.5 1.5 0 0 0 3 0" stroke-linecap="round"/></svg></span>Notifications<span id="notif-badge" class="nav-badge" style="display:none;">0</span></button>
+    </div>
+    <div class="sidebar-footer">
+      <button class="theme-toggle" onclick="toggleTheme()"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 13A7 7 0 1 1 7 3a5 5 0 0 0 10 10z" stroke-linejoin="round"/></svg><span id="theme-lbl">Dark mode</span></button>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div class="content-area">
+
+    <!-- HOME -->
+    <div class="tab-content active" id="ptab-home">
+      <div class="topbar"><span class="topbar-title" id="home-greeting">Dashboard</span><div class="topbar-right"><span class="week-pill" id="week-pill">—</span></div></div>
+      <div class="home-scroll">
+        <div id="announcement-slot"></div>
+        <div id="home-grid"></div>
+      </div>
+    </div>
+
+    <!-- MY REPS -->
+    <div class="tab-content" id="ptab-reps">
+      <div class="topbar"><span class="topbar-title">My Reps</span></div>
+      <div class="page-scroll"><div class="page-wrap">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:20px;box-shadow:var(--s1);">
+          <div class="sec-lbl" style="margin-bottom:12px;">Add new rep</div>
+          <div class="rep-fields" style="margin-bottom:12px;">
+            <div class="field-group"><label class="field-lbl">Full name <span style="color:var(--danger)">*</span></label><input class="field-input" id="add-rep-name" type="text" placeholder="Full name…" onkeydown="if(event.key==='Enter')addRep()"/></div>
+            <div class="field-group"><label class="field-lbl">Email</label><input class="field-input" id="add-rep-email" type="email" placeholder="email@example.com"/></div>
+            <div class="field-group"><label class="field-lbl">Position</label>
+              <select class="field-input" id="add-rep-position">
+                <option value="">Select position…</option>
+              </select>
+            </div>
+            <div class="field-group"><label class="field-lbl">Reports to</label>
+              <select class="field-input" id="add-rep-leader">
+                <option value="">Not assigned</option>
+              </select>
+            </div>
+          </div>
+          <button class="add-btn" style="width:100%;padding:10px;" onclick="addRep()">Add rep</button>
+        </div>
+        <div style="position:relative;margin-bottom:14px;">
+          <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input id="rep-search" type="text" placeholder="Search by name or position…" oninput="filterReps()" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px 9px 34px;border-radius:var(--r);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+        </div>
+        <div class="sec-lbl" style="margin-bottom:10px;">Team roster</div>
+        <div class="rep-list" id="rep-list"><div class="empty-state"><strong>No reps yet</strong>Add your first rep above.</div></div>
+      </div></div>
+    </div>
+
+    <!-- WEEKLY UPDATE -->
 
     <!-- REPORTS -->
     <div class="tab-content" id="ptab-reports">
@@ -1270,24 +1369,28 @@ function renderHome(){
 
     <!-- ROW 1: Stat tiles — solid colour blocks -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
-      <div style="background:#3b5bdb;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;cursor:pointer;" onclick="switchTab('reps')">
-        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.82);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Active Reps</div>
-        <div style="font-size:34px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1;">${active.length}</div>
-        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-top:8px;">${leavers.length} leaver${leavers.length!==1?'s':''}</div>
+
+      <div style="background:#abc9ff;border-radius:10px;padding:20px 22px;cursor:default;position:relative;overflow:hidden;">
+        <div style="font-size:11px;font-weight:700;color:#1a3870;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Active Reps</div>
+        <div style="font-size:34px;font-weight:800;color:#0c2060;letter-spacing:-.03em;line-height:1;">${active.length}</div>
+        <div style="font-size:11px;font-weight:600;color:#1a3870;margin-top:8px;">${delta>0?'▲ +'+delta+' from last week':delta<0?'▼ '+delta+' from last week':'— Same as last week'}</div>
         <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${ICO.users.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
-      <div style="background:#e67700;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;cursor:pointer;" onclick="switchTab('reps')">
-        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.82);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Flagged</div>
-        <div style="font-size:34px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1;">${flagged.length}</div>
-        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-top:8px;">${flagged.length?'Need attention':'All clear'}</div>
+
+      <div style="background:#abc9ff;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
+        <div style="font-size:11px;font-weight:700;color:#1a3870;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Flagged</div>
+        <div style="font-size:34px;font-weight:800;color:#0c2060;letter-spacing:-.03em;line-height:1;">${flagged.length}</div>
+        <div style="font-size:11px;font-weight:600;color:#1a3870;margin-top:8px;">${leavers.length} leaver${leavers.length!==1?'s':''}</div>
         <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${ICO.warn.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
+
       <div style="background:#abc9ff;border-radius:10px;padding:20px 22px;cursor:pointer;position:relative;overflow:hidden;" onclick="switchTab('review')">
         <div style="font-size:11px;font-weight:700;color:#1a3870;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Weekly Review</div>
         <div style="font-size:24px;font-weight:800;color:#0c2060;letter-spacing:-.02em;line-height:1.1;">${savedReviews.length?'Submitted':'Pending'}</div>
         <div style="font-size:11px;font-weight:600;color:#1a3870;margin-top:8px;">${savedReviews.length?'Tap to view':'Tap to start'}</div>
         <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${ICO.check.replace('width="16"','width="56"').replace('height="16"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
+
       <div style="background:#1d9ba4;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
         <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.82);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Latest Wire</div>
         <div style="font-size:34px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1;">${curWire?'£'+curWire.toLocaleString('en-GB'):'—'}</div>
@@ -1574,7 +1677,7 @@ function renderReps(){
             ${flagInfo?`<span class="rep-flag-indicator" style="font-size:11px;font-weight:600;color:${flagInfo.color};">● ${esc(flagInfo.label)}</span>`:`<span class="rep-flag-indicator" style="display:none;font-size:11px;font-weight:600;"></span>`}
           </div>
         </div>
-        <button class="leaver-quick-btn ${r.leaver?'active':''}" onclick="event.stopPropagation();quickToggleLeaver('${r.id}')" title="${r.leaver?'Undo leaver':'Mark as leaver'}">${r.leaver?'Undo leaver':'Leaver'}</button>
+        <button class="leaver-quick-btn ${r.leaver?'active':''}" onclick="event.stopPropagation();quickToggleLeaver('${r.id}')" title="${r.leaver?'Undo leaver':'Mark as leaver'}">${r.leaver?'Undo':'Leaver'}</button>
         <button class="expand-btn" id="eb-${r.id}">›</button>
       </div>
       <div class="rep-card-body" id="rb-${r.id}">
@@ -1623,8 +1726,8 @@ function updateRep(id,f,v){const r=roster.find(x=>x.id===id);if(!r)return;r[f]=v
     if(fm){fm.style.color=fi?fi.color:'transparent';fm.textContent=fi?`● ${fi.label}`:'';fm.style.display=fi?'':'none';}
   }
 }
-function toggleLeaver(id){const r=roster.find(x=>x.id===id);if(!r)return;r.leaver=!r.leaver;renderReps();setTimeout(()=>{const b=document.getElementById(`rb-${id}`);if(b){b.classList.add('open');document.getElementById(`eb-${id}`).textContent='∨';}},0);}
 async function quickToggleLeaver(id){const r=roster.find(x=>x.id===id);if(!r)return;r.leaver=!r.leaver;renderReps();try{await api({action:'saveRep',manager:managerName,rep:r});showToast(r.leaver?r.name+' marked as leaver ✓':r.name+' restored ✓','success');}catch(e){showToast('Saved locally — sheet sync failed','error');}}
+function toggleLeaver(id){const r=roster.find(x=>x.id===id);if(!r)return;r.leaver=!r.leaver;renderReps();setTimeout(()=>{const b=document.getElementById(`rb-${id}`);if(b){b.classList.add('open');document.getElementById(`eb-${id}`).textContent='∨';}},0);}
 async function saveRep(id){const r=roster.find(x=>x.id===id);if(!r)return;try{await api({action:'saveRep',manager:managerName,rep:r});showToast(`${r.name} saved ✓`,'success');renderReps();renderHome();}catch(e){showToast('Save failed','error');}}
 function filterReps(){const q=(document.getElementById('rep-search').value||'').toLowerCase();const cards=document.querySelectorAll('.rep-card');let shown=0;cards.forEach(card=>{const name=(card.querySelector('.rep-name')||{textContent:''}).textContent.toLowerCase();const pos=(card.querySelector('.pos-tag')||{textContent:''}).textContent.toLowerCase();const match=!q||name.includes(q)||pos.includes(q);card.style.display=match?'':'none';if(match)shown++;});const empty=document.querySelector('#rep-list .empty-state');if(empty)empty.style.display=shown===0&&q?'block':'none';}
 function refreshAddLeaderDropdown(){
@@ -1717,8 +1820,12 @@ function buildPayProductionCard(week){
     </div>
     ${wire>0||take>0?`
     <div style="display:grid;grid-template-columns:1fr 1fr${pct!==null?' 1fr':''}; gap:10px;margin-bottom:${wire>0?'14px':'4px'};">
+      <div style="background:#abc9ff;border-radius:8px;padding:12px 14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:#1a3870;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Office Wire</div>
         <div style="font-size:18px;font-weight:800;color:#0c2060;">£${wire>0?wire.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
+      <div style="background:#abc9ff;border-radius:8px;padding:12px 14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:#1a3870;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Manager's Take</div>
         <div style="font-size:18px;font-weight:800;color:#0c2060;">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
       ${pct!==null?`<div style="background:#1d9ba4;border-radius:8px;padding:12px 14px;text-align:center;">
