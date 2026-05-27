@@ -703,7 +703,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ── Apps Script source ─────────────────────────────────
-const APPS_SCRIPT_VERSION = '2.3.0';
+const APPS_SCRIPT_VERSION = '2.4.0';
 const APPS_SCRIPT = `// The Back Office — Google Apps Script v${APPS_SCRIPT_VERSION}
 // Extensions > Apps Script > paste > Deploy as Web App (Anyone)
 
@@ -827,12 +827,70 @@ function doPost(e) {
     for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager&&rows[i][1]===data.week){ah.getRange(i+1,3).setValue(new Date().toISOString());f=true;break;}} if(!f)ah.appendRow([data.manager,data.week,new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'getCalEvents') {
-    const ch=getOrCreate('cal_events',['manager','events','updatedAt']); const row=ch.getDataRange().getValues().slice(1).find(r=>r[0]===data.manager);
-    try{result={events:row?JSON.parse(row[1]):[]};}catch(e){result={events:[]};}
+    // FIX 6: row-per-event schema
+    const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
+    const rows=ch.getDataRange().getValues().slice(1).filter(r=>r[1]===data.manager);
+    result={events:rows.map(r=>({id:String(r[0]),manager:r[1],title:r[2],date:safeDate(r[3]),time:r[4]||'',notes:r[5]||'',reminder:r[6]||'',category:r[7]||'personal',pushedAt:r[8]||'',recurring:r[9]==='yes'||r[9]===true,recurringGroupId:r[10]||null,recurringFreq:r[11]||null}))};
 
   } else if (data.action === 'saveCalEvents') {
-    const ch=getOrCreate('cal_events',['manager','events','updatedAt']); const rows=ch.getDataRange().getValues(); const evJson=JSON.stringify(data.events||[]); let f=false;
-    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){ch.getRange(i+1,2,1,2).setValues([[evJson,new Date().toISOString()]]);f=true;break;}} if(!f)ch.appendRow([data.manager,evJson,new Date().toISOString()]); result={ok:true};
+    // FIX 6: delete all rows for this manager and re-insert
+    const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
+    const rows=ch.getDataRange().getValues();
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][1]===data.manager)ch.deleteRow(i+1);}
+    (data.events||[]).forEach(ev=>{ch.appendRow([ev.id||('ev'+Date.now()+Math.random().toString(36).slice(2,5)),data.manager,ev.title||'',ev.date||'',ev.time||'',ev.notes||'',ev.reminder||'',ev.category||'personal',ev.pushedAt||new Date().toISOString(),ev.recurring?'yes':'no',ev.recurringGroupId||'',ev.recurringFreq||'']);});
+    result={ok:true};
+
+  } else if (data.action === 'saveCalEvent') {
+    // FIX 6: upsert a single event row
+    const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
+    const ev=data.event; const rows=ch.getDataRange().getValues(); let found=false;
+    const row=[ev.id,ev.manager||data.manager,ev.title||'',ev.date||'',ev.time||'',ev.notes||'',ev.reminder||'',ev.category||'personal',ev.pushedAt||new Date().toISOString(),ev.recurring?'yes':'no',ev.recurringGroupId||'',ev.recurringFreq||''];
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===ev.id&&rows[i][1]===(ev.manager||data.manager)){ch.getRange(i+1,1,1,row.length).setValues([row]);found=true;break;}}
+    if(!found)ch.appendRow(row); result={ok:true};
+
+  } else if (data.action === 'deleteCalEvent') {
+    // FIX 6: delete a single event by id across all manager rows
+    const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
+    const rows=ch.getDataRange().getValues();
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.id)ch.deleteRow(i+1);}
+    result={ok:true};
+
+  } else if (data.action === 'updateCalEvent') {
+    // FIX 6: update title/date/time/notes for all rows with this id
+    const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
+    const rows=ch.getDataRange().getValues();
+    for(let i=1;i<rows.length;i++){
+      if(rows[i][0]===data.id){
+        if(data.title!==undefined)ch.getRange(i+1,3).setValue(data.title);
+        if(data.date!==undefined)ch.getRange(i+1,4).setValue(data.date);
+        if(data.time!==undefined)ch.getRange(i+1,5).setValue(data.time);
+        if(data.notes!==undefined)ch.getRange(i+1,6).setValue(data.notes);
+      }
+    }
+    result={ok:true};
+
+  // ── FIX 4: Deadline settings in sheet + time-based trigger ──────────
+  } else if (data.action === 'saveDeadlineSettings') {
+    const sh=getOrCreate('settings',['key','value','updatedAt']);
+    const keyMap={deadlineDay:data.day,deadlineTime:data.time,deadlineMsg:data.msg};
+    const rows=sh.getDataRange().getValues();
+    Object.entries(keyMap).forEach(([key,val])=>{
+      let found=false;
+      for(let i=1;i<rows.length;i++){if(rows[i][0]===key){sh.getRange(i+1,2,1,2).setValues([[val,new Date().toISOString()]]);found=true;break;}}
+      if(!found)sh.appendRow([key,val,new Date().toISOString()]);
+    });
+    installDeadlineTrigger();
+    result={ok:true};
+
+  } else if (data.action === 'getDeadlineSettings') {
+    const sh=getOrCreate('settings',['key','value','updatedAt']);
+    const rows=sh.getDataRange().getValues().slice(1);
+    const get=k=>{const r=rows.find(r=>r[0]===k);return r?String(r[1]||''):'';}
+    result={day:get('deadlineDay'),time:get('deadlineTime')||'17:00',msg:get('deadlineMsg')};
+
+  } else if (data.action === 'removeDeadlineTrigger') {
+    ScriptApp.getProjectTriggers().filter(t=>t.getHandlerFunction()==='runDeadlineCheckTrigger').forEach(t=>ScriptApp.deleteTrigger(t));
+    result={ok:true};
 
   } else if (data.action === 'getAnnouncement') {
     const ah=getOrCreate('announcements',['id','title','message','active','createdAt']);
@@ -931,6 +989,71 @@ function doPost(e) {
   }
 
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// ── FIX 4: Time-based trigger for deadline reminders ──────────────────
+function installDeadlineTrigger() {
+  // Remove any existing deadline triggers first
+  ScriptApp.getProjectTriggers()
+    .filter(t => t.getHandlerFunction() === 'runDeadlineCheckTrigger')
+    .forEach(t => ScriptApp.deleteTrigger(t));
+  // Install a new trigger that runs every day at 8am
+  // The handler itself reads the configured time from the sheet and skips if not yet due
+  ScriptApp.newTrigger('runDeadlineCheckTrigger')
+    .timeBased()
+    .everyDays(1)
+    .atHour(8)
+    .create();
+}
+
+function runDeadlineCheckTrigger() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getSheetByName('settings');
+  if (!sh) return;
+  const rows = sh.getDataRange().getValues().slice(1);
+  const get = k => { const r = rows.find(r => r[0]===k); return r ? String(r[1]||'') : ''; };
+  const day = get('deadlineDay');
+  const time = get('deadlineTime') || '17:00';
+  const msg = get('deadlineMsg') || '⏰ Reminder: Your weekly update is overdue. Please submit it now.';
+  if (!day) return; // not configured
+
+  // Work out if deadline has passed this week
+  const now = new Date();
+  const [hh, mm] = time.split(':').map(Number);
+  // Find Monday of this week
+  const mon = new Date(now);
+  mon.setHours(0,0,0,0);
+  const dow = mon.getDay() === 0 ? 6 : mon.getDay() - 1; // Mon=0
+  mon.setDate(mon.getDate() - dow);
+  const dayOffset = parseInt(day) === 0 ? 6 : parseInt(day) - 1;
+  const deadlineDate = new Date(mon);
+  deadlineDate.setDate(mon.getDate() + dayOffset);
+  deadlineDate.setHours(hh, mm, 0, 0);
+  if (now < deadlineDate) return; // not yet due
+
+  // Check last-run to avoid duplicate sends on same week
+  const weekKey = Utilities.formatDate(mon, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  const lrSheet = getOrCreate('trigger_log', ['weekKey','ranAt']);
+  const lrRows = lrSheet.getDataRange().getValues().slice(1);
+  if (lrRows.some(r => r[0] === weekKey)) return; // already ran this week
+
+  // Find managers who haven't submitted
+  const subSheet = ss.getSheetByName('submissions');
+  if (!subSheet) return;
+  const subs = subSheet.getDataRange().getValues().slice(1);
+  const submittedMgrs = new Set(subs.filter(r => r[2] === weekKey).map(r => r[1]));
+  const mgrSheet = ss.getSheetByName('managers');
+  if (!mgrSheet) return;
+  const allMgrs = mgrSheet.getDataRange().getValues().slice(1).map(r => r[0]).filter(Boolean);
+  const missing = allMgrs.filter(m => !submittedMgrs.has(m));
+  if (!missing.length) { lrSheet.appendRow([weekKey, now.toISOString()]); return; }
+
+  // Send notifications
+  const notifSheet = getOrCreate('notifications', ['id','manager','title','message','sentAt','readAt']);
+  missing.forEach(mgr => {
+    notifSheet.appendRow(['deadline'+now.getTime()+Math.random().toString(36).slice(2,5), mgr, 'Submission Overdue', msg, now.toISOString(), '']);
+  });
+  lrSheet.appendRow([weekKey, now.toISOString()]);
 }`;
 
 document.getElementById('apps-script-pre').textContent = APPS_SCRIPT;
@@ -1610,10 +1733,9 @@ async function pushCalendarEvent() {
 
   for (const mgr of selectedMgrs) {
     try {
-      const res = await api({ action: 'getCalEvents', manager: mgr });
-      const existing = res.events || [];
-      const updated = [...existing, ...newEvents];
-      await api({ action: 'saveCalEvents', manager: mgr, events: updated });
+      for (const ev of newEvents) {
+        await api({ action: 'saveCalEvent', manager: mgr, event: { ...ev, manager: mgr } });
+      }
       successCount++;
     } catch(e) { errors.push(mgr); }
   }
@@ -1710,15 +1832,10 @@ async function saveEditedEvent() {
   if (!ev) { showToast('Event not found','error'); return; }
   ev.title = newTitle; ev.date = newDate; ev.time = newTime; ev.notes = newNotes;
 
-  // Update in all affected managers' calendars
-  const mgrList = ev.managers || [];
-  for (const mgr of mgrList) {
-    try {
-      const res = await api({action:'getCalEvents', manager:mgr});
-      const updated = (res.events||[]).map(e => e.id===id ? {...e,title:newTitle,date:newDate,time:newTime,notes:newNotes} : e);
-      await api({action:'saveCalEvents', manager:mgr, events:updated});
-    } catch(e){}
-  }
+  // Update in all affected managers' calendars via single updateCalEvent call
+  try {
+    await api({ action: 'updateCalEvent', id, title: newTitle, date: newDate, time: newTime, notes: newNotes });
+  } catch(e) { showToast('Failed to save changes', 'error'); return; }
 
   closeEditModal();
   renderCalHistory();
@@ -1727,19 +1844,12 @@ async function saveEditedEvent() {
 
 async function deleteCalEvent(id) {
   if (!confirm('Remove this event from all managers?')) return;
-  const ev = pushedCalEvents.find(e => e.id === id);
   pushedCalEvents = pushedCalEvents.filter(e => e.id !== id);
   renderCalHistory();
-  if (ev) {
-    for (const mgr of (ev.managers||[])) {
-      try {
-        const res = await api({action:'getCalEvents', manager:mgr});
-        const updated = (res.events||[]).filter(e => e.id !== id);
-        await api({action:'saveCalEvents', manager:mgr, events:updated});
-      } catch(e){}
-    }
-  }
-  showToast('Event removed ✓','success');
+  try {
+    await api({ action: 'deleteCalEvent', id });
+    showToast('Event removed ✓', 'success');
+  } catch(e) { showToast('Failed to remove from sheet', 'error'); }
 }
 
 // ── Weekly Reviews ────────────────────────────────────
@@ -1880,30 +1990,42 @@ function exportAllReviewsCSV() {
 }
 
 // ── FIX #6: Submission deadline reminder ──────────────
-function saveDeadlineSettings() {
+// ── FIX 4: Deadline settings stored in sheet ──────────
+async function saveDeadlineSettings() {
   const day = document.getElementById('deadline-day').value;
   const time = document.getElementById('deadline-time').value;
   const msg = document.getElementById('deadline-msg').value.trim();
   const status = document.getElementById('deadline-status');
-  localStorage.setItem('tt_deadline_day', day);
-  localStorage.setItem('tt_deadline_time', time);
-  localStorage.setItem('tt_deadline_msg', msg);
-  status.textContent = '✓ Saved';
-  setTimeout(()=>status.textContent='',3000);
-  showToast('Deadline settings saved ✓','success');
-  runDeadlineCheck();
+  try {
+    await api({ action: 'saveDeadlineSettings', day, time, msg });
+    status.textContent = '✓ Saved & trigger activated';
+    setTimeout(() => status.textContent = '', 4000);
+    showToast('Deadline settings saved — daily trigger installed ✓', 'success');
+    runDeadlineCheck();
+  } catch(e) { showToast('Failed to save deadline settings', 'error'); }
 }
 
-function loadDeadlineSettings() {
-  const day = localStorage.getItem('tt_deadline_day')||'';
-  const time = localStorage.getItem('tt_deadline_time')||'17:00';
-  const msg = localStorage.getItem('tt_deadline_msg')||'⏰ Reminder: Your weekly update is overdue. Please submit it now.';
-  const ddEl=document.getElementById('deadline-day');
-  const dtEl=document.getElementById('deadline-time');
-  const dmEl=document.getElementById('deadline-msg');
-  if(ddEl)ddEl.value=day;
-  if(dtEl)dtEl.value=time;
-  if(dmEl)dmEl.value=msg;
+async function loadDeadlineSettings() {
+  // Load from sheet first; fall back to localStorage for backwards compat
+  try {
+    const res = await api({ action: 'getDeadlineSettings' });
+    const day = res.day || localStorage.getItem('tt_deadline_day') || '';
+    const time = res.time || localStorage.getItem('tt_deadline_time') || '17:00';
+    const msg = res.msg || localStorage.getItem('tt_deadline_msg') || '⏰ Reminder: Your weekly update is overdue. Please submit it now.';
+    const ddEl = document.getElementById('deadline-day');
+    const dtEl = document.getElementById('deadline-time');
+    const dmEl = document.getElementById('deadline-msg');
+    if (ddEl) ddEl.value = day;
+    if (dtEl) dtEl.value = time;
+    if (dmEl) dmEl.value = msg;
+  } catch(e) {
+    // Fallback to localStorage
+    const day = localStorage.getItem('tt_deadline_day') || '';
+    const time = localStorage.getItem('tt_deadline_time') || '17:00';
+    const msg = localStorage.getItem('tt_deadline_msg') || '⏰ Reminder: Your weekly update is overdue. Please submit it now.';
+    const ddEl = document.getElementById('deadline-day'); const dtEl = document.getElementById('deadline-time'); const dmEl = document.getElementById('deadline-msg');
+    if (ddEl) ddEl.value = day; if (dtEl) dtEl.value = time; if (dmEl) dmEl.value = msg;
+  }
 }
 
 async function runDeadlineCheckNow() {
@@ -1913,22 +2035,20 @@ async function runDeadlineCheckNow() {
 }
 
 async function runDeadlineCheck(force=false) {
-  const day = localStorage.getItem('tt_deadline_day');
-  if (!day) return; // disabled
-  const time = localStorage.getItem('tt_deadline_time')||'17:00';
-  const msg = localStorage.getItem('tt_deadline_msg')||'⏰ Reminder: Your weekly update is overdue. Please submit it now.';
+  // Read settings from sheet (already loaded into UI fields)
+  const day = document.getElementById('deadline-day')?.value || localStorage.getItem('tt_deadline_day');
+  if (!day) return;
+  const time = document.getElementById('deadline-time')?.value || localStorage.getItem('tt_deadline_time') || '17:00';
+  const msg = document.getElementById('deadline-msg')?.value || localStorage.getItem('tt_deadline_msg') || '⏰ Reminder: Your weekly update is overdue. Please submit it now.';
   const lastRunKey = `tt_deadline_last_${currentWeek}`;
   const lastRun = localStorage.getItem(lastRunKey);
   const status = document.getElementById('deadline-status');
   const lastRunEl = document.getElementById('deadline-last-run');
 
-  // Check if deadline has passed this week
   const now = new Date();
   const [hh,mm] = time.split(':').map(Number);
   const deadlineDay = parseInt(day);
-  // Find this week's deadline date
   const weekStart = new Date(currentWeek+'T12:00:00');
-  // deadlineDay: 1=Mon,2=Tue,...,0=Sun. weekStart is Monday.
   const dayOffset = deadlineDay === 0 ? 6 : deadlineDay - 1;
   const deadlineDate = new Date(weekStart);
   deadlineDate.setDate(weekStart.getDate() + dayOffset);
@@ -1936,37 +2056,27 @@ async function runDeadlineCheck(force=false) {
 
   if (!force && lastRun) {
     if(lastRunEl) lastRunEl.textContent = `Last reminder sent: ${new Date(lastRun).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
-    if(status) status.textContent='';
-    return; // already ran this week
+    if(status) status.textContent=''; return;
   }
-
   if (!force && now < deadlineDate) {
     if(lastRunEl) lastRunEl.textContent = `Deadline: ${deadlineDate.toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})} — not yet passed`;
-    if(status) status.textContent='';
-    return; // deadline not yet passed
+    if(status) status.textContent=''; return;
   }
 
-  // Find managers who haven't submitted this week
   const submittedMgrs = new Set(allSubs.filter(s=>s.week===currentWeek).map(s=>s.manager));
   const missing = managers.filter(m=>!submittedMgrs.has(m));
-
   if (!missing.length) {
-    if(status) status.textContent='✓ All managers submitted — no reminders needed';
+    if(status) status.textContent='✓ All managers submitted';
     if(lastRunEl) lastRunEl.textContent=`Checked ${now.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})} — all submitted`;
     return;
   }
 
-  // Send reminder notifications
   let sent=0;
   for(const mgr of missing){
-    try{
-      await api({action:'saveNotification',notification:{id:'deadline'+Date.now()+Math.random().toString(36).slice(2,5),manager:mgr,title:'Submission Overdue',message:msg,sentAt:new Date().toISOString()}});
-      sent++;
-    }catch(e){}
+    try{ await api({action:'saveNotification',notification:{id:'deadline'+Date.now()+Math.random().toString(36).slice(2,5),manager:mgr,title:'Submission Overdue',message:msg,sentAt:new Date().toISOString()}}); sent++; }catch(e){}
   }
-
   localStorage.setItem(lastRunKey, now.toISOString());
-  if(status) { status.textContent=`✓ Sent ${sent} reminder${sent!==1?'s':''}`; setTimeout(()=>{if(status)status.textContent='';},4000); }
+  if(status){status.textContent=`✓ Sent ${sent} reminder${sent!==1?'s':''}`;setTimeout(()=>{if(status)status.textContent='';},4000);}
   if(lastRunEl) lastRunEl.textContent=`Reminders sent to: ${missing.map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join(', ')} — ${now.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
   if(sent>0) showToast(`Deadline reminders sent to ${sent} manager${sent!==1?'s':''} ✓`,'success');
 }

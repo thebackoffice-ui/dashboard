@@ -3283,8 +3283,29 @@ function openEditEvent(ev,id){ev.stopPropagation();const event=calEvents.find(e=
 function selectCat(el,cat){document.querySelectorAll('.colour-swatch').forEach(s=>s.classList.remove('selected'));el.classList.add('selected');updateCatLabel(cat);}
 function updateCatLabel(cat){document.getElementById('ev-cat-lbl').textContent=CAT_NAMES[cat]||cat;}
 function getSelectedCat(){const s=document.querySelector('.colour-swatch.selected');return s?s.dataset.cat:'personal';}
-async function saveEvent(){const title=document.getElementById('ev-title').value.trim();if(!title){showToast('Add a title','error');return;}const cat=getSelectedCat();if(editingEvent){const ev=calEvents.find(e=>e.id===editingEvent);if(ev){ev.title=title;ev.category=cat;}}else{calEvents.push({id:'ev'+Date.now(),date:editingDate,title,category:cat});}closeEventModal();renderCalendar();try{await api({action:'saveCalEvents',manager:managerName,events:calEvents});showToast('Event saved ✓','success');}catch(e){showToast('Saved locally — sheet sync failed','error');}}
-async function deleteEvent(){calEvents=calEvents.filter(e=>e.id!==editingEvent);closeEventModal();renderCalendar();try{await api({action:'saveCalEvents',manager:managerName,events:calEvents});}catch(e){}}
+async function saveEvent(){
+  const title=document.getElementById('ev-title').value.trim();
+  if(!title){showToast('Add a title','error');return;}
+  const cat=getSelectedCat();
+  if(editingEvent){
+    const ev=calEvents.find(e=>e.id===editingEvent);
+    if(ev){ev.title=title;ev.category=cat;}
+    closeEventModal();renderCalendar();
+    try{await api({action:'saveCalEvent',manager:managerName,event:{...ev,title,category:cat}});showToast('Event saved ✓','success');}
+    catch(e){showToast('Saved locally — sheet sync failed','error');}
+  }else{
+    const ev={id:'ev'+Date.now(),date:editingDate,title,category:cat,manager:managerName,pushedAt:new Date().toISOString(),recurring:false};
+    calEvents.push(ev);closeEventModal();renderCalendar();
+    try{await api({action:'saveCalEvent',manager:managerName,event:ev});showToast('Event saved ✓','success');}
+    catch(e){showToast('Saved locally — sheet sync failed','error');}
+  }
+}
+async function deleteEvent(){
+  const id=editingEvent;
+  calEvents=calEvents.filter(e=>e.id!==id);
+  closeEventModal();renderCalendar();
+  try{await api({action:'deleteCalEvent',id,manager:managerName});}catch(e){}
+}
 function closeEventModal(){document.getElementById('event-modal').style.display='none';}
 
 // ── MAP ───────────────────────────────────────────────
