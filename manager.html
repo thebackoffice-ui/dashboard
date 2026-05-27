@@ -1167,11 +1167,9 @@ function showApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app-shell').style.display='flex';
   const dn=rawName.trim().charAt(0).toUpperCase()+rawName.trim().slice(1);
-  // Profile picture
-  const savedPic=localStorage.getItem('tt_profile_pic_'+managerName);
+  // Profile picture — show initial immediately, then fetch from sheet
   const av=document.getElementById('sb-avatar');
-  if(savedPic){av.innerHTML=`<img src="${savedPic}" alt="${dn}"/>`;}
-  else{av.textContent=dn.charAt(0);}
+  av.textContent=dn.charAt(0);
   document.getElementById('sb-name').textContent=dn;
   document.getElementById('sb-week').textContent=formatWeek(weekKey);
   document.getElementById('home-greeting').textContent=`Welcome back, ${dn} 👋`;
@@ -1183,13 +1181,16 @@ function showApp(){
 
 function handleProfilePic(input){
   const file=input.files[0];if(!file)return;
+  if(file.size>2*1024*1024){showToast('Image too large — max 2MB','error');return;}
   const reader=new FileReader();
-  reader.onload=e=>{
-    const data=e.target.result;
-    localStorage.setItem('tt_profile_pic_'+managerName,data);
+  reader.onload=async e=>{
+    const picData=e.target.result;
     const av=document.getElementById('sb-avatar');
-    av.innerHTML=`<img src="${data}" alt="profile" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>`;
-    showToast('Profile picture updated ✓','success');
+    av.innerHTML=`<img src="${picData}" alt="profile" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>`;
+    try{
+      await api({action:'saveProfilePic',manager:managerName,picData});
+      showToast('Profile picture updated ✓','success');
+    }catch(err){showToast('Picture saved locally — sheet sync failed','error');}
   };
   reader.readAsDataURL(file);
 }
@@ -1226,7 +1227,7 @@ let roster=[],weekLeavers=new Set(),allReports=[],weekSubmitted=false,calEvents=
 
 async function loadAll(){
   try{
-    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes,pdRes]=await Promise.all([
+    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes,pdRes,picRes,revRes]=await Promise.all([
       api({action:'getRoster',manager:managerName}),
       api({action:'getSubmission',manager:managerName,week:weekKey}),
       api({action:'loadMap',manager:managerName}),
@@ -1235,7 +1236,9 @@ async function loadAll(){
       api({action:'getAnnouncement'}),
       api({action:'getNotes',manager:managerName}),
       api({action:'getLastWeekCount',manager:managerName,currentWeek:weekKey}),
-      api({action:'getPayData',manager:managerName})
+      api({action:'getPayData',manager:managerName}),
+      api({action:'getProfilePic',manager:managerName}),
+      api({action:'getManagerReviews',manager:managerName})
     ]);
     if(rRes.roster)roster=rRes.roster;
     if(sRes.rows&&sRes.rows.length){weekSubmitted=true;document.getElementById('banner-done').style.display='block';weekLeavers=new Set(sRes.rows.filter(r=>r.leaver).map(r=>r.id).filter(Boolean));}
@@ -1247,8 +1250,14 @@ async function loadAll(){
     if(prevRes.count!==undefined)lastWeekCount=prevRes.count;
     if(sRes.acked)ackDone=true;
     if(pdRes.payData)allPayData=pdRes.payData;
-    // Load saved reviews from localStorage
-    try{savedReviews=JSON.parse(localStorage.getItem('tt_reviews_'+managerName)||'[]');}catch(e){savedReviews=[];}
+    // Load profile pic from sheet and update avatar
+    if(picRes.picData){
+      const av=document.getElementById('sb-avatar');
+      const dn=rawName.trim().charAt(0).toUpperCase()+rawName.trim().slice(1);
+      av.innerHTML=`<img src="${picRes.picData}" alt="${dn}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>`;
+    }
+    // Load saved reviews from sheet
+    if(revRes.reviews)savedReviews=revRes.reviews;
     renderAll();
   }catch(e){console.error(e);showToast('Could not load data','error',5000);renderAll();}
 }
@@ -2591,9 +2600,8 @@ async function submitReview(){
   if(!wrMapSnapshot)await captureMapPreview();
   data.mapSnapshot=wrMapSnapshot;
 
-  // Save locally
+  // Save locally in memory
   savedReviews.push(data);
-  localStorage.setItem('tt_reviews_'+managerName,JSON.stringify(savedReviews));
 
   // Generate PDF HTML
   const pdfHtml=buildReviewPDF(data);
@@ -2619,7 +2627,7 @@ async function submitReview(){
   // Try to save to sheet + email admin
   try{
     btn.innerHTML='<span class="spinner"></span>Sending…';
-    await api({action:'saveWeeklyReview',manager:managerName,review:{...data,pdfHtml}});
+    await api({action:'saveWeeklyReview',manager:managerName,week:data.week||weekKey,id:'wr'+Date.now(),reviewData:{...data,pdfHtml}});
   }catch(e){/* sheet may not have this action yet */}
 
   btn.disabled=false;btn.textContent='Submit Review & Generate PDF';
@@ -2987,7 +2995,7 @@ function closeAddPanel(){document.getElementById('spider-add-panel').style.displ
 function addMapNode(repId){closeAddPanel();const parent=sp.nodes.find(n=>n.id===addPanelTargetId);if(!parent)return;const rep=roster.find(r=>r.id===repId);if(!rep)return;// Find angle from root to parent for direction context
 const mgr=sp.nodes.find(n=>n.id==='mgr');const baseAngle=mgr?(Math.atan2(parent.y-mgr.y,parent.x-mgr.x)):0;const siblings=sp.edges.filter(e=>e.a===parent.id).length;const RDIST=150;const spread=Math.PI*0.55;const angleOffset=(siblings===0?0:(siblings%2===1?1:-1)*Math.ceil(siblings/2)*spread/Math.max(siblings,2));const angle=baseAngle+angleOffset;sp.nodes.push({id:rep.id,label:rep.name,position:rep.position||'default',x:parent.x+RDIST*Math.cos(angle),y:parent.y+RDIST*Math.sin(angle)});sp.edges.push({a:parent.id,b:rep.id});renderSpider();}
 function clearMap(){if(!confirm('Clear the map?'))return;sp.nodes=[];sp.edges=[];sp.nodes.push({id:'mgr',label:getMgrDisplay(),position:'Manager',x:500,y:420});renderSpider();}
-async function saveMap(){const md=JSON.stringify({nodes:sp.nodes,edges:sp.edges});localStorage.setItem(`tt_spider_${managerName}`,md);try{await api({action:'saveMap',manager:managerName,mapData:md});showToast('Map saved ✓','success');}catch(e){showToast('Saved locally only','error');}}
+async function saveMap(){const md=JSON.stringify({nodes:sp.nodes,edges:sp.edges});try{await api({action:'saveMap',manager:managerName,mapData:md});showToast('Map saved ✓','success');}catch(e){showToast('Failed to save map','error');}}
 
 // ── Tab switching ─────────────────────────────────────
 const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map'];
