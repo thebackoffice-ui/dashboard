@@ -766,6 +766,16 @@ function doPost(e) {
     rh.appendRow([data.id||('wr'+Date.now()), data.manager, data.week, JSON.stringify(data.reviewData), new Date().toISOString()]);
     result = { ok: true };
 
+  } else if (data.action === 'getManagerReviews') {
+    const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
+    result = { reviews: rh.getDataRange().getValues().slice(1)
+      .filter(r => r[1]===data.manager)
+      .map(r => ({
+        id:r[0], manager:r[1], week:r[2],
+        reviewData: (() => { try { return JSON.parse(r[3]); } catch(e) { return {}; } })(),
+        submittedAt:r[4]
+      })) };
+
   } else if (data.action === 'getAllWeeklyReviews') {
     const rh = getOrCreate('weekly_reviews', ['id','manager','week','reviewData','submittedAt']);
     result = { reviews: rh.getDataRange().getValues().slice(1).map(r => ({
