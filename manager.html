@@ -746,12 +746,20 @@ function fmtDate(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,
 function parseDate(s){if(!s||typeof s!=='string')return null;const p=s.split('-');if(p.length!==3)return null;const d=new Date(+p[0],+p[1]-1,+p[2]);return isNaN(d)?null:d;}
 function formatWeek(k){const d=parseDate(k);if(!d)return'—';const e=new Date(d);e.setDate(e.getDate()+6);const f=dt=>dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'});return`w/c ${f(d)} – ${f(e)}`;}
 function fmtReportDate(k){
-  const d=parseDate(k);if(!d)return'—';
+  if(!k||typeof k!=='string'||k==='—')return'—';
+  // Strip any time component
+  const raw=k.trim().split('T')[0];
+  const p=raw.split('-');
+  if(p.length!==3)return k;
+  const yr=parseInt(p[0],10),mo=parseInt(p[1],10)-1,dy=parseInt(p[2],10);
+  if(isNaN(yr)||isNaN(mo)||isNaN(dy))return k;
+  const dt=new Date(yr,mo,dy);
+  if(isNaN(dt.getTime()))return k;
   const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const day=d.getDate();
+  const day=dt.getDate();
   const sfx=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
-  return days[d.getDay()]+' '+day+sfx+' '+months[d.getMonth()]+' '+d.getFullYear();
+  return days[dt.getDay()]+' '+day+sfx+' '+months[dt.getMonth()]+' '+dt.getFullYear();
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -919,26 +927,7 @@ function renderHome(){
     const rep=allReports.find(r=>r.type==='Pay Report'&&r.week===wk);
     return{wk,wire:parseFloat((pd&&pd.officeWire)||rep?.officeWire||0)||0,take:parseFloat((pd&&pd.mgrTake)||rep?.mgrTake||0)||0};
   });
-  const maxWire=Math.max(...wireByWeek.map(w=>Math.max(w.wire,w.take)),1);
-  const chartH=130,padL=10,padR=10,padT=12,padB=20,innerH=chartH-padT-padB;
-  const chartW=520,innerW=chartW-padL-padR;
-  const groupStep=innerW/6;
-  const bw=Math.floor(groupStep*0.32);
-  const gridLines=[0.25,0.5,0.75,1].map(pct=>{
-    const y=padT+innerH-(pct*innerH);
-    const val=Math.round(maxWire*pct);
-    const lbl=val>=1000?'£'+(val/1000).toFixed(1)+'k':'£'+val;
-    return `<line x1="${padL}" y1="${y}" x2="${chartW-padR}" y2="${y}" stroke="#e8ecee" stroke-width="1"/><text x="${padL-2}" y="${y+4}" text-anchor="end" font-size="8" fill="#a0b0ba" font-family="DM Sans,sans-serif">${lbl}</text>`;
-  }).join('');
-  const chartBars=wireByWeek.map((d,i)=>{
-    const cx=padL+i*groupStep+groupStep/2;
-    const wireH=Math.max(Math.round((d.wire/maxWire)*innerH),d.wire>0?2:0);
-    const takeH=Math.max(Math.round((d.take/maxWire)*innerH),d.take>0?2:0);
-    const shortWk=(()=>{if(!d.wk)return'';const dt=parseDate(d.wk);if(!dt)return'';const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return dt.getDate()+' '+ms[dt.getMonth()];})();
-    return `<rect x="${cx-bw-3}" y="${padT+innerH-wireH}" width="${bw}" height="${wireH}" rx="3" fill="#b8e0f5" opacity="0.9"/>
-      <rect x="${cx+3}" y="${padT+innerH-takeH}" width="${bw}" height="${takeH}" rx="3" fill="#8eca44" opacity="0.9"/>
-      <text x="${cx}" y="${padT+innerH+14}" text-anchor="middle" font-size="9" fill="#6b7d8a" font-family="DM Sans,sans-serif">${shortWk}</text>`;
-  }).join('');
+  // wireByWeek is ready — chart drawn after DOM update
 
   // Leaderboard snapshot
   const lbSnap=(typeof lbRows!=='undefined'&&lbRows.length)?lbFiltered().slice(0,5):[];
@@ -1021,11 +1010,8 @@ function renderHome(){
             <div style="width:10px;height:10px;border-radius:50%;background:#8eca44;"></div>Manager Take
           </div>
         </div>
-        <div style="padding:8px 14px 16px;">
-          <svg viewBox="0 0 520 150" width="100%" height="150" xmlns="http://www.w3.org/2000/svg">
-            ${gridLines}
-            ${chartBars}
-          </svg>
+        <div style="padding:8px 14px 24px;">
+          <canvas id="prod-chart-canvas" height="160" style="width:100%;display:block;"></canvas>
         </div>
       </div>
 
@@ -1036,7 +1022,7 @@ function renderHome(){
         ${latestPay
           ?`<a href="${esc(latestPay.url)}" target="_blank" class="nd-link-row">
               <div class="nd-link-icon" style="background:#f0f1ff;color:#6366f1;">${ICO.pay}</div>
-              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub">${fmtReportDate(latestPay.week)}</div></div>
+              <div><div class="nd-link-name">Pay Report</div><div class="nd-link-sub" id="pay-link-sub"></div></div>
               <div class="nd-link-arrow">${ICO.chevron}</div>
             </a>`
           :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
@@ -1046,7 +1032,7 @@ function renderHome(){
         ${latestPlanner
           ?`<a href="${esc(latestPlanner.url)}" target="_blank" class="nd-link-row">
               <div class="nd-link-icon" style="background:#fef3c7;color:#d97706;">${ICO.cal}</div>
-              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">${latestPlanner.campaign?esc(latestPlanner.campaign)+' · '+fmtReportDate(latestPlanner.week):fmtReportDate(latestPlanner.week)}</div></div>
+              <div><div class="nd-link-name">Daily Planner</div><div class="nd-link-sub">${latestPlanner.campaign?esc(latestPlanner.campaign):''}</div></div>
               <div class="nd-link-arrow">${ICO.chevron}</div>
             </a>`
           :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
@@ -1056,7 +1042,7 @@ function renderHome(){
         ${latestProlog
           ?`<a href="${esc(latestProlog.url)}" target="_blank" class="nd-link-row">
               <div class="nd-link-icon" style="background:#f0fdf4;color:#16a34a;">${ICO.doc}</div>
-              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">${latestProlog.campaign?esc(latestProlog.campaign)+' · '+fmtReportDate(latestProlog.week):fmtReportDate(latestProlog.week)}</div></div>
+              <div><div class="nd-link-name">Pro-log</div><div class="nd-link-sub">${latestProlog.campaign?esc(latestProlog.campaign):''}</div></div>
               <div class="nd-link-arrow">${ICO.chevron}</div>
             </a>`
           :`<div class="nd-link-none" style="display:flex;align-items:center;gap:10px;opacity:.55;">
@@ -1108,9 +1094,95 @@ function renderHome(){
     </div>
   `;
 
+  // Draw production chart on canvas
+  window.wireByWeekGlobal=wireByWeek;
+  requestAnimationFrame(()=>drawProdChart(wireByWeek));
+
   if(typeof lbRows!=='undefined'&&!lbLoaded){
     lbInit().then(()=>renderHome()).catch(()=>{});
   }
+}
+
+function drawProdChart(wireByWeek){
+  const canvas=document.getElementById('prod-chart-canvas');
+  if(!canvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth||canvas.parentElement.offsetWidth||600;
+  const H=160;
+  canvas.width=W*dpr;
+  canvas.height=H*dpr;
+  canvas.style.width=W+'px';
+  canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const padL=48,padR=16,padT=12,padB=32;
+  const innerW=W-padL-padR;
+  const innerH=H-padT-padB;
+  const maxWire=Math.max(...wireByWeek.map(w=>Math.max(w.wire||0,w.take||0)),1);
+
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  const gridCol=dark?'#2a3a3a':'#eef0f3';
+  const labelCol=dark?'#6b8080':'#9aabb8';
+  const textCol=dark?'#9aabb8':'#6b7d8a';
+
+  // Grid lines
+  ctx.strokeStyle=gridCol;
+  ctx.lineWidth=1;
+  [0.25,0.5,0.75,1].forEach(pct=>{
+    const y=padT+innerH-(pct*innerH);
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+innerW,y);ctx.stroke();
+    const val=Math.round(maxWire*pct);
+    const lbl=val>=1000?'£'+(val/1000).toFixed(1)+'k':'£'+val;
+    ctx.fillStyle=labelCol;
+    ctx.font='10px DM Sans,sans-serif';
+    ctx.textAlign='right';
+    ctx.fillText(lbl,padL-6,y+4);
+  });
+
+  // Bars
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const groupW=innerW/wireByWeek.length;
+  const bw=Math.max(Math.floor(groupW*0.28),4);
+
+  wireByWeek.forEach((d,i)=>{
+    const cx=padL+i*groupW+groupW/2;
+
+    // Wire bar (blue)
+    if(d.wire>0){
+      const bh=Math.max(Math.round((d.wire/maxWire)*innerH),2);
+      ctx.fillStyle='#b8e0f5';
+      const r=4;const x=cx-bw-3,y=padT+innerH-bh,w=bw,h=bh;
+      ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();ctx.fill();
+    }
+
+    // Take bar (green)
+    if(d.take>0){
+      const bh=Math.max(Math.round((d.take/maxWire)*innerH),2);
+      ctx.fillStyle='#8eca44';
+      const r=4;const x=cx+3,y=padT+innerH-bh,w=bw,h=bh;
+      ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();ctx.fill();
+    }
+
+    // Date label
+    if(d.wk){
+      const parts=d.wk.split('-');
+      if(parts.length===3){
+        const dt=new Date(+parts[0],+parts[1]-1,+parts[2]);
+        if(!isNaN(dt)){
+          const lbl=dt.getDate()+' '+months[dt.getMonth()];
+          ctx.fillStyle=textCol;
+          ctx.font='10px DM Sans,sans-serif';
+          ctx.textAlign='center';
+          ctx.fillText(lbl,cx,padT+innerH+16);
+          // Year on second line if space
+          ctx.fillStyle=labelCol;
+          ctx.font='9px DM Sans,sans-serif';
+          ctx.fillText(dt.getFullYear(),cx,padT+innerH+27);
+        }
+      }
+    }
+  });
 }
 
 
@@ -1894,6 +1966,7 @@ function switchTab(tab){
     if(panel)panel.classList.toggle('active',id===tab);
   });
   if(tab==='map'){setTimeout(()=>{initMapPan();if(sp.nodes.length===0)rebuildMap();else{renderSpider();renderLegend();}applyTransform();},50);}
+  if(tab==='home'&&typeof wireByWeekGlobal!=='undefined'){requestAnimationFrame(()=>drawProdChart(wireByWeekGlobal));}
   if(tab==='calendar')renderCalendar();
   if(tab==='leaderboard')lbInit();
   if(tab==='review'){showReviewForm();}
@@ -1955,7 +2028,10 @@ function lbRender(){
 // ── Util ──────────────────────────────────────────────
 async function api(p){const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(p)});const text=await r.text();if(!r.ok)throw new Error('HTTP '+r.status+': '+text.slice(0,200));try{return JSON.parse(text);}catch(e){throw new Error('Apps Script did not return JSON: '+text.slice(0,200));}}
 function showToast(msg,type,dur){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',dur||3000);}
-window.addEventListener('resize',()=>{if(document.getElementById('ptab-map').classList.contains('active'))renderEdges();});
+window.addEventListener('resize',()=>{
+  if(document.getElementById('ptab-map').classList.contains('active'))renderEdges();
+  if(document.getElementById('ptab-home').classList.contains('active')&&typeof wireByWeekGlobal!=='undefined')drawProdChart(wireByWeekGlobal);
+});
 
 if(!managerName){document.getElementById('login-screen').innerHTML='<div class="login-box"><div class="login-logo">The <span>Back Office</span></div><h2 style="font-size:18px;margin-bottom:8px;text-align:center;">No manager specified</h2><p style="color:var(--muted);font-size:13px;text-align:center;">Add your name to the URL: manager.html?name=sarah</p></div>';}
 else{checkAuth();}
