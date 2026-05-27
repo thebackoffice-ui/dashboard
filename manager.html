@@ -495,6 +495,14 @@ select.field-input{cursor:pointer;appearance:none;}
 .submit-btn{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:500;padding:12px;border-radius:var(--r);cursor:pointer;width:100%;transition:opacity .15s;}
 .submit-btn:hover{opacity:.88;}.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
 
+/* ── WEEKLY UPDATE DESCRIPTION ── */
+.weekly-update-desc{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r);padding:14px 16px;margin-bottom:18px;box-shadow:var(--s1);}
+.wud-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.wud-body{flex:1;min-width:0;}
+.wud-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.wud-text{font-size:12px;color:var(--muted);line-height:1.5;}
+[data-theme="dark"] .weekly-update-desc{background:var(--surface);border-left-color:var(--accent);}
+
 /* ── REPORTS TABS ── */
 .report-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
 .rtab-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font);font-size:13px;font-weight:500;padding:10px 18px;cursor:pointer;margin-bottom:-1px;transition:color .15s;}
@@ -525,20 +533,23 @@ select.field-input{cursor:pointer;appearance:none;}
 .rpt-search-input:focus{border-color:var(--accent);width:240px;}
 .rpt-search-input::placeholder{color:var(--subtle);}
 
-/* ── REPORTS SUMMARY STRIP — matches dashboard stat tiles ── */
+/* ── REPORTS SUMMARY STRIP — softer SaaS stat tiles ── */
 .rpt-summary{display:grid;gap:12px;margin-bottom:22px;}
 .rpt-summary.pay-grid{grid-template-columns:repeat(4,1fr);}
 .rpt-summary.basic-grid{grid-template-columns:repeat(3,1fr);}
-.rpt-stat{background:#abc9ff;border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;}
-.rpt-stat-val{font-size:28px;font-weight:800;letter-spacing:-.03em;color:#0c2060;line-height:1;}
-.rpt-stat-lbl{font-size:11px;color:#1a3870;margin-top:6px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;}
-.rpt-stat.teal-stat{background:#1d9ba4;}
-.rpt-stat.teal-stat .rpt-stat-val{color:#fff;}
-.rpt-stat.teal-stat .rpt-stat-lbl{color:rgba(255,255,255,.82);}
+.rpt-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;box-shadow:var(--s1);transition:box-shadow .15s;}
+.rpt-stat:hover{box-shadow:var(--s2);}
+.rpt-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:10px 10px 0 0;}
+.rpt-stat-val{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1;margin-top:4px;}
+.rpt-stat-lbl{font-size:11px;color:var(--muted);margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;}
+.rpt-stat.teal-stat{background:var(--surface);border-top:none;}
+.rpt-stat.teal-stat::before{background:linear-gradient(90deg,#0f766e,#14b8a6);}
+.rpt-stat.teal-stat .rpt-stat-val{color:var(--accent);}
+.rpt-stat.teal-stat .rpt-stat-lbl{color:var(--muted);}
 [data-theme="dark"] .rpt-stat{background:var(--surface);border:1px solid var(--border);}
 [data-theme="dark"] .rpt-stat .rpt-stat-val{color:var(--text);}
 [data-theme="dark"] .rpt-stat .rpt-stat-lbl{color:var(--muted);}
-[data-theme="dark"] .rpt-stat.teal-stat{background:rgba(20,184,166,.15);border-color:rgba(20,184,166,.3);}
+[data-theme="dark"] .rpt-stat.teal-stat{background:var(--surface);border-color:var(--border);}
 [data-theme="dark"] .rpt-stat.teal-stat .rpt-stat-val{color:var(--accent);}
 [data-theme="dark"] .rpt-stat.teal-stat .rpt-stat-lbl{color:var(--muted);}
 
@@ -586,7 +597,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 .wr-rep-card.selected[data-pos]{border-color:#0f766e !important;box-shadow:0 0 0 2px #0f766e !important;}
 .wr-rep-card-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2;}
 .wr-rep-card-pos{font-size:10px;font-weight:600;margin-top:1px;}
-.wr-rep-card .pos-tag{background:transparent !important;border-color:transparent !important;padding-left:0;padding-right:0;}
+.wr-rep-card .pos-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:2px;}
 .wr-selected-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
 .wr-selected-row{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;display:flex;align-items:center;gap:10px;}
 
@@ -911,6 +922,13 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       <div class="topbar"><span class="topbar-title">Weekly Update</span><div class="topbar-right"><span class="week-pill" id="week-pill2">—</span></div></div>
       <div class="page-scroll"><div class="page-wrap">
         <div id="banner-done" class="banner-ok" style="display:none;"><strong>✓ Submitted this week</strong>You can update and resubmit any time.</div>
+        <div class="weekly-update-desc">
+          <div class="wud-icon">👥</div>
+          <div class="wud-body">
+            <div class="wud-title">Review your team for this week</div>
+            <div class="wud-text">Check everyone below is still active. Mark anyone who has left this week as a leaver, then hit submit.</div>
+          </div>
+        </div>
         <div class="sec-lbl">Your team this week</div>
         <div class="week-list" id="week-list"><div class="empty-state"><strong>No reps yet</strong>Add reps on My Reps first.</div></div>
         <div class="submit-wrap"><button class="submit-btn" id="submit-btn" onclick="submitWeek()">Submit team for this week</button></div>
@@ -1859,17 +1877,17 @@ function buildPayProductionCard(week){
     </div>
     ${wire>0||take>0?`
     <div style="display:grid;grid-template-columns:1fr 1fr${pct!==null?' 1fr':''}; gap:10px;margin-bottom:${wire>0?'14px':'4px'};">
-      <div style="background:#abc9ff;border-radius:8px;padding:12px 14px;text-align:center;">
-        <div style="font-size:10px;font-weight:700;color:#1a3870;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Office Wire</div>
-        <div style="font-size:18px;font-weight:800;color:#0c2060;">£${wire>0?wire.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:8px;padding:12px 14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Office Wire</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);">£${wire>0?wire.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
-      <div style="background:#abc9ff;border-radius:8px;padding:12px 14px;text-align:center;">
-        <div style="font-size:10px;font-weight:700;color:#1a3870;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Manager's Take</div>
-        <div style="font-size:18px;font-weight:800;color:#0c2060;">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:8px;padding:12px 14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Manager's Take</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
       </div>
-      ${pct!==null?`<div style="background:#1d9ba4;border-radius:8px;padding:12px 14px;text-align:center;">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Take %</div>
-        <div style="font-size:18px;font-weight:800;color:#fff;">${pct}%</div>
+      ${pct!==null?`<div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent2);border-radius:8px;padding:12px 14px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Take %</div>
+        <div style="font-size:18px;font-weight:800;color:var(--accent);">${pct}%</div>
       </div>`:''}
     </div>
     ${wire>0?`<div style="background:#f0f3f6;border-radius:6px;padding:8px 12px;margin-bottom:4px;">
