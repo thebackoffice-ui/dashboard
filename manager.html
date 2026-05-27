@@ -816,8 +816,22 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       <div class="topbar"><span class="topbar-title">My Reps</span></div>
       <div class="page-scroll"><div class="page-wrap">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:20px;box-shadow:var(--s1);">
-          <div class="sec-lbl" style="margin-bottom:10px;">Add new rep</div>
-          <div class="add-row"><input class="add-input" id="add-rep-name" type="text" placeholder="Full name…" onkeydown="if(event.key==='Enter')addRep()"/><button class="add-btn" onclick="addRep()">Add rep</button></div>
+          <div class="sec-lbl" style="margin-bottom:12px;">Add new rep</div>
+          <div class="rep-fields" style="margin-bottom:12px;">
+            <div class="field-group"><label class="field-lbl">Full name <span style="color:var(--danger)">*</span></label><input class="field-input" id="add-rep-name" type="text" placeholder="Full name…" onkeydown="if(event.key==='Enter')addRep()"/></div>
+            <div class="field-group"><label class="field-lbl">Email</label><input class="field-input" id="add-rep-email" type="email" placeholder="email@example.com"/></div>
+            <div class="field-group"><label class="field-lbl">Position</label>
+              <select class="field-input" id="add-rep-position">
+                <option value="">Select position…</option>
+              </select>
+            </div>
+            <div class="field-group"><label class="field-lbl">Reports to</label>
+              <select class="field-input" id="add-rep-leader">
+                <option value="">Not assigned</option>
+              </select>
+            </div>
+          </div>
+          <button class="add-btn" style="width:100%;padding:10px;" onclick="addRep()">Add rep</button>
         </div>
         <div style="position:relative;margin-bottom:14px;">
           <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1169,7 +1183,7 @@ async function loadAll(){
   }catch(e){console.error(e);showToast('Could not load data','error',5000);renderAll();}
 }
 
-function renderAll(){renderHome();renderReps();renderWeekly();renderReports();renderCalendar();}
+function renderAll(){renderHome();renderReps();renderWeekly();renderReports();renderCalendar();refreshAddLeaderDropdown();}
 function getMgrDisplay(){return rawName.trim().charAt(0).toUpperCase()+rawName.trim().slice(1);}
 
 // ── HOME ──────────────────────────────────────────────
@@ -1565,7 +1579,8 @@ function renderReps(){
   const list=document.getElementById('rep-list');
   if(!roster.length){list.innerHTML='<div class="empty-state"><strong>No reps yet</strong>Add your first rep above.</div>';return;}
   const mgrEntry={id:'__mgr__',name:getMgrDisplay(),position:'Manager'};
-  const leaders=[mgrEntry,...roster.filter(r=>(r.position==='Leader'||r.position==='Core')&&!r.leaver)];
+  const REPORTABLE_POSITIONS=['Leader','Core','Junior Partner +'];
+  const leaders=[mgrEntry,...roster.filter(r=>REPORTABLE_POSITIONS.includes(r.position)&&!r.leaver)];
   list.innerHTML=roster.map(r=>{
     const c=pc(r.position||'default');
     const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
@@ -1620,7 +1635,39 @@ function updateRep(id,f,v){const r=roster.find(x=>x.id===id);if(r){r[f]=v;if(f==
 function toggleLeaver(id){const r=roster.find(x=>x.id===id);if(!r)return;r.leaver=!r.leaver;renderReps();setTimeout(()=>{const b=document.getElementById(`rb-${id}`);if(b){b.classList.add('open');document.getElementById(`eb-${id}`).textContent='∨';}},0);}
 async function saveRep(id){const r=roster.find(x=>x.id===id);if(!r)return;try{await api({action:'saveRep',manager:managerName,rep:r});showToast(`${r.name} saved ✓`,'success');renderReps();renderHome();}catch(e){showToast('Save failed','error');}}
 function filterReps(){const q=(document.getElementById('rep-search').value||'').toLowerCase();const cards=document.querySelectorAll('.rep-card');let shown=0;cards.forEach(card=>{const name=(card.querySelector('.rep-name')||{textContent:''}).textContent.toLowerCase();const pos=(card.querySelector('.pos-tag')||{textContent:''}).textContent.toLowerCase();const match=!q||name.includes(q)||pos.includes(q);card.style.display=match?'':'none';if(match)shown++;});const empty=document.querySelector('#rep-list .empty-state');if(empty)empty.style.display=shown===0&&q?'block':'none';}
-async function addRep(){const inp=document.getElementById('add-rep-name');const name=inp.value.trim();if(!name)return;if(roster.find(r=>r.name.toLowerCase()===name.toLowerCase())){showToast('Already in team','error');return;}const rep={id:'r'+Date.now(),name,email:'',position:'',leader:'',notes:'',flag:'',leaver:false,addedOn:weekKey};roster.push(rep);inp.value='';try{await api({action:'saveRep',manager:managerName,rep});showToast(`${name} added ✓`,'success');}catch(e){showToast('Added — sheet sync failed','error');}renderReps();renderHome();}
+function refreshAddLeaderDropdown(){
+  // Populate position options
+  const posSel=document.getElementById('add-rep-position');
+  if(posSel&&posSel.options.length<=1){
+    POSITIONS.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;posSel.appendChild(o);});
+  }
+  // Populate reports-to options
+  const sel=document.getElementById('add-rep-leader');
+  if(!sel)return;
+  const REPORTABLE_POSITIONS=['Leader','Core','Junior Partner +'];
+  const mgrEntry={id:'__mgr__',name:getMgrDisplay(),position:'Manager'};
+  const opts=[mgrEntry,...roster.filter(r=>REPORTABLE_POSITIONS.includes(r.position)&&!r.leaver)];
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Not assigned</option>'+opts.map(l=>`<option value="${esc(l.id)}"${cur===l.id?' selected':''}>${esc(l.name)} (${esc(l.position)})</option>`).join('');
+}
+async function addRep(){
+  const inp=document.getElementById('add-rep-name');
+  const emailInp=document.getElementById('add-rep-email');
+  const posInp=document.getElementById('add-rep-position');
+  const leaderInp=document.getElementById('add-rep-leader');
+  const name=inp.value.trim();
+  if(!name){showToast('Please enter a name','error');inp.focus();return;}
+  if(roster.find(r=>r.name.toLowerCase()===name.toLowerCase())){showToast('Already in team','error');return;}
+  const rep={id:'r'+Date.now(),name,email:(emailInp?emailInp.value.trim():''),position:(posInp?posInp.value:''),leader:(leaderInp?leaderInp.value:''),notes:'',flag:'',leaver:false,addedOn:weekKey};
+  roster.push(rep);
+  inp.value='';
+  if(emailInp)emailInp.value='';
+  if(posInp)posInp.value='';
+  if(leaderInp)leaderInp.value='';
+  try{await api({action:'saveRep',manager:managerName,rep});showToast(`${name} added ✓`,'success');}
+  catch(e){showToast('Added — sheet sync failed','error');}
+  renderReps();renderHome();refreshAddLeaderDropdown();
+}
 
 // ── WEEKLY UPDATE ─────────────────────────────────────
 function renderWeekly(){
