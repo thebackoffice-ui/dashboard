@@ -269,6 +269,29 @@
   border: 2px solid var(--pos-junior-border) !important;
 }
 
+
+/* Collaborative planner */
+.dp-collab-bar{display:flex;align-items:center;gap:8px;padding:6px 16px;background:var(--accent-soft);border-bottom:1px solid var(--accent-border);font-size:11px;color:var(--accent);font-weight:600;}
+.dp-collab-avatars{display:flex;gap:-4px;}
+.dp-collab-avatar{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:2px solid var(--surface);margin-left:-4px;}
+.dp-collab-avatar:first-child{margin-left:0;}
+.dp-live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:dp-pulse 2s infinite;}
+@keyframes dp-pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* PDF download btn */
+.dp-pdf-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--rsm);cursor:pointer;display:flex;align-items:center;gap:5px;}
+.dp-pdf-btn:hover{color:var(--text);border-color:var(--border);}
+
+/* Print / PDF styles */
+@media print{
+  body > *:not(#ptab-planner){display:none!important;}
+  .topbar,.dp-day-tabs,.dp-save-bar,.dp-collab-bar,.tab-header{display:none!important;}
+  .dp-pages-wrap{padding:0!important;overflow:visible!important;background:white!important;}
+  .dp-page-a4-wrap{max-width:100%!important;}
+  .dp-page{box-shadow:none!important;border:1px solid #e5e7eb!important;page-break-after:always;}
+  .dp-field,.dp-tpt-input,.dp-event-qname,.dp-event-footer-input{background:white!important;border-color:#e5e7eb!important;}
+}
+
 </style>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -1152,9 +1175,9 @@ select.wr-input{cursor:pointer;appearance:none;}
 .dp-day-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .dp-day-tab:hover:not(.active){color:var(--text);}
 .dp-shared-badge{font-size:10px;font-weight:700;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);padding:2px 7px;border-radius:20px;}
-.dp-pages-wrap{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:20px;background:var(--bg);}
+.dp-pages-wrap{flex:1;overflow-y:auto;padding:28px 24px;display:flex;flex-direction:column;gap:20px;background:var(--bg);align-items:center;}.dp-page-a4-wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:20px;}
 /* Page card */
-.dp-page{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--niond-shadow);overflow:hidden;}
+.dp-page{background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.10),0 1px 4px rgba(0,0,0,.06);overflow:hidden;width:100%;}
 .dp-page-hdr{background:var(--accent);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
 .dp-page-hdr-title{font-size:13px;font-weight:700;letter-spacing:.03em;}
 .dp-page-hdr-date{font-size:11px;opacity:.8;}
@@ -1682,7 +1705,10 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
         <div class="dp-save-bar">
           <button class="dp-save-btn" onclick="dpSave()">Save day</button>
           <span class="dp-save-status" id="dp-save-status"></span>
-          <button style="margin-left:auto;background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--rsm);cursor:pointer;" onclick="dpShowShareModal()">👥 Shared with</button>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+            <button class="dp-pdf-btn" onclick="dpDownloadPDF()" title="Download today as PDF">⬇ PDF</button>
+            <button id="dp-group-btn" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--rsm);cursor:pointer;" onclick="dpShowShareModal()">👥 Group</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1737,8 +1763,8 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
 <!-- PLANNER SHARE MODAL -->
 <div id="dp-share-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:700;display:none;align-items:center;justify-content:center;" onclick="if(event.target===this)dpCloseShareModal()">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px;width:340px;box-shadow:0 16px 40px rgba(0,0,0,.2);">
-    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Share this week's planner</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Select managers who can view and edit your planner this week. They'll see it under their own Daily Planner tab.</div>
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Planner Group</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Add managers to your planner group — everyone in the group edits the same planner together and sees changes in real time.</div>
     <div id="dp-share-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;">
       <button class="modal-btn secondary" onclick="dpCloseShareModal()">Cancel</button>
@@ -3779,7 +3805,7 @@ function switchTab(tab){
   if(tab==='notifications'){renderManagerNotifs();markAllNotifsRead();}
   if(tab==='reports'){setTimeout(rptPtcRenderChart,80);}
   if(tab==='notes'){notesRenderFolders();notesRenderList();}
-  if(tab==='planner'){dpInit();}
+  if(tab==='planner'){dpInit();} else { clearInterval(dpPollTimer); }
 }
 
 // ── LEADERBOARD ───────────────────────────────────────
@@ -4656,10 +4682,15 @@ document.addEventListener('DOMContentLoaded',()=>{notesInit();});
 ══════════════════════════════════════════ */
 let dpActiveDayIdx = 0;       // 0=Mon … 4=Fri
 let dpData = {};              // { 'YYYY-MM-DD': { daily:{…}, events:[…] } }
-let dpSharedWith = [];        // manager names this mgr shared with
-let dpSharedFrom = [];        // planners shared TO me: [{manager, date, daily, events}]
+let dpSharedWith = [];        // manager names in my planner group
+let dpSharedFrom = [];        // (legacy — kept for compat)
 let dpSaveDirtyTimer = null;
 let dpInitDone = false;
+let dpGroupMembers = [];      // all managers in my group (incl. me)
+let dpGroupOwner = null;      // the canonical owner of the shared planner
+let dpPollTimer = null;       // live-poll interval
+let dpLastSavedHash = '';     // for detecting remote changes
+let dpAdminAssigned = false;  // true = admin controls the group, button hidden
 
 // Get Mon-Fri dates for the current week
 function dpGetWeekDates(){
@@ -4699,11 +4730,23 @@ function dpInit(){
   dpLoadAndRender();
 }
 
-async function dpLoadAndRender(){
+async function dpLoadAndRender(silent=false){
   const dates = dpGetWeekDates();
-  // Load all 5 days data from sheet in parallel
   try{
-    const results = await Promise.all(dates.map(date=>api({action:'getDailyPlanner',manager:managerName,date})));
+    // Load sharing prefs to find group
+    const prefRes = await api({action:'getDpSharing',manager:managerName});
+    dpSharedWith = prefRes.sharedWith||[];
+    dpAdminAssigned = prefRes.adminAssigned||false;
+    // Determine group & owner (lowest alpha name = owner to ensure everyone uses same planner)
+    dpGroupMembers = [managerName, ...dpSharedWith].sort();
+    dpGroupOwner = dpGroupMembers[0];
+    const badge = document.getElementById('dp-shared-badge');
+    if(badge) badge.style.display = dpSharedWith.length?'':'none';
+    // Hide/show the Group button depending on whether admin controls it
+    const groupBtn = document.getElementById('dp-group-btn');
+    if(groupBtn) groupBtn.style.display = dpAdminAssigned ? 'none' : '';
+    // Load all 5 days from the group owner's planner
+    const results = await Promise.all(dates.map(date=>api({action:'getDailyPlanner',manager:dpGroupOwner,date})));
     results.forEach((res,i)=>{
       if(res.data){
         try{dpData[dates[i]]=JSON.parse(res.data);}catch(e){dpData[dates[i]]=dpBlank();}
@@ -4711,18 +4754,42 @@ async function dpLoadAndRender(){
         if(!dpData[dates[i]])dpData[dates[i]]=dpBlank();
       }
     });
-    // Also load planners shared with me
-    const sharedRes = await api({action:'getSharedPlanners',manager:managerName,week:dpGetWeekDates()[0]});
-    dpSharedFrom = sharedRes.planners||[];
-    // Load sharing prefs
-    const prefRes = await api({action:'getDpSharing',manager:managerName});
-    dpSharedWith = prefRes.sharedWith||[];
-    const badge = document.getElementById('dp-shared-badge');
-    if(badge) badge.style.display = dpSharedWith.length||dpSharedFrom.length?'':'none';
   }catch(e){
     dates.forEach(d=>{if(!dpData[d])dpData[d]=dpBlank();});
   }
   dpRenderDay();
+  dpStartPoll();
+}
+
+async function dpPollForChanges(){
+  // Silently fetch current day from server; update if changed
+  try{
+    const dates = dpGetWeekDates();
+    const date = dates[dpActiveDayIdx];
+    const res = await api({action:'getDailyPlanner',manager:dpGroupOwner||managerName,date});
+    if(res.data){
+      const hash = res.data;
+      if(hash !== dpLastSavedHash && dpLastSavedHash !== ''){
+        // Remote change detected — only apply if we're not currently editing
+        const active = document.activeElement;
+        const editing = active && (active.tagName==='TEXTAREA'||active.tagName==='INPUT') && document.getElementById('dp-pages-wrap')?.contains(active);
+        if(!editing){
+          try{dpData[date]=JSON.parse(res.data);}catch(e){}
+          dpRenderDay();
+          const st=document.getElementById('dp-save-status');
+          if(st){st.textContent='Updated by teammate ✓';setTimeout(()=>st.textContent='',3000);}
+        }
+      }
+      dpLastSavedHash = hash;
+    }
+  }catch(e){}
+}
+
+function dpStartPoll(){
+  clearInterval(dpPollTimer);
+  if(dpGroupMembers.length>1){
+    dpPollTimer = setInterval(dpPollForChanges, 8000);
+  }
 }
 
 function dpBlank(){
@@ -4760,31 +4827,32 @@ function dpRenderDay(){
   const d = data.daily;
   const events = data.events || dpBlank().events;
 
-  // Check if any shared planners exist for this date
-  const sharedForDay = dpSharedFrom.filter(p=>p.date===date);
-
-  let html = '';
-
-  // ── Shared planners from other managers ──────────────
-  if(sharedForDay.length){
-    sharedForDay.forEach(sp=>{
-      const dn = sp.manager.charAt(0).toUpperCase()+sp.manager.slice(1);
-      html += `<div style="border:1px solid var(--accent-border);border-radius:10px;overflow:hidden;box-shadow:var(--niond-shadow);">
-        <div style="background:var(--accent-soft);padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--accent-border);">
-          <span style="font-size:12px;font-weight:700;color:var(--accent);">👥 ${esc(dn)}'s planner — shared with you</span>
-          <button style="margin-left:auto;background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;" onclick="dpToggleSharedView(this)">${'▼ Collapse'}</button>
-        </div>
-        <div class="dp-shared-day-content">
-          ${dpRenderDailyPageHTML(sp.daily||{}, sp.events||dpBlank().events, date, true, sp.manager)}
-        </div>
-      </div>`;
-    });
+  // Collab bar HTML
+  let collabBar = '';
+  if(dpGroupMembers.length>1){
+    const avatars = dpGroupMembers.map(m=>{
+      const initial = m.charAt(0).toUpperCase();
+      const isMe = m===managerName;
+      return `<div class="dp-collab-avatar" title="${esc(m.charAt(0).toUpperCase()+m.slice(1))}${isMe?' (you)':''}" style="${isMe?'background:var(--accent);':'background:#6b7280;'}">${initial}</div>`;
+    }).join('');
+    const groupNames = dpGroupMembers.filter(m=>m!==managerName).map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join(', ');
+    const adminLabel = dpAdminAssigned ? ' <span style="font-size:10px;opacity:.7;font-weight:400;">(assigned by admin)</span>' : '';
+    collabBar = `<div class="dp-collab-bar">
+      <div class="dp-live-dot"></div>
+      <div class="dp-collab-avatars">${avatars}</div>
+      <span>Live group planner — editing with ${esc(groupNames)}${adminLabel}</span>
+    </div>`;
   }
 
-  // ── My own planner ──────────────────────────────────
-  html += dpRenderDailyPageHTML(d, events, date, false, managerName);
+  // Build planner pages HTML
+  const pagesHtml = dpRenderDailyPageHTML(d, events, date, false, managerName);
+
+  // Wrap in A4 container
+  const html = `${collabBar}<div class="dp-page-a4-wrap">${pagesHtml}</div>`;
 
   document.getElementById('dp-pages-wrap').innerHTML = html;
+  // Store hash of loaded data for poll comparison
+  if(!dpLastSavedHash) dpLastSavedHash = JSON.stringify(dpData[date]||{});
 }
 
 function dpToggleSharedView(btn){
@@ -4977,8 +5045,12 @@ async function dpSaveCurrentDay(){
   const dates = dpGetWeekDates();
   const date = dates[dpActiveDayIdx];
   const st = document.getElementById('dp-save-status');
+  const owner = dpGroupOwner||managerName;
+  const payload = JSON.stringify(dpData[date]);
   try{
-    await api({action:'saveDailyPlanner',manager:managerName,date,data:JSON.stringify(dpData[date])});
+    // Save under group owner key so all members read same data
+    await api({action:'saveDailyPlanner',manager:owner,date,data:payload});
+    dpLastSavedHash = payload;
     if(st){st.textContent='Saved ✓';setTimeout(()=>st.textContent='',3000);}
   }catch(e){
     if(st) st.textContent='Save failed — check connection';
@@ -5021,14 +5093,61 @@ async function dpSaveSharing(){
   const week = dpGetWeekDates()[0];
   try{
     await api({action:'saveDpSharing',manager:managerName,sharedWith:selected,week});
-    const badge = document.getElementById('dp-shared-badge');
-    if(badge) badge.style.display = selected.length?'':'none';
     dpCloseShareModal();
-    showToast(`Planner shared with ${selected.length} manager${selected.length!==1?'s':''}${selected.length?'':'nobody'}  ✓`,'success');
-    // Reload to get fresh shared data
-    dpLoadAndRender();
-  }catch(e){ showToast('Failed to save sharing','error'); }
+    const names = selected.map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join(', ');
+    showToast(selected.length?`Group: you + ${names}  ✓`:'Solo planner  ✓','success');
+    // Rebuild group + reload shared planner
+    dpGroupMembers = [managerName,...selected].sort();
+    dpGroupOwner = dpGroupMembers[0];
+    dpLastSavedHash = '';
+    await dpLoadAndRender();
+  }catch(e){ showToast('Failed to save group','error'); }
 }
+
+/* ── PDF Download ─────────────────────────── */
+async function dpDownloadPDF(){
+  // Flush current edits first
+  dpFlushCurrentDay();
+  const dates = dpGetWeekDates();
+  const date = dates[dpActiveDayIdx];
+  const data = dpData[date] || dpBlank();
+  const d = data.daily;
+  const events = data.events || dpBlank().events;
+  const dn = managerName.charAt(0).toUpperCase()+managerName.slice(1);
+  const dateStr = dpDateLabel(date);
+
+  // Build a standalone printable HTML document
+  const pageHtml = dpRenderDailyPageHTML(d, events, date, true, managerName);
+
+  // Get current CSS variables from document
+  const styles = [...document.styleSheets].map(ss=>{try{return [...ss.cssRules].map(r=>r.cssText).join('\n');}catch(e){return '';}}).join('\n');
+
+  const printDoc = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>${dn} Daily Planner — ${dateStr}</title>
+<style>
+${styles}
+body{margin:0;padding:20px;background:#f8fafc;font-family:system-ui,sans-serif;}
+.dp-page{max-width:860px;margin:0 auto 24px;background:white;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;width:100%;}
+.dp-page-a4-wrap{max-width:860px;margin:0 auto;}
+textarea,input{background:white!important;border-color:#e5e7eb!important;}
+@media print{body{padding:0;background:white;}.dp-page{box-shadow:none;border-color:#e5e7eb;page-break-after:always;max-width:100%;}}
+</style>
+</head>
+<body>
+<div class="dp-page-a4-wrap">${pageHtml}</div>
+</body>
+</html>`;
+
+  const win = window.open('','_blank','width=920,height=800');
+  if(!win){showToast('Allow pop-ups to download PDF','error');return;}
+  win.document.write(printDoc);
+  win.document.close();
+  win.onload = ()=>{ win.focus(); win.print(); };
+}
+
 </script>
 </body>
 </html>

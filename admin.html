@@ -282,6 +282,7 @@ select.form-input { cursor: pointer; }
     <button class="tab-btn" onclick="switchTab('calendar')">Calendar</button>
     <button class="tab-btn" onclick="switchTab('reviews')">Weekly Reviews</button>
     <button class="tab-btn" onclick="switchTab('notifications')">Notifications</button>
+    <button class="tab-btn" onclick="switchTab('planner')">Planner Groups</button>
     <button class="tab-btn" onclick="switchTab('setup')">Setup</button>
   </div>
 
@@ -665,6 +666,23 @@ select.form-input { cursor: pointer; }
     </div>
 
   </div>
+
+  <div class="tab-panel" id="tab-planner">
+    <div class="setup-card">
+      <h3>Planner Groups</h3>
+      <p>Assign managers into groups. Every manager in the same group edits a single shared daily planner together — changes are synced live. Managers not in any group get their own private planner.</p>
+      <div id="pg-groups-list" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;"></div>
+      <button onclick="pgAddGroup()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:600;padding:9px 18px;border-radius:var(--radius-sm);cursor:pointer;">+ New group</button>
+    </div>
+    <div class="setup-card" style="margin-top:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h3 style="margin:0;">Unassigned managers</h3>
+        <span style="font-size:12px;color:var(--muted);">These managers have their own private planner</span>
+      </div>
+      <div id="pg-unassigned" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
+  </div>
+
 </main>
 
 </div><!-- /admin-main-wrap -->
@@ -1017,10 +1035,34 @@ function doPost(e) {
     if(!f)sh.appendRow([data.manager,data.week,sw,new Date().toISOString()]);
     result={ok:true};
 
+  } else if (data.action === 'savePlannerGroups') {
+    // Admin saves group assignments: [{id, name, members:[]}]
+    const sh=getOrCreate('planner_groups',['groupId','groupName','members','updatedAt']);
+    // Delete all existing rows and rewrite
+    const lr=sh.getLastRow();
+    if(lr>1)sh.deleteRows(2,lr-1);
+    (data.groups||[]).forEach(g=>{
+      sh.appendRow([g.id,g.name,(g.members||[]).join(','),new Date().toISOString()]);
+    });
+    result={ok:true};
+
+  } else if (data.action === 'getPlannerGroups') {
+    const sh=getOrCreate('planner_groups',['groupId','groupName','members','updatedAt']);
+    const rows=sh.getDataRange().getValues().slice(1).filter(r=>r[0]);
+    result={groups:rows.map(r=>({id:String(r[0]),name:String(r[1]),members:r[2]?String(r[2]).split(',').filter(Boolean):[]}))};
+
   } else if (data.action === 'getDpSharing') {
-    const sh=getOrCreate('dp_sharing',['manager','week','sharedWith','updatedAt']);
-    const row=sh.getDataRange().getValues().slice(1).filter(r=>r[0]===data.manager).pop();
-    result={sharedWith:row&&row[2]?String(row[2]).split(',').filter(Boolean):[]};
+    const gsh=getOrCreate('planner_groups',['groupId','groupName','members','updatedAt']);
+    const groups=gsh.getDataRange().getValues().slice(1).filter(r=>r[0]);
+    let groupMembers=[];let groupName='';
+    for(const g of groups){const members=g[2]?String(g[2]).split(',').filter(Boolean):[];if(members.includes(data.manager)){groupMembers=members;groupName=String(g[1]);break;}}
+    if(groupMembers.length>1){
+      result={sharedWith:groupMembers.filter(m=>m!==data.manager),groupName,adminAssigned:true};
+    } else {
+      const sh=getOrCreate('dp_sharing',['manager','week','sharedWith','updatedAt']);
+      const row=sh.getDataRange().getValues().slice(1).filter(r=>r[0]===data.manager).pop();
+      result={sharedWith:row&&row[2]?String(row[2]).split(',').filter(Boolean):[],adminAssigned:false};
+    }
 
   } else if (data.action === 'getSharedPlanners') {
     // Returns planner data for all managers who have shared with data.manager for this week
@@ -1186,7 +1228,7 @@ function toggleTheme() {
 }
 // ── State ──────────────────────────────────────────────
 let scriptUrl = localStorage.getItem('teamtracker_script_url')||'';
-let managers=[], allSubs=[], allPeople=[], allWeeks=[], viewWeekKey='', allRoster=[], managerPasswords={};
+let managers=[], plannerGroups=[], allSubs=[], allPeople=[], allWeeks=[], viewWeekKey='', allRoster=[], managerPasswords={};
 let managerPasswordStatus = {}; // manager -> true if password set
 let allProfilePics = {}; // manager -> Drive URL
 let pushedCalEvents = [];
@@ -1268,7 +1310,7 @@ async function loadAll() {
     allWeeks=Array.from(ws).sort();
     if (!viewWeekKey||!allWeeks.includes(viewWeekKey)) viewWeekKey=currentWeek;
 
-    renderOverview(); renderPeople(); renderLinks();
+    renderOverview(); renderPeople(); renderLinks(); await pgLoad();
     loadWeeklyReviews();
     loadReviewEmails();
 
@@ -1592,6 +1634,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', tabNames[i] === tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`));
   if(tab==='upload'){renderUploadHistory();renderManagerCheckboxes();}
+  if(tab==='planner'){pgRender();}
   if(tab==='calendar'){renderCalManagerCheckboxes();renderCalHistory();}
   if(tab==='reviews'){populateReviewFilters();renderReviews();}
   if(tab==='notifications'){renderNotifManagerCheckboxes();refreshLiveNotifs();loadNotifTemplates();}
@@ -2359,6 +2402,102 @@ async function deleteNotifTemplate(){
   try{await api({action:'deleteNotifTemplate',id});notifTemplates=notifTemplates.filter(t=>t.id!==id);renderTemplateDropdown();showToast('Template deleted ✓','success');}
   catch(e){showToast('Failed to delete','error');}
 }
+
+/* ══════════════════════════════════════════
+   PLANNER GROUPS (admin)
+══════════════════════════════════════════ */
+
+async function pgLoad() {
+  try {
+    const res = await api({action:'getPlannerGroups'});
+    plannerGroups = res.groups || [];
+  } catch(e) {}
+  pgRender();
+}
+
+function pgRender() {
+  const list = document.getElementById('pg-groups-list');
+  const unassignedEl = document.getElementById('pg-unassigned');
+  if (!list || !unassignedEl) return;
+
+  // Which managers are assigned
+  const assigned = new Set(plannerGroups.flatMap(g => g.members));
+  const unassigned = managers.filter(m => !assigned.has(m));
+
+  // Render groups
+  if (!plannerGroups.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;">No groups yet — click "+ New group" to create one.</div>';
+  } else {
+    list.innerHTML = plannerGroups.map((g, gi) => {
+      const memberChips = managers.map(m => {
+        const dn = m.charAt(0).toUpperCase() + m.slice(1);
+        const inGroup = g.members.includes(m);
+        return `<div onclick="pgToggleMember(${gi},'${esc(m)}')" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:pointer;user-select:none;transition:all .15s;${inGroup ? 'background:var(--accent);color:#fff;border:1px solid var(--accent);' : 'background:var(--surface);color:var(--muted);border:1px solid var(--border);'}">
+          <span style="width:18px;height:18px;border-radius:50%;background:${inGroup?'rgba(255,255,255,.3)':'var(--surface2)'};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;">${dn.charAt(0)}</span>
+          ${esc(dn)}
+        </div>`;
+      }).join('');
+      return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <input value="${esc(g.name)}" oninput="plannerGroups[${gi}].name=this.value" placeholder="Group name…" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;padding:6px 10px;border-radius:7px;outline:none;"/>
+          <button onclick="pgRemoveGroup(${gi})" style="background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:var(--font);" onmouseover="this.style.color='var(--danger)';this.style.borderColor='var(--danger)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border2)'">Remove group</button>
+        </div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Members — click to toggle</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${memberChips || '<span style="font-size:12px;color:var(--muted);">No managers yet</span>'}</div>
+        <div style="font-size:11px;color:var(--muted);">${g.members.length} manager${g.members.length!==1?'s':''} share one planner${g.members.length>0?' — shared under <code style="font-size:11px;background:var(--surface);padding:1px 5px;border-radius:4px;">'+ g.members.slice().sort()[0] +'</code>'s key':''}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Render unassigned
+  if (!unassigned.length) {
+    unassignedEl.innerHTML = '<span style="font-size:12px;color:var(--muted);">All managers are in a group.</span>';
+  } else {
+    unassignedEl.innerHTML = unassigned.map(m => {
+      const dn = m.charAt(0).toUpperCase() + m.slice(1);
+      return `<div style="display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:4px 10px;border-radius:20px;background:var(--surface);border:1px solid var(--border);color:var(--muted);">
+        <span style="width:18px;height:18px;border-radius:50%;background:var(--surface2);display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;">${dn.charAt(0)}</span>
+        ${esc(dn)}
+      </div>`;
+    }).join('');
+  }
+}
+
+function pgAddGroup() {
+  const id = 'g_' + Date.now();
+  plannerGroups.push({id, name: 'Group ' + (plannerGroups.length + 1), members: []});
+  pgRender();
+  pgSave();
+}
+
+function pgRemoveGroup(gi) {
+  if (!confirm('Remove this group? Managers will revert to private planners.')) return;
+  plannerGroups.splice(gi, 1);
+  pgRender();
+  pgSave();
+}
+
+function pgToggleMember(gi, mgr) {
+  const g = plannerGroups[gi];
+  const idx = g.members.indexOf(mgr);
+  if (idx === -1) {
+    // Remove from any other group first
+    plannerGroups.forEach((og, i) => { if (i !== gi) og.members = og.members.filter(m => m !== mgr); });
+    g.members.push(mgr);
+  } else {
+    g.members.splice(idx, 1);
+  }
+  pgRender();
+  pgSave();
+}
+
+async function pgSave() {
+  try {
+    await api({action:'savePlannerGroups', groups: plannerGroups});
+    showToast('Groups saved ✓', 'success');
+  } catch(e) { showToast('Failed to save groups', 'error'); }
+}
+
 </script>
 </body>
 </html>
