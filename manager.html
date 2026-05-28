@@ -4651,7 +4651,7 @@ let dpSharedFrom = [];        // (legacy — kept for compat)
 let dpSaveDirtyTimer = null;
 let dpInitDone = false;
 let dpGroupMembers = [];      // all managers in my group (incl. me)
-let dpGroupOwner = null;      // the canonical owner of the shared planner
+let dpGroupKey = null;        // group name used as shared storage key
 let dpPollTimer = null;       // live-poll interval
 let dpLastSavedHash = '';     // for detecting remote changes
 let dpPollInitialised = false; // true after first load sets the baseline hash
@@ -4708,8 +4708,8 @@ async function dpFetchGroup(){
   console.log('[DP GROUP] getDpSharing response for '+managerName+':', JSON.stringify(prefRes));
   if(!dpAdminAssigned) return false;
   dpGroupMembers = [managerName, ...dpSharedWith].sort();
-  dpGroupOwner = dpGroupMembers[0];
-  console.log('[DP GROUP] members='+JSON.stringify(dpGroupMembers)+' owner='+dpGroupOwner);
+  dpGroupKey = 'group::' + (prefRes.groupName||dpGroupMembers.join(','));
+  console.log('[DP GROUP] members='+JSON.stringify(dpGroupMembers)+' key='+dpGroupKey);
   const badge = document.getElementById('dp-shared-badge');
   if(badge) badge.style.display = dpSharedWith.length?'':'none';
   return true;
@@ -4724,7 +4724,7 @@ async function dpLoadAndRender(silent=false){
       return;
     }
     // Load all 5 days from the group owner's planner
-    const results = await Promise.all(dates.map(date=>api({action:'getDailyPlanner',manager:dpGroupOwner,date})));
+    const results = await Promise.all(dates.map(date=>api({action:'getDailyPlanner',manager:dpGroupKey,date})));
     results.forEach((res,i)=>{
       if(res.data){
         try{dpData[dates[i]]=JSON.parse(res.data);}catch(e){dpData[dates[i]]=dpBlank();}
@@ -4757,16 +4757,16 @@ function dpRenderLocked(){
 
 async function dpPollForChanges(){
   try{
-    const prevOwner = dpGroupOwner;
+    const prevKey = dpGroupKey;
     const assigned = await dpFetchGroup();
-    console.log('[DP POLL] assigned='+assigned+' owner='+dpGroupOwner+' members='+JSON.stringify(dpGroupMembers));
+    console.log('[DP POLL] assigned='+assigned+' key='+dpGroupKey+' members='+JSON.stringify(dpGroupMembers));
     if(!assigned){
       clearInterval(dpPollTimer);
       dpRenderLocked();
       return;
     }
-    if(prevOwner && prevOwner !== dpGroupOwner){
-      console.log('[DP POLL] owner changed from '+prevOwner+' to '+dpGroupOwner+' — reloading');
+    if(prevKey && prevKey !== dpGroupKey){
+      console.log('[DP POLL] group key changed from '+prevKey+' to '+dpGroupKey+' — reloading');
       dpLastSavedHash = '';
       dpPollInitialised = false;
       await dpLoadAndRender();
@@ -4774,7 +4774,7 @@ async function dpPollForChanges(){
     }
     const dates = dpGetWeekDates();
     const date = dates[dpActiveDayIdx];
-    const res = await api({action:'getDailyPlanner',manager:dpGroupOwner,date});
+    const res = await api({action:'getDailyPlanner',manager:dpGroupKey,date});
     const incoming = res.data || null;
     console.log('[DP POLL] date='+date+' incomingLen='+(incoming?incoming.length:0)+' lastHashLen='+dpLastSavedHash.length+' initialised='+dpPollInitialised+' match='+(incoming===dpLastSavedHash));
     if(incoming){
@@ -5076,9 +5076,9 @@ function dpFlushCurrentDay(){
 async function dpSaveCurrentDay(){
   const dates = dpGetWeekDates();
   const date = dates[dpActiveDayIdx];
-  const owner = dpGroupOwner||managerName;
+  const owner = dpGroupKey||managerName;
   const payload = JSON.stringify(dpData[date]);
-  console.log('[DP SAVE] saving as owner='+owner+' date='+date+' payloadLen='+payload.length);
+  console.log('[DP SAVE] saving as key='+owner+' date='+date+' payloadLen='+payload.length);
   try{
     await api({action:'saveDailyPlanner',manager:owner,date,data:payload});
     dpLastSavedHash = payload;

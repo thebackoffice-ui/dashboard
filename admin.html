@@ -1003,7 +1003,7 @@ function doPost(e) {
     const ph=getOrCreate('daily_planner',['manager','date','data','updatedAt']);
     const rows=ph.getDataRange().getValues(); let f=false;
     for(let i=1;i<rows.length;i++){
-      if(rows[i][0]===data.manager&&rows[i][1]===data.date){
+      if(rows[i][0]===data.manager&&safeDate(rows[i][1])===data.date){
         ph.getRange(i+1,3,1,2).setValues([[data.data,new Date().toISOString()]]);f=true;break;
       }
     }
@@ -1012,8 +1012,8 @@ function doPost(e) {
 
   } else if (data.action === 'getDailyPlanner') {
     const ph=getOrCreate('daily_planner',['manager','date','data','updatedAt']);
-    const row=ph.getDataRange().getValues().slice(1).find(r=>r[0]===data.manager&&r[1]===data.date);
-    result={data:row?row[2]:null};
+    const row=ph.getDataRange().getValues().slice(1).find(r=>r[0]===data.manager&&safeDate(r[1])===data.date);
+    result={data:row?String(row[2]||''):null};
 
   } else if (data.action === 'savePlannerGroups') {
     // Admin saves group assignments: [{id, name, members:[]}]
