@@ -4907,9 +4907,9 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
           <div class="dp-event-qnames" style="position:relative;z-index:1;">
             <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q0" oninput="${readOnly?'':'dpMarkDirty()'}"\
  style="border-right:1px solid var(--border);border-bottom:1px solid var(--border);">${esc(ev.q?.[0]||'')}</textarea>
-            <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q1" oninput="${readOnly?'':'dpMarkDirty()}"\
+            <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q1" oninput="${readOnly?'':'dpMarkDirty()'}"\
  style="border-bottom:1px solid var(--border);">${esc(ev.q?.[1]||'')}</textarea>
-            <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q2" oninput="${readOnly?'':'dpMarkDirty()}"\
+            <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q2" oninput="${readOnly?'':'dpMarkDirty()'}"\
  style="border-right:1px solid var(--border);">${esc(ev.q?.[2]||'')}</textarea>
             <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q3" oninput="${readOnly?'':'dpMarkDirty()'}\">${esc(ev.q?.[3]||'')}</textarea>
           </div>
@@ -4917,11 +4917,11 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
         <div class="dp-event-footer">
           <div class="dp-event-footer-cell">
             <div class="dp-event-footer-lbl">Location</div>
-            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-loc" value="${esc(ev.location||'')}" placeholder="Location…" oninput="${readOnly?'':'dpMarkDirty()}"/>
+            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-loc" value="${esc(ev.location||'')}" placeholder="Location…" oninput="${readOnly?'':'dpMarkDirty()'}"/>
           </div>
           <div class="dp-event-footer-cell">
             <div class="dp-event-footer-lbl">Breakeven</div>
-            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-be" value="${esc(ev.breakeven||'')}" placeholder="Breakeven…" oninput="${readOnly?'':'dpMarkDirty()}"/>
+            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-be" value="${esc(ev.breakeven||'')}" placeholder="Breakeven…" oninput="${readOnly?'':'dpMarkDirty()'}"/>
           </div>
         </div>
       </div>`;
