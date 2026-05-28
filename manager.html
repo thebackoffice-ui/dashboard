@@ -1099,7 +1099,6 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
           <div class="ptc-chart-wrap" style="height:240px;">
             <canvas id="rpt-ptc-canvas" class="ptc-canvas" style="height:100%;"></canvas>
           </div>
-          <div class="ptc-stats" id="rpt-ptc-stats"></div>
         </div>
 
         <div class="report-tabs">
@@ -2140,7 +2139,7 @@ function buildPayProductionCard(week){
       ${wire>0||take>0?`<div style="text-align:right;"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">Your take</div><div style="font-size:26px;font-weight:800;color:#1d9ba4;letter-spacing:-.03em;">£${take>0?take.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div></div>`:''}
     </div>
     ${wire>0||take>0?`
-    <div style="display:grid;grid-template-columns:1fr 1fr${pct!==null?' 1fr':''}; gap:10px;margin-bottom:${wire>0?'14px':'4px'};">
+    <div style="display:grid;grid-template-columns:1fr 1fr${pct!==null?' 1fr':''}; gap:10px;margin-bottom:4px;">
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;">
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Office Wire</div>
         <div style="font-size:18px;font-weight:800;color:var(--text);">£${wire>0?wire.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
@@ -2154,15 +2153,6 @@ function buildPayProductionCard(week){
         <div style="font-size:18px;font-weight:800;color:var(--accent);">${pct}%</div>
       </div>`:''}
     </div>
-    ${wire>0?`<div style="background:#f0f3f6;border-radius:6px;padding:8px 12px;margin-bottom:4px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-        <div style="font-size:11px;font-weight:600;color:var(--muted);">Take as % of wire</div>
-        <div style="font-size:11px;font-weight:700;color:#1d9ba4;">${pct||0}%</div>
-      </div>
-      <div style="height:6px;background:rgba(0,0,0,.08);border-radius:3px;overflow:hidden;">
-        <div style="height:100%;width:${Math.min(pct||0,100)}%;background:linear-gradient(90deg,#1d9ba4,#14b8a6);border-radius:3px;transition:width .4s;"></div>
-      </div>
-    </div>`:''}
     `:'<div style="font-size:13px;color:var(--subtle);margin-bottom:10px;padding:4px 0;">No production figures uploaded for this week yet.</div>'}
     <details style="margin-top:8px;">
       <summary style="font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:4px 0;">
@@ -2265,13 +2255,13 @@ function _renderPayReports(){
       </div>`;
     }).join('');
     return`<div class="month-accordion${isCur?' is-current':''}" data-month="${mk}">
-      <div class="month-acc-hdr${isCur?' open':''}" onclick="toggleMonthAcc(this)">
+      <div class="month-acc-hdr" onclick="toggleMonthAcc(this)">
         <span class="month-acc-chevron">›</span>
         <span class="month-acc-title">${_monthKeyLabel(mk)}</span>
         ${isCur?'<span class="now-badge">Current</span>':''}
         <span class="month-acc-meta">${metaParts.join(' · ')}</span>
       </div>
-      <div class="month-acc-body${isCur?' open':''}">${bodyHtml}</div>
+      <div class="month-acc-body">${bodyHtml}</div>
     </div>`;
   }).join('');
 }
@@ -2318,13 +2308,13 @@ function _renderSimpleReports(reports,listId,stripId,badgeClass,icon,iconBg,icon
       </div>`;
     }).join('');
     return`<div class="month-accordion${isCur?' is-current':''}" data-month="${mk}">
-      <div class="month-acc-hdr${isCur?' open':''}" onclick="toggleMonthAcc(this)">
+      <div class="month-acc-hdr" onclick="toggleMonthAcc(this)">
         <span class="month-acc-chevron">›</span>
         <span class="month-acc-title">${_monthKeyLabel(mk)}</span>
         ${isCur?'<span class="now-badge">Current</span>':''}
         <span class="month-acc-meta">${mWeeks.length} week${mWeeks.length!==1?'s':''} · ${totalInMonth} report${totalInMonth!==1?'s':''}</span>
       </div>
-      <div class="month-acc-body${isCur?' open':''}">${bodyHtml}</div>
+      <div class="month-acc-body">${bodyHtml}</div>
     </div>`;
   }).join('');
 }
@@ -3639,26 +3629,13 @@ function rptPtcRenderChart(){
   const data=ptcGetDataN(rptPtcRange);
   const sub=document.getElementById('rpt-ptc-sub');
   if(sub)sub.textContent=data.length?`${data.length} week${data.length!==1?'s':''} of data · Wire vs Take`:'No pay data yet';
-  const statsEl=document.getElementById('rpt-ptc-stats');
-  if(statsEl){
-    const totalWire=data.reduce((s,d)=>s+d.wire,0);
-    const totalTake=data.reduce((s,d)=>s+d.take,0);
-    const avgTake=data.filter(d=>d.take>0).length?totalTake/data.filter(d=>d.take>0).length:0;
-    const fmt=n=>n>=1000?'£'+(n/1000).toFixed(1)+'k':'£'+Math.round(n).toLocaleString('en-GB');
-    statsEl.innerHTML=`
-      <div class="ptc-stat"><div class="ptc-stat-lbl">Total Wire</div><div class="ptc-stat-val">${fmt(totalWire)}</div></div>
-      <div class="ptc-stat hi"><div class="ptc-stat-lbl">Total Take</div><div class="ptc-stat-val">${fmt(totalTake)}</div></div>
-      <div class="ptc-stat"><div class="ptc-stat-lbl">Avg / week</div><div class="ptc-stat-val">${fmt(avgTake)}</div></div>`;
-  }
   const canvas=document.getElementById('rpt-ptc-canvas');
   if(canvas&&data.length)requestAnimationFrame(()=>ptcDraw(canvas,data));
 }
 
 function ptcDraw(canvas,data){
   const dpr=window.devicePixelRatio||1;
-  // Subtract horizontal padding (22px each side) so canvas doesn't overflow
-  const parentEl=canvas.parentElement;
-  const W=Math.max((parentEl.clientWidth||parentEl.offsetWidth||700)-44,200);
+  const W=canvas.parentElement.offsetWidth||700;
   const H=canvas.parentElement.offsetHeight||240;
   canvas.width=W*dpr;canvas.height=H*dpr;
   canvas.style.width=W+'px';canvas.style.height=H+'px';
@@ -3669,6 +3646,10 @@ function ptcDraw(canvas,data){
   const labelCol=dark?'#5a7070':'#9aabb8';
   const textCol=dark?'#8a9db0':'#6b7d8a';
 
+  // Generous padding so lines never touch the edges
+  const padL=56,padR=40,padT=24,padB=58;
+  const iW=W-padL-padR,iH=H-padT-padB;
+
   // Separate max for each series so a small Take line isn't squished
   const wireVals=data.map(d=>d.wire);
   const takeVals=data.map(d=>d.take);
@@ -3678,10 +3659,6 @@ function ptcDraw(canvas,data){
   const useDual=maxWire>maxTake*3;
   const maxLeft=maxWire;
   const maxRight=useDual?maxTake:maxWire;
-
-  // Generous padding so lines never touch the edges; extra right room for dual-axis labels
-  const padL=56,padR=useDual?52:40,padT=24,padB=42;
-  const iW=W-padL-padR,iH=H-padT-padB;
 
   // Round max up to a nice number so gridlines land cleanly
   function niceMax(v){
