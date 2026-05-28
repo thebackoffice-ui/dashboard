@@ -1142,6 +1142,82 @@ select.wr-input{cursor:pointer;appearance:none;}
 .n-tag-input:focus{border-color:var(--accent);}
 .n-tag-ok{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;}
 
+/* ══════════════════════════════════════════
+   DAILY PLANNER TAB
+══════════════════════════════════════════ */
+.dp-shell{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.dp-topbar-inner{display:flex;align-items:center;gap:10px;flex:1;}
+.dp-day-tabs{display:flex;gap:4px;padding:0 24px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.dp-day-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font);font-size:12px;font-weight:600;padding:10px 14px;cursor:pointer;margin-bottom:-1px;transition:color .15s;white-space:nowrap;}
+.dp-day-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.dp-day-tab:hover:not(.active){color:var(--text);}
+.dp-shared-badge{font-size:10px;font-weight:700;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);padding:2px 7px;border-radius:20px;}
+.dp-pages-wrap{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:20px;background:var(--bg);}
+/* Page card */
+.dp-page{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--niond-shadow);overflow:hidden;}
+.dp-page-hdr{background:var(--accent);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.dp-page-hdr-title{font-size:13px;font-weight:700;letter-spacing:.03em;}
+.dp-page-hdr-date{font-size:11px;opacity:.8;}
+.dp-page-body{padding:16px;}
+/* Section label */
+.dp-sec-lbl{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+/* Team columns row */
+.dp-team-row{display:grid;grid-template-columns:1fr 1fr 1fr 1.6fr;gap:10px;margin-bottom:14px;}
+.dp-team-col{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.dp-team-col-hdr{background:var(--surface2);padding:7px 10px;font-size:11px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);}
+.dp-team-col-hdr.accent{background:var(--accent);color:#fff;}
+.dp-team-body{padding:6px 8px;display:flex;flex-direction:column;gap:4px;}
+.dp-field{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:5px 8px;border-radius:5px;outline:none;transition:border-color .15s;width:100%;resize:none;}
+.dp-field:focus{border-color:var(--accent);}
+.dp-field::placeholder{color:var(--subtle);}
+/* Leaders meeting sub-grid */
+.dp-lm-top{min-height:60px;padding:6px 8px;}
+.dp-lm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border);}
+.dp-lm-cell{padding:4px 6px;border-right:1px solid var(--border);}
+.dp-lm-cell:last-child{border-right:none;}
+.dp-lm-cell-hdr{font-size:10px;font-weight:700;color:var(--muted);text-align:center;padding:5px 4px;border-top:1px solid var(--border);border-right:1px solid var(--border);text-transform:uppercase;letter-spacing:.05em;background:var(--surface2);}
+.dp-lm-cell-hdr:last-child{border-right:none;}
+/* TPT row */
+.dp-tpt-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.dp-tpt-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;}
+.dp-tpt-lbl{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:10px 7px;background:var(--surface2);border-right:1px solid var(--border);flex-shrink:0;}
+.dp-tpt-input{flex:1;background:none;border:none;color:var(--text);font-family:var(--font);font-size:12px;padding:8px 10px;resize:none;outline:none;min-height:70px;line-height:1.6;}
+.dp-tpt-input::placeholder{color:var(--subtle);}
+/* Bottom sections */
+.dp-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.dp-bottom-full{margin-bottom:14px;}
+.dp-section-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.dp-section-box-hdr{background:var(--surface2);padding:7px 10px;font-size:11px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);}
+.dp-section-box-hdr.accent{background:var(--accent);color:#fff;}
+.dp-section-box-body{padding:6px 8px;}
+/* Event planner page */
+.dp-event-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;}
+.dp-event-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.dp-event-quadrant{position:relative;height:140px;border-bottom:1px solid var(--border);}
+.dp-event-quadrant::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);}
+.dp-event-quadrant::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border);}
+.dp-event-qnames{display:grid;grid-template-columns:1fr 1fr;height:100%;}
+.dp-event-qname{padding:6px 8px;font-size:11px;color:var(--text);background:none;border:none;outline:none;font-family:var(--font);resize:none;line-height:1.4;}
+.dp-event-qname:focus{background:var(--accent-soft);}
+.dp-event-qname::placeholder{color:var(--subtle);}
+.dp-event-footer{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);}
+.dp-event-footer-cell{padding:5px 8px;border-right:1px solid var(--border);}
+.dp-event-footer-cell:last-child{border-right:none;}
+.dp-event-footer-lbl{font-size:9px;font-weight:800;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px;}
+.dp-event-footer-input{width:100%;background:none;border:none;color:var(--text);font-family:var(--font);font-size:12px;outline:none;padding:0;}
+.dp-event-footer-input::placeholder{color:var(--subtle);}
+/* Save bar */
+.dp-save-bar{padding:10px 24px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.dp-save-btn{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:600;padding:9px 20px;border-radius:var(--rsm);cursor:pointer;transition:opacity .15s;}
+.dp-save-btn:hover{opacity:.85;}
+.dp-save-status{font-size:12px;color:var(--muted);}
+/* Shared managers selector */
+.dp-shared-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;}
+.dp-shared-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
+.dp-shared-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.dp-mgr-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:all .15s;user-select:none;}
+.dp-mgr-chip.selected{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-border);}
+
 </style>
 </head>
 <body>
@@ -1205,6 +1281,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       <button class="nav-item" onclick="switchTab('map')" id="nav-map"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 4l6 2 6-2 6 2v13l-6-2-6 2-6-2z" stroke-linejoin="round"/><path d="M7 6v13M13 4v13" stroke-linecap="round"/></svg></span>Team Map</button>
       <button class="nav-item" onclick="switchTab('notifications')" id="nav-notifications"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 0 1 6 6c0 3.5 1.5 5 1.5 5h-15S4 11.5 4 8a6 6 0 0 1 6-6z" stroke-linejoin="round"/><path d="M8.5 17a1.5 1.5 0 0 0 3 0" stroke-linecap="round"/></svg></span>Notifications<span id="notif-badge" class="nav-badge" style="display:none;">0</span></button>
       <button class="nav-item" onclick="switchTab('notes')" id="nav-notes"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h10a1 1 0 0 1 1 1v10l-4 4H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke-linejoin="round"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/></svg></span>Notes</button>
+      <button class="nav-item" onclick="switchTab('planner')" id="nav-planner"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14M8 8v9" stroke-linecap="round"/></svg></span>Daily Planner</button>
     </div>
     <div class="sidebar-footer">
       <button class="theme-toggle" onclick="toggleTheme()"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 13A7 7 0 1 1 7 3a5 5 0 0 0 10 10z" stroke-linejoin="round"/></svg><span id="theme-lbl">Dark mode</span></button>
@@ -1585,6 +1662,31 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       </div>
     </div>
 
+    <!-- DAILY PLANNER -->
+    <div class="tab-content" id="ptab-planner">
+      <div class="topbar">
+        <span class="topbar-title">Daily Planner</span>
+        <div class="topbar-right">
+          <span class="week-pill" id="dp-week-pill">—</span>
+          <span class="dp-shared-badge" id="dp-shared-badge" style="display:none;">Shared</span>
+        </div>
+      </div>
+      <div class="dp-shell">
+        <!-- Day tabs -->
+        <div class="dp-day-tabs" id="dp-day-tabs"></div>
+        <!-- Pages content -->
+        <div class="dp-pages-wrap" id="dp-pages-wrap">
+          <div style="text-align:center;padding:60px 0;color:var(--muted);font-size:13px;">Loading planner…</div>
+        </div>
+        <!-- Save bar -->
+        <div class="dp-save-bar">
+          <button class="dp-save-btn" onclick="dpSave()">Save day</button>
+          <span class="dp-save-status" id="dp-save-status"></span>
+          <button style="margin-left:auto;background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--rsm);cursor:pointer;" onclick="dpShowShareModal()">👥 Shared with</button>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /content-area -->
 </div><!-- /app-shell -->
 
@@ -1631,6 +1733,19 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
 </div>
 
 <!-- TAG POPOVER (injected dynamically) -->
+
+<!-- PLANNER SHARE MODAL -->
+<div id="dp-share-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:700;display:none;align-items:center;justify-content:center;" onclick="if(event.target===this)dpCloseShareModal()">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px;width:340px;box-shadow:0 16px 40px rgba(0,0,0,.2);">
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Share this week's planner</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Select managers who can view and edit your planner this week. They'll see it under their own Daily Planner tab.</div>
+    <div id="dp-share-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="modal-btn secondary" onclick="dpCloseShareModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="dpSaveSharing()">Save</button>
+    </div>
+  </div>
+</div>
 
 <!-- Event modal -->
 <div id="event-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)closeEventModal()">
@@ -3648,7 +3763,7 @@ function clearMap(){if(!confirm('Clear the map?'))return;sp.nodes=[];sp.edges=[]
 async function saveMap(){const md=JSON.stringify({nodes:sp.nodes,edges:sp.edges});try{await api({action:'saveMap',manager:managerName,mapData:md});showToast('Map saved ✓','success');}catch(e){showToast('Failed to save map','error');}}
 
 // ── Tab switching ─────────────────────────────────────
-const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications','notes'];
+const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications','notes','planner'];
 function switchTab(tab){
   TABS.forEach(id=>{
     const nav=document.getElementById(`nav-${id}`);
@@ -3664,6 +3779,7 @@ function switchTab(tab){
   if(tab==='notifications'){renderManagerNotifs();markAllNotifsRead();}
   if(tab==='reports'){setTimeout(rptPtcRenderChart,80);}
   if(tab==='notes'){notesRenderFolders();notesRenderList();}
+  if(tab==='planner'){dpInit();}
 }
 
 // ── LEADERBOARD ───────────────────────────────────────
@@ -4536,4 +4652,383 @@ function notesSaveFolder(){
 
 // Initialise notes on load
 document.addEventListener('DOMContentLoaded',()=>{notesInit();});
+
+/* ══════════════════════════════════════════
+   DAILY PLANNER
+══════════════════════════════════════════ */
+let dpActiveDayIdx = 0;       // 0=Mon … 4=Fri
+let dpData = {};              // { 'YYYY-MM-DD': { daily:{…}, events:[…] } }
+let dpSharedWith = [];        // manager names this mgr shared with
+let dpSharedFrom = [];        // planners shared TO me: [{manager, date, daily, events}]
+let dpSaveDirtyTimer = null;
+let dpInitDone = false;
+
+// Get Mon-Fri dates for the current week
+function dpGetWeekDates(){
+  const d = new Date();
+  // Find Monday
+  const dow = d.getDay() === 0 ? 6 : d.getDay() - 1;
+  const mon = new Date(d); mon.setHours(0,0,0,0); mon.setDate(d.getDate() - dow);
+  const dates = [];
+  for(let i=0;i<5;i++){
+    const dd = new Date(mon); dd.setDate(mon.getDate()+i);
+    dates.push(dd.toISOString().slice(0,10));
+  }
+  return dates;
+}
+
+function dpDateLabel(iso){
+  const d = new Date(iso+'T12:00:00');
+  return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+}
+
+function dpInit(){
+  const dates = dpGetWeekDates();
+  // Update week pill
+  const pill = document.getElementById('dp-week-pill');
+  if(pill) pill.textContent = `w/c ${dpDateLabel(dates[0]).replace(/^[A-Za-z]+, /,'')}`;
+  // Build day tabs
+  const tabsEl = document.getElementById('dp-day-tabs');
+  const days = ['Mon','Tue','Wed','Thu','Fri'];
+  tabsEl.innerHTML = days.map((d,i)=>`<button class="dp-day-tab ${i===dpActiveDayIdx?'active':''}" onclick="dpSwitchDay(${i})">${d} <span style="font-weight:400;opacity:.7;">${dpDateLabel(dates[i]).split(' ').slice(1).join(' ')}</span></button>`).join('');
+  // Ensure today is selected on first open
+  if(!dpInitDone){
+    const todayIso = new Date().toISOString().slice(0,10);
+    const todayIdx = dates.indexOf(todayIso);
+    if(todayIdx>=0) dpActiveDayIdx = todayIdx;
+    dpInitDone = true;
+  }
+  dpLoadAndRender();
+}
+
+async function dpLoadAndRender(){
+  const dates = dpGetWeekDates();
+  // Load all 5 days data from sheet in parallel
+  try{
+    const results = await Promise.all(dates.map(date=>api({action:'getDailyPlanner',manager:managerName,date})));
+    results.forEach((res,i)=>{
+      if(res.data){
+        try{dpData[dates[i]]=JSON.parse(res.data);}catch(e){dpData[dates[i]]=dpBlank();}
+      } else {
+        if(!dpData[dates[i]])dpData[dates[i]]=dpBlank();
+      }
+    });
+    // Also load planners shared with me
+    const sharedRes = await api({action:'getSharedPlanners',manager:managerName,week:dpGetWeekDates()[0]});
+    dpSharedFrom = sharedRes.planners||[];
+    // Load sharing prefs
+    const prefRes = await api({action:'getDpSharing',manager:managerName});
+    dpSharedWith = prefRes.sharedWith||[];
+    const badge = document.getElementById('dp-shared-badge');
+    if(badge) badge.style.display = dpSharedWith.length||dpSharedFrom.length?'':'none';
+  }catch(e){
+    dates.forEach(d=>{if(!dpData[d])dpData[d]=dpBlank();});
+  }
+  dpRenderDay();
+}
+
+function dpBlank(){
+  return {
+    daily:{
+      trainees:[],solo:[],leaders:[],
+      lmNotes:'',lmUnder:'',lmEqual:'',lmOver:'',
+      tpt1:'',tpt2:'',
+      announcements:'',topPerformers:'',
+      keyConversations:'',sitDowns:'',morningMeeting:''
+    },
+    events:[
+      {q:['','','',''],location:'',breakeven:''},
+      {q:['','','',''],location:'',breakeven:''},
+      {q:['','','',''],location:'',breakeven:''},
+      {q:['','','',''],location:'',breakeven:''},
+      {q:['','','',''],location:'',breakeven:''},
+      {q:['','','',''],location:'',breakeven:''}
+    ]
+  };
+}
+
+function dpSwitchDay(idx){
+  dpFlushCurrentDay(); // save before switching
+  dpActiveDayIdx = idx;
+  // Update tab highlight
+  document.querySelectorAll('.dp-day-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  dpRenderDay();
+}
+
+function dpRenderDay(){
+  const dates = dpGetWeekDates();
+  const date = dates[dpActiveDayIdx];
+  const data = dpData[date] || dpBlank();
+  const d = data.daily;
+  const events = data.events || dpBlank().events;
+
+  // Check if any shared planners exist for this date
+  const sharedForDay = dpSharedFrom.filter(p=>p.date===date);
+
+  let html = '';
+
+  // ── Shared planners from other managers ──────────────
+  if(sharedForDay.length){
+    sharedForDay.forEach(sp=>{
+      const dn = sp.manager.charAt(0).toUpperCase()+sp.manager.slice(1);
+      html += `<div style="border:1px solid var(--accent-border);border-radius:10px;overflow:hidden;box-shadow:var(--niond-shadow);">
+        <div style="background:var(--accent-soft);padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--accent-border);">
+          <span style="font-size:12px;font-weight:700;color:var(--accent);">👥 ${esc(dn)}'s planner — shared with you</span>
+          <button style="margin-left:auto;background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;" onclick="dpToggleSharedView(this)">${'▼ Collapse'}</button>
+        </div>
+        <div class="dp-shared-day-content">
+          ${dpRenderDailyPageHTML(sp.daily||{}, sp.events||dpBlank().events, date, true, sp.manager)}
+        </div>
+      </div>`;
+    });
+  }
+
+  // ── My own planner ──────────────────────────────────
+  html += dpRenderDailyPageHTML(d, events, date, false, managerName);
+
+  document.getElementById('dp-pages-wrap').innerHTML = html;
+}
+
+function dpToggleSharedView(btn){
+  const content = btn.closest('[style*="border:1px solid var(--accent-border)"]').querySelector('.dp-shared-day-content');
+  if(!content)return;
+  const collapsed = content.style.display==='none';
+  content.style.display = collapsed?'':'none';
+  btn.textContent = collapsed?'▼ Collapse':'▶ Expand';
+}
+
+function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
+  const ro = readOnly ? 'disabled' : '';
+  const dn = mgrName.charAt(0).toUpperCase()+mgrName.slice(1);
+  const dateStr = dpDateLabel(date);
+
+  // Helper to make a textarea/input
+  const ta = (id, val, rows, ph='') => `<textarea class="dp-field" ${ro} rows="${rows}" placeholder="${ph}" id="${readOnly?'ro_':''}${id}" oninput="${readOnly?'':'dpMarkDirty()'}">${esc(val||'')}</textarea>`;
+  const inp = (id, val, ph='') => `<input class="dp-field" ${ro} type="text" placeholder="${ph}" id="${readOnly?'ro_':''}${id}" value="${esc(val||'')}" oninput="${readOnly?'':'dpMarkDirty()}"/>`;
+
+  // Team columns: trainees, solo, leaders (arrays stored as newline-separated strings)
+  const trainees = Array.isArray(d.trainees)?d.trainees.join('\n'):(d.trainees||'');
+  const solo = Array.isArray(d.solo)?d.solo.join('\n'):(d.solo||'');
+  const leaders = Array.isArray(d.leaders)?d.leaders.join('\n'):(d.leaders||'');
+
+  let html = `
+  <!-- PAGE 1: Daily Planner -->
+  <div class="dp-page">
+    <div class="dp-page-hdr">
+      <span class="dp-page-hdr-title">${esc(dn)}'s Daily Planner</span>
+      <span class="dp-page-hdr-date">${dateStr}</span>
+    </div>
+    <div class="dp-page-body">
+
+      <!-- Team columns -->
+      <div class="dp-sec-lbl">Team</div>
+      <div class="dp-team-row">
+        <div class="dp-team-col">
+          <div class="dp-team-col-hdr">Trainees</div>
+          <div class="dp-team-body">${ta('dp-trainees',trainees,4,'Names…')}</div>
+        </div>
+        <div class="dp-team-col">
+          <div class="dp-team-col-hdr">Solo</div>
+          <div class="dp-team-body">${ta('dp-solo',solo,4,'Names…')}</div>
+        </div>
+        <div class="dp-team-col">
+          <div class="dp-team-col-hdr">Leaders</div>
+          <div class="dp-team-body">${ta('dp-leaders',leaders,4,'Names…')}</div>
+        </div>
+        <div class="dp-team-col">
+          <div class="dp-team-col-hdr accent">Leaders Meeting</div>
+          <div class="dp-lm-top">${ta('dp-lm-notes',d.lmNotes,2,'Notes…')}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
+            <div class="dp-lm-cell-hdr">Under</div>
+            <div class="dp-lm-cell-hdr">Equal</div>
+            <div class="dp-lm-cell-hdr">Over</div>
+          </div>
+          <div class="dp-lm-grid">
+            <div class="dp-lm-cell">${ta('dp-lm-under',d.lmUnder,2,'')}</div>
+            <div class="dp-lm-cell">${ta('dp-lm-equal',d.lmEqual,2,'')}</div>
+            <div class="dp-lm-cell">${ta('dp-lm-over',d.lmOver,2,'')}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TPT 1 & 2 -->
+      <div class="dp-tpt-row">
+        <div class="dp-tpt-box">
+          <div class="dp-tpt-lbl">TPT 1</div>
+          <textarea class="dp-tpt-input" ${ro} placeholder="Top Performer Talk 1…" id="${readOnly?'ro_':''}dp-tpt1" oninput="${readOnly?'':'dpMarkDirty()'}">${esc(d.tpt1||'')}</textarea>
+        </div>
+        <div class="dp-tpt-box">
+          <div class="dp-tpt-lbl">TPT 2</div>
+          <textarea class="dp-tpt-input" ${ro} placeholder="Top Performer Talk 2…" id="${readOnly?'ro_':''}dp-tpt2" oninput="${readOnly?'':'dpMarkDirty()'}">${esc(d.tpt2||'')}</textarea>
+        </div>
+      </div>
+
+      <!-- Announcements + Top Performers -->
+      <div class="dp-bottom-grid">
+        <div class="dp-section-box">
+          <div class="dp-section-box-hdr accent">Announcements</div>
+          <div class="dp-section-box-body">${ta('dp-announcements',d.announcements,6,'')}</div>
+        </div>
+        <div class="dp-section-box">
+          <div class="dp-section-box-hdr">Top Performers</div>
+          <div class="dp-section-box-body">${ta('dp-top-performers',d.topPerformers,6,'')}</div>
+        </div>
+      </div>
+
+      <!-- Key Conversations / Sit Downs / Morning Meeting -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="dp-section-box">
+          <div class="dp-section-box-hdr">Key Conversations</div>
+          <div class="dp-section-box-body">${ta('dp-key-convos',d.keyConversations,4,'')}</div>
+        </div>
+        <div class="dp-section-box">
+          <div class="dp-section-box-hdr">Sit Downs / Dinners</div>
+          <div class="dp-section-box-body">${ta('dp-sit-downs',d.sitDowns,4,'')}</div>
+        </div>
+        <div class="dp-section-box">
+          <div class="dp-section-box-hdr">Morning Meeting</div>
+          <div class="dp-section-box-body">${ta('dp-morning',d.morningMeeting,4,'')}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 2: Event Planner -->
+  <div class="dp-page">
+    <div class="dp-page-hdr">
+      <span class="dp-page-hdr-title">${esc(dn)}'s Event Planner</span>
+      <span class="dp-page-hdr-date">${dateStr}</span>
+    </div>
+    <div class="dp-event-grid">`;
+
+  events.forEach((ev,i)=>{
+    const prefix = readOnly ? `ro_ev${i}` : `ev${i}`;
+    html += `
+      <div class="dp-event-box">
+        <div class="dp-event-quadrant">
+          <div class="dp-event-qnames" style="position:relative;z-index:1;">
+            <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q0" oninput="${readOnly?'':'dpMarkDirty()'}"\
+ style="border-right:1px solid var(--border);border-bottom:1px solid var(--border);">${esc(ev.q?.[0]||'')}</textarea>
+            <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q1" oninput="${readOnly?'':'dpMarkDirty()}"\
+ style="border-bottom:1px solid var(--border);">${esc(ev.q?.[1]||'')}</textarea>
+            <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q2" oninput="${readOnly?'':'dpMarkDirty()}"\
+ style="border-right:1px solid var(--border);">${esc(ev.q?.[2]||'')}</textarea>
+            <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q3" oninput="${readOnly?'':'dpMarkDirty()'}\">${esc(ev.q?.[3]||'')}</textarea>
+          </div>
+        </div>
+        <div class="dp-event-footer">
+          <div class="dp-event-footer-cell">
+            <div class="dp-event-footer-lbl">Location</div>
+            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-loc" value="${esc(ev.location||'')}" placeholder="Location…" oninput="${readOnly?'':'dpMarkDirty()}"/>
+          </div>
+          <div class="dp-event-footer-cell">
+            <div class="dp-event-footer-lbl">Breakeven</div>
+            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-be" value="${esc(ev.breakeven||'')}" placeholder="Breakeven…" oninput="${readOnly?'':'dpMarkDirty()}"/>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  html += `
+    </div>
+  </div>`;
+
+  return html;
+}
+
+/* ── Flush / save ─────────────────────────── */
+function dpMarkDirty(){
+  clearTimeout(dpSaveDirtyTimer);
+  const st = document.getElementById('dp-save-status');
+  if(st) st.textContent = 'Unsaved changes…';
+  dpSaveDirtyTimer = setTimeout(()=>{ dpFlushCurrentDay(); dpSaveCurrentDay(); }, 1200);
+}
+
+function dpFlushCurrentDay(){
+  const dates = dpGetWeekDates();
+  const date = dates[dpActiveDayIdx];
+  if(!dpData[date]) dpData[date] = dpBlank();
+  const d = dpData[date].daily;
+  const events = dpData[date].events;
+
+  const g = id => { const el=document.getElementById(id); return el?el.value:''; };
+
+  d.trainees = g('dp-trainees');
+  d.solo = g('dp-solo');
+  d.leaders = g('dp-leaders');
+  d.lmNotes = g('dp-lm-notes');
+  d.lmUnder = g('dp-lm-under');
+  d.lmEqual = g('dp-lm-equal');
+  d.lmOver = g('dp-lm-over');
+  d.tpt1 = g('dp-tpt1');
+  d.tpt2 = g('dp-tpt2');
+  d.announcements = g('dp-announcements');
+  d.topPerformers = g('dp-top-performers');
+  d.keyConversations = g('dp-key-convos');
+  d.sitDowns = g('dp-sit-downs');
+  d.morningMeeting = g('dp-morning');
+
+  events.forEach((ev,i)=>{
+    ev.q = [g(`ev${i}-q0`),g(`ev${i}-q1`),g(`ev${i}-q2`),g(`ev${i}-q3`)];
+    ev.location = g(`ev${i}-loc`);
+    ev.breakeven = g(`ev${i}-be`);
+  });
+}
+
+async function dpSaveCurrentDay(){
+  const dates = dpGetWeekDates();
+  const date = dates[dpActiveDayIdx];
+  const st = document.getElementById('dp-save-status');
+  try{
+    await api({action:'saveDailyPlanner',manager:managerName,date,data:JSON.stringify(dpData[date])});
+    if(st){st.textContent='Saved ✓';setTimeout(()=>st.textContent='',3000);}
+  }catch(e){
+    if(st) st.textContent='Save failed — check connection';
+  }
+}
+
+function dpSave(){
+  dpFlushCurrentDay();
+  dpSaveCurrentDay();
+}
+
+/* ── Share modal ─────────────────────────── */
+function dpShowShareModal(){
+  // Get all manager names from the system (reuse `managers` var if available, else parse from known data)
+  const allMgrs = (typeof managers!=='undefined'?managers:[]).filter(m=>m!==managerName);
+  const chips = document.getElementById('dp-share-chips');
+  if(!chips)return;
+  if(!allMgrs.length){
+    chips.innerHTML='<div style="font-size:12px;color:var(--muted);">No other managers found. Make sure the Script URL is configured.</div>';
+  } else {
+    chips.innerHTML = allMgrs.map(m=>{
+      const dn = m.charAt(0).toUpperCase()+m.slice(1);
+      const sel = dpSharedWith.includes(m)?'selected':'';
+      return`<div class="dp-mgr-chip ${sel}" onclick="this.classList.toggle('selected')" data-mgr="${esc(m)}">
+        <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${dn.charAt(0)}</span>
+        ${esc(dn)}
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('dp-share-modal-backdrop').style.display='flex';
+}
+
+function dpCloseShareModal(){
+  document.getElementById('dp-share-modal-backdrop').style.display='none';
+}
+
+async function dpSaveSharing(){
+  const selected = [...document.querySelectorAll('.dp-mgr-chip.selected')].map(c=>c.dataset.mgr);
+  dpSharedWith = selected;
+  const week = dpGetWeekDates()[0];
+  try{
+    await api({action:'saveDpSharing',manager:managerName,sharedWith:selected,week});
+    const badge = document.getElementById('dp-shared-badge');
+    if(badge) badge.style.display = selected.length?'':'none';
+    dpCloseShareModal();
+    showToast(`Planner shared with ${selected.length} manager${selected.length!==1?'s':''}${selected.length?'':'nobody'}  ✓`,'success');
+    // Reload to get fresh shared data
+    dpLoadAndRender();
+  }catch(e){ showToast('Failed to save sharing','error'); }
+}
 </script>
