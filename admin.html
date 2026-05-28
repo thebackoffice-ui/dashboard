@@ -1631,7 +1631,7 @@ function copyLink(url,btn) {
 
 // ── Tabs ───────────────────────────────────────────────
 function switchTab(tab) {
-  const tabNames = ['overview','people','upload','calendar','reviews','notifications','setup'];
+  const tabNames = ['overview','people','upload','calendar','reviews','notifications','planner','setup'];
   document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', tabNames[i] === tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`));
   if(tab==='upload'){renderUploadHistory();renderManagerCheckboxes();}
