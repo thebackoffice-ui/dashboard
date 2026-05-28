@@ -2448,7 +2448,7 @@ function pgRender() {
         </div>
         <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Members — click to toggle</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${memberChips || '<span style="font-size:12px;color:var(--muted);">No managers yet</span>'}</div>
-        <div style="font-size:11px;color:var(--muted);">${g.members.length} manager${g.members.length!==1?'s':''} share one planner${g.members.length>0?' — shared under <code style="font-size:11px;background:var(--surface);padding:1px 5px;border-radius:4px;">'+ g.members.slice().sort()[0] +'</code>'s key':''}</div>
+        <div style="font-size:11px;color:var(--muted);">${g.members.length} manager${g.members.length!==1?'s':''} share one planner${g.members.length>0?' — shared under <code style="font-size:11px;background:var(--surface);padding:1px 5px;border-radius:4px;">'+ g.members.slice().sort()[0] +'</code>&#39;s key':''}</div>
       </div>`;
     }).join('');
   }
