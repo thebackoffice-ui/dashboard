@@ -758,7 +758,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 .lb2-controls { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
 .lb2-view-group { display:flex; background:var(--niond-surface,#fff); border:1px solid var(--niond-border,#e8ecee); border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.05); flex-shrink:0; }
 [data-theme="dark"] .lb2-view-group { background:var(--surface); border-color:var(--border); }
-.lb-view-btn { background:none; border:none; border-right:1px solid var(--niond-border,#e8ecee); color:var(--niond-muted,#6b7d8a); font-family:var(--font); font-size:12px; font-weight:600; padding:9px 14px; cursor:pointer; transition:all .15s; white-space:nowrap; }
+.lb-view-btn { background:none; border:none; border-right:1px solid var(--niond-border,#e8ecee); color:var(--niond-muted,#6b7d8a); font-family:var(--font); font-size:12px; font-weight:600; padding:9px 0; cursor:pointer; transition:all .15s; white-space:nowrap; min-width:52px; text-align:center; }
 [data-theme="dark"] .lb-view-btn { border-right-color:var(--border); color:var(--muted); }
 .lb-view-btn:last-child { border-right:none; }
 .lb-view-btn:hover:not(.active) { color:var(--niond-text,#0f1923); background:rgba(15,118,110,.05); }
@@ -775,16 +775,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 .lb-camp-pill:hover { background:rgba(15,118,110,.06); border-color:rgba(15,118,110,.3); color:#0f766e; }
 .lb-camp-pill.active { background:#0f766e; border-color:#0f766e; color:#fff; box-shadow:0 2px 8px rgba(15,118,110,.25); }
 
-/* ── Stats strip ── */
-.lb2-stats-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
-.lb-stat-card { background:var(--niond-surface,#fff); border:1px solid var(--niond-border,#e8ecee); border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,.05); transition:box-shadow .18s; }
-[data-theme="dark"] .lb-stat-card { background:var(--surface); border-color:var(--border); }
-.lb-stat-card:hover { box-shadow:0 4px 14px rgba(15,118,110,.1), 0 1px 3px rgba(0,0,0,.04); border-color:rgba(15,118,110,.2); }
-[data-theme="dark"] .lb-stat-card:hover { box-shadow:0 4px 14px rgba(20,184,166,.1); border-color:rgba(20,184,166,.2); }
 
-.lb-stat-val { font-size:28px; font-weight:800; letter-spacing:-.04em; color:#0f766e; line-height:1; margin-top:4px; }
-[data-theme="dark"] .lb-stat-val { color:#2dd4bf; }
-.lb-stat-lbl { font-size:11px; color:var(--niond-muted,#6b7d8a); margin-top:6px; text-transform:uppercase; letter-spacing:.08em; font-weight:600; }
 
 /* ── Podium ── */
 .lb2-podium-section { margin-bottom:20px; }
@@ -839,6 +830,13 @@ select.wr-input{cursor:pointer;appearance:none;}
   border:2px solid transparent;
   flex-shrink:0;
 }
+/* Medal colours — podium only */
+.lb-av-gold   { background:#fef3c7; color:#92400e; border-color:#f59e0b; }
+.lb-av-silver { background:#f1f5f9; color:#475569; border-color:#94a3b8; }
+.lb-av-bronze { background:#fff7ed; color:#7c2d12; border-color:#c2855a; }
+/* Neutral — list rows */
+.lb-av-neutral { background:var(--niond-bg,#f0f3f6); color:var(--niond-muted,#6b7d8a); border-color:var(--niond-border,#e8ecee); }
+[data-theme="dark"] .lb-av-neutral { background:var(--surface2); color:var(--muted); border-color:var(--border); }
 
 .lb-p-name { font-size:15px; font-weight:700; margin-bottom:3px; letter-spacing:-.02em; color:var(--niond-text,#0f1923); }
 [data-theme="dark"] .lb-p-name { color:var(--text); }
@@ -1378,6 +1376,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
             <button class="lb-view-btn" data-view="Wed" onclick="lbSetView(this,'Wed')">Wed</button>
             <button class="lb-view-btn" data-view="Thu" onclick="lbSetView(this,'Thu')">Thu</button>
             <button class="lb-view-btn" data-view="Fri" onclick="lbSetView(this,'Fri')">Fri</button>
+            <button class="lb-view-btn" data-view="Sat" onclick="lbSetView(this,'Sat')">Sat</button>
           </div>
           <div class="lb2-search-wrap">
             <svg class="lb2-search-ico" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1386,8 +1385,6 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
           <div class="lb2-camp-pills" id="lb-campaign-pills"></div>
         </div>
 
-        <!-- Stats strip -->
-        <div class="lb2-stats-strip" id="lb-stats-strip"></div>
 
         <!-- Podium -->
         <div id="lb-podium-wrap"></div>
@@ -3603,13 +3600,6 @@ function lbRender(){
   const total=rows.reduce((s,r)=>s+lbNum(r[lbView]),0);
   const avgScore=rows.length?Math.round(total/rows.length):0;
 
-  // Stats strip
-  document.getElementById('lb-stats-strip').innerHTML=[
-    {val:total.toLocaleString(),lbl:'Total Production'},
-    {val:rows.length,lbl:'Reps on Board'},
-    {val:avgScore.toLocaleString(),lbl:'Avg Score'},
-  ].map(s=>`<div class="lb-stat-card"><div class="lb-stat-val">${s.val}</div><div class="lb-stat-lbl">${s.lbl}</div></div>`).join('');
-
   if(!rows.length){
     document.getElementById('lb-podium-wrap').innerHTML='';
     document.getElementById('lb-list').innerHTML='<div class="lb-empty">No results found</div>';
@@ -3631,11 +3621,11 @@ function lbRender(){
       <div class="lb2-podium">${podOrder.map((r,pi)=>{
         const score=lbNum(r[lbView]);
         const pct=Math.round((score/maxScore)*100);
-        const av=lbAvColor(r.Agent);
         const initials=lbAvInitials(r.Agent);
+        const medalClass=['lb-av-silver','lb-av-gold','lb-av-bronze'][pi];
         return`<div class="lb-podium-card ${podClass[pi]}">
           <span class="lb-p-rank-num">${podLabel[pi]}</span>
-          <div class="lb-p-av" style="background:${av.bg};color:${av.color};border-color:${av.border};">${initials}</div>
+          <div class="lb-p-av ${medalClass}">${initials}</div>
           <div class="lb-p-name">${esc(r.Agent)}</div>
           <div class="lb-p-camp">${esc(r.Campaign||'—')}</div>
           <div class="lb-p-score">${score.toLocaleString()}</div>
@@ -3663,12 +3653,11 @@ function lbRender(){
       ${rows.map((r,i)=>{
         const score=lbNum(r[lbView]);
         const pct=Math.round((score/maxScore)*100);
-        const av=lbAvColor(r.Agent);
         const initials=lbAvInitials(r.Agent);
         return`<div class="lb-row ${i===0?'lb-top':''}">
           <div class="lb-rank">${i+1}</div>
           <div class="lb-rep-cell">
-            <div class="lb-row-av" style="background:${av.bg};color:${av.color};border-color:${av.border};">${initials}</div>
+            <div class="lb-row-av lb-av-neutral">${initials}</div>
             <div style="min-width:0;">
               <div class="lb-row-name">${esc(r.Agent)}</div>
               <div class="lb-row-camp">${esc(r.Campaign||'—')}</div>
@@ -3683,29 +3672,26 @@ function lbRender(){
       }).join('')}
     </div>`;
 
-  // Animate bars in after paint
-  requestAnimationFrame(()=>{
-    document.querySelectorAll('.lb-bar,.lb-p-bar').forEach(b=>{
-      const target=b.getAttribute('data-w')||b.style.width;
-      b.style.width='0';
-      requestAnimationFrame(()=>{ b.style.width=target||'0%'; });
-    });
-    // Set podium bar targets
-    const podBars=document.querySelectorAll('.lb-p-bar');
+  // Animate bars: set all to 0, then after a tick set real widths
+  // Podium bars
+  const podBars=document.querySelectorAll('.lb-p-bar');
+  podOrder.forEach((r,pi)=>{ if(podBars[pi])podBars[pi].style.width='0%'; });
+  // List bars
+  const listBars=document.querySelectorAll('.lb-bar');
+  listBars.forEach(b=>b.style.width='0%');
+
+  setTimeout(()=>{
     podOrder.forEach((r,pi)=>{
       if(!r||!podBars[pi])return;
-      const score=lbNum(r[lbView]);
-      const pct=Math.round((score/maxScore)*100);
+      const pct=Math.round((lbNum(r[lbView])/maxScore)*100);
       podBars[pi].style.width=pct+'%';
     });
-    // Set list bar targets
-    document.querySelectorAll('.lb-bar').forEach((b,i)=>{
+    listBars.forEach((b,i)=>{
       if(!rows[i])return;
-      const score=lbNum(rows[i][lbView]);
-      const pct=Math.round((score/maxScore)*100);
+      const pct=Math.round((lbNum(rows[i][lbView])/maxScore)*100);
       b.style.width=pct+'%';
     });
-  });
+  }, 40);
 }
 
 // ── Util ──────────────────────────────────────────────
