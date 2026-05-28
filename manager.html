@@ -4786,9 +4786,14 @@ async function dpPollForChanges(){
           dpRenderDay();
           dpSetSyncStatus('saved','Updated by teammate ✓');
           setTimeout(()=>dpSetSyncStatus('',''), 3000);
+        } else {
+          // User is typing — update hash so next poll re-checks cleanly
+          dpLastSavedHash = incoming;
         }
       } else {
         dpLastSavedHash = incoming;
+        // First successful poll — re-render collab bar now we know the group
+        if(!dpPollInitialised) dpRenderDay();
         dpPollInitialised = true;
       }
     }
@@ -4797,9 +4802,8 @@ async function dpPollForChanges(){
 
 function dpStartPoll(){
   clearInterval(dpPollTimer);
-  if(dpGroupMembers.length>1){
-    dpPollTimer = setInterval(dpPollForChanges, 4000);
-  }
+  // Always poll — the poll itself re-fetches group membership each tick
+  dpPollTimer = setInterval(dpPollForChanges, 4000);
 }
 
 function dpBlank(){
