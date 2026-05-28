@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Back Office</title>
+<script>/* Prevent dark mode FOUC */(function(){var t=localStorage.getItem('tt_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -3883,7 +3884,8 @@ function lbRender(){
 }
 
 // ── Util ──────────────────────────────────────────────
-async function api(p){const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(p)});const text=await r.text();if(!r.ok)throw new Error('HTTP '+r.status+': '+text.slice(0,200));try{return JSON.parse(text);}catch(e){throw new Error('Apps Script did not return JSON: '+text.slice(0,200));}}
+function getMgrToken(){return sessionStorage.getItem('tt_mgr_token_'+managerName)||'';}
+async function api(p){const body=JSON.stringify({token:getMgrToken(),...p});const r=await fetch(SCRIPT_URL,{method:'POST',body});const text=await r.text();if(!r.ok)throw new Error('HTTP '+r.status+': '+text.slice(0,200));try{return JSON.parse(text);}catch(e){throw new Error('Apps Script did not return JSON: '+text.slice(0,200));}}
 function showToast(msg,type,dur){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',dur||3000);}
 window.addEventListener('resize',()=>{
   if(document.getElementById('ptab-map').classList.contains('active'))renderEdges();

@@ -305,7 +305,7 @@ select.form-input { cursor: pointer; }
       <span class="week-label" id="week-display">—</span>
       <button class="nav-btn" id="next-week" onclick="changeWeek(1)">›</button>
     </div>
-    <button class="icon-btn" onclick="loadAll()">↻ Refresh</button>
+    <button class="icon-btn" onclick="loadAll(true)">↻ Refresh</button>
     <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙 Dark</button>
   </div>
 </header>
@@ -1454,41 +1454,81 @@ window.onload = () => {
   // No session token — show login screen (already visible by default)
 };
 
-async function loadAll() {
+// Tracks which tabs have already loaded their data this session
+const _tabLoaded = new Set();
+
+async function loadAll(force=false) {
   if (!scriptUrl) { showEmpty(); return; }
+  if (force) _tabLoaded.clear();
   document.getElementById('teams-grid').innerHTML = '<div class="loading-state"><span class="spinner"></span>Loading…</div>';
   try {
-    const [data, reportsData, picsData] = await Promise.all([
+    // ── Phase 1: Core data needed for Overview only ──────────────────
+    const [data, picsData] = await Promise.all([
       api({action:'getAllData'}),
-      api({action:'getAllReports'}),
       api({action:'getAllProfilePics'})
     ]);
     managers=data.managers||[]; allSubs=data.subs||[]; allPeople=data.people||[]; allRoster=data.roster||[];
-    allUploadedReports=reportsData.reports||[];
     (picsData.pics||[]).forEach(p => { if(p.picUrl) allProfilePics[p.manager] = p.picUrl; });
     if (data.managerPasswordStatus) managerPasswordStatus = data.managerPasswordStatus;
 
     const ws=new Set();
     allSubs.forEach(s=>ws.add(s.week));
     ws.add(currentWeek);
-    // Add 4 upcoming weeks so admin can navigate forward
     for(let i=1;i<=4;i++){const fw=new Date();fw.setDate(fw.getDate()-(fw.getDay()===0?6:fw.getDay()-1)+i*7);ws.add(fw.toISOString().split('T')[0]);}
     allWeeks=Array.from(ws).sort();
     if (!viewWeekKey||!allWeeks.includes(viewWeekKey)) viewWeekKey=currentWeek;
 
+    // Overview renders immediately — user sees data fast
     renderOverview(); renderPeople(); renderLinks();
-    try { await pgLoad(); } catch(e) { console.warn('pgLoad failed:', e); }
-    loadWeeklyReviews();
-    loadReviewEmails();
 
-    loadAllCalendarEvents();
+    // ── Phase 2: Background loads that don't block the UI ────────────
+    // Run in background — tabs will also lazy-load on first open,
+    // but pre-fetching here means they're instant if user navigates quickly.
+    Promise.allSettled([
+      _loadReportsData(),
+      _loadCalendarData(),
+      _loadReviewsData(),
+      _loadPlannerData(),
+      loadDeadlineSettings(),
+    ]).then(() => { runDeadlineCheck(); });
 
-    loadDeadlineSettings();
-    runDeadlineCheck();
   } catch(e) {
     showToast('Failed to load — check script URL','error',5000);
     document.getElementById('teams-grid').innerHTML='<div class="no-data"><strong>Could not load data</strong>Check your Apps Script URL in the Setup tab.</div>';
   }
+}
+
+// ── Lazy loaders — each runs once, then marks itself done ─────────────
+
+async function _loadReportsData() {
+  if (_tabLoaded.has('upload')) return;
+  _tabLoaded.add('upload');
+  try {
+    const res = await api({action:'getAllReports'});
+    allUploadedReports = res.reports||[];
+    updateCampaignSuggestions();
+  } catch(e) { _tabLoaded.delete('upload'); }
+}
+
+async function _loadCalendarData() {
+  if (_tabLoaded.has('calendar')) return;
+  _tabLoaded.add('calendar');
+  try { await loadAllCalendarEvents(); } catch(e) { _tabLoaded.delete('calendar'); }
+}
+
+async function _loadReviewsData() {
+  if (_tabLoaded.has('reviews')) return;
+  _tabLoaded.add('reviews');
+  try {
+    await loadWeeklyReviews();
+    await loadReviewEmails();
+  } catch(e) { _tabLoaded.delete('reviews'); }
+}
+
+async function _loadPlannerData() {
+  if (_tabLoaded.has('planner')) return;
+  _tabLoaded.add('planner');
+  try { await pgLoad(); } catch(e) { _tabLoaded.delete('planner'); }
 }
 
 async function loadAllCalendarEvents() {
@@ -1840,27 +1880,66 @@ function switchTab(tab) {
   const tabNames = ['overview','people','upload','calendar','reviews','notifications','planner','setup','audit'];
   document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', tabNames[i] === tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`));
-  if(tab==='upload'){renderUploadHistory();renderManagerCheckboxes();}
-  if(tab==='planner'){pgRender();}
-  if(tab==='calendar'){renderCalManagerCheckboxes();renderCalHistory();}
-  if(tab==='reviews'){
-    // Pre-select the currently viewed week in the filter so context is preserved
-    populateReviewFilters();
-    const wkSel=document.getElementById('review-filter-week');
-    if(wkSel&&viewWeekKey&&viewWeekKey!==currentWeek){
-      const opt=Array.from(wkSel.options).find(o=>o.value===viewWeekKey);
-      if(opt){wkSel.value=viewWeekKey;}
+
+  if (tab === 'upload') {
+    if (!_tabLoaded.has('upload')) {
+      _showTabSpinner('ul-history');
+      _loadReportsData().then(() => { renderUploadHistory(); renderManagerCheckboxes(); updateCampaignSuggestions(); });
+    } else {
+      renderUploadHistory(); renderManagerCheckboxes();
     }
-    renderReviews();
   }
-  if(tab==='notifications'){renderNotifManagerCheckboxes();refreshLiveNotifs();loadNotifTemplates();}
-  if(tab==='audit'){loadAuditLog();}
-  // Show currently-viewed week in the people tab header
-  if(tab==='people'){
-    const lbl=document.querySelector('#tab-people .sec-lbl');
-    if(lbl&&viewWeekKey!==currentWeek)lbl.textContent='All people ever tracked (viewing w/c '+formatWeek(viewWeekKey)+')';
-    else if(lbl)lbl.textContent='All people ever tracked';
+
+  if (tab === 'calendar') {
+    if (!_tabLoaded.has('calendar')) {
+      _showTabSpinner('cal-history');
+      _loadCalendarData().then(() => { renderCalManagerCheckboxes(); renderCalHistory(); });
+    } else {
+      renderCalManagerCheckboxes(); renderCalHistory();
+    }
   }
+
+  if (tab === 'reviews') {
+    if (!_tabLoaded.has('reviews')) {
+      _showTabSpinner('reviews-list');
+      _loadReviewsData().then(() => { populateReviewFilters(); _preselectReviewWeek(); renderReviews(); });
+    } else {
+      populateReviewFilters(); _preselectReviewWeek(); renderReviews();
+    }
+  }
+
+  if (tab === 'notifications') {
+    renderNotifManagerCheckboxes(); refreshLiveNotifs(); loadNotifTemplates();
+  }
+
+  if (tab === 'planner') {
+    if (!_tabLoaded.has('planner')) {
+      _loadPlannerData().then(() => pgRender());
+    } else {
+      pgRender();
+    }
+  }
+
+  if (tab === 'audit') { loadAuditLog(); }
+
+  if (tab === 'people') {
+    const lbl = document.querySelector('#tab-people .sec-lbl');
+    if (lbl && viewWeekKey !== currentWeek) lbl.textContent = 'All people ever tracked (viewing w/c ' + formatWeek(viewWeekKey) + ')';
+    else if (lbl) lbl.textContent = 'All people ever tracked';
+  }
+}
+
+function _preselectReviewWeek() {
+  const wkSel = document.getElementById('review-filter-week');
+  if (wkSel && viewWeekKey && viewWeekKey !== currentWeek) {
+    const opt = Array.from(wkSel.options).find(o => o.value === viewWeekKey);
+    if (opt) wkSel.value = viewWeekKey;
+  }
+}
+
+function _showTabSpinner(containerId) {
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = '<div class="loading-state"><span class="spinner"></span>Loading…</div>';
 }
 
 async function loadAuditLog() {
