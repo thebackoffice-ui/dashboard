@@ -1416,16 +1416,11 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
 
         <div class="report-tabs">
           <button class="rtab-btn active" onclick="switchReportTab('pay')">💰 Pay Reports</button>
-          <button class="rtab-btn" onclick="switchReportTab('planner')">📅 Daily Planners</button>
           <button class="rtab-btn" onclick="switchReportTab('prolog')">📋 Pro-logs</button>
         </div>
         <div class="rtab-panel active" id="rtab-pay">
           <div id="pay-summary-strip"></div>
           <div id="pay-reports-list"></div>
-        </div>
-        <div class="rtab-panel" id="rtab-planner">
-          <div id="planner-summary-strip"></div>
-          <div id="planner-reports-list"></div>
         </div>
         <div class="rtab-panel" id="rtab-prolog">
           <div id="prolog-summary-strip"></div>
@@ -2002,8 +1997,6 @@ function renderHome(){
   const payReports=allReports.filter(r=>r.type==='Pay Report').sort((a,b)=>b.week.localeCompare(a.week));
   const latestPay=payReports[0]||null;
   const isThisWeekPay=latestPay&&(()=>{const rep=parseDate(latestPay.week);const mon=parseDate(weekKey);if(!rep||!mon)return false;const sun=new Date(mon);sun.setDate(sun.getDate()+6);return rep>=mon&&rep<=sun;})();
-  const planners=allReports.filter(r=>r.type==='Daily Planner').sort((a,b)=>b.week.localeCompare(a.week));
-  const latestPlanner=planners[0]||null;
   const prologs=allReports.filter(r=>r.type==='Pro-log').sort((a,b)=>b.week.localeCompare(a.week));
   const latestProlog=prologs[0]||null;
 
@@ -2125,16 +2118,11 @@ function renderHome(){
               <div><div style="font-size:13px;font-weight:600;color:var(--muted);">Pay Report</div><div style="font-size:11px;color:var(--subtle);">Not uploaded yet</div></div>
             </div>`}
 
-        ${latestPlanner
-          ?`<a href="${esc(latestPlanner.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:var(--niond-shadow);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03)'">
-              <div style="width:34px;height:34px;border-radius:8px;background:#FFF4E0;color:#FFA800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.cal}</div>
-              <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);">Daily Planner</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">${esc(latestPlanner.campaign||'')}</div></div>
-              <div style="color:var(--muted);">${SVG.chev}</div>
-            </a>`
-          :`<div style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;box-shadow:var(--niond-shadow);opacity:.55;">
-              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.cal}</div>
-              <div><div style="font-size:13px;font-weight:600;color:var(--muted);">Daily Planner</div><div style="font-size:11px;color:var(--subtle);">Not uploaded yet</div></div>
-            </div>`}
+        <div onclick="switchTab('planner')" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;box-shadow:var(--niond-shadow);cursor:pointer;transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04)'" onmouseout="this.style.boxShadow='var(--niond-shadow)'">
+          <div style="width:34px;height:34px;border-radius:8px;background:#FFF4E0;color:#FFA800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.cal}</div>
+          <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);">Daily Planner</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">Open this week's planner</div></div>
+          <div style="color:var(--muted);">${SVG.chev}</div>
+        </div>
 
         ${latestProlog
           ?`<a href="${esc(latestProlog.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:var(--niond-shadow);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03)'">
@@ -2563,7 +2551,6 @@ function buildPayProductionCard(week){
 
 function renderReports(){
   _renderPayReports();
-  _renderSimpleReports(allReports.filter(r=>r.type==='Daily Planner'),'planner-reports-list','planner-summary-strip','rt-planner','📅','#FFF4E0','#FFA800');
   _renderSimpleReports(allReports.filter(r=>r.type==='Pro-log'),'prolog-reports-list','prolog-summary-strip','rt-prolog','📋','#E0F7F4','#00BFA5');
   // Inline pay chart at top of reports page
   setTimeout(rptPtcRenderChart, 80);
