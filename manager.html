@@ -785,7 +785,7 @@ select.wr-input{cursor:pointer;appearance:none;}
   background:var(--niond-surface,#fff);
   border:1px solid var(--niond-border,#e8ecee);
   border-radius:14px;
-  padding:22px 22px 20px;
+  padding:16px 18px 14px;
   text-align:left;
   box-shadow:0 1px 4px rgba(0,0,0,.05);
   transition:transform .2s,box-shadow .2s;
@@ -803,7 +803,7 @@ select.wr-input{cursor:pointer;appearance:none;}
   box-shadow:0 6px 24px rgba(15,118,110,.14), 0 1px 4px rgba(0,0,0,.05);
 }
 [data-theme="dark"] .lb-podium-1 { border-color:rgba(20,184,166,.35); box-shadow:0 6px 24px rgba(20,184,166,.12); }
-.lb-podium-2,.lb-podium-3 { padding-top:18px; }
+.lb-podium-2,.lb-podium-3 { padding-top:14px; }
 
 /* Medal hidden */
 .lb-medal { display:none; }
@@ -811,7 +811,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 /* Rank label */
 .lb-p-rank-num {
   font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
-  color:var(--niond-muted,#6b7d8a); margin-bottom:16px; display:block;
+  color:var(--niond-muted,#6b7d8a); margin-bottom:10px; display:block;
 }
 [data-theme="dark"] .lb-p-rank-num { color:var(--muted); }
 .lb-podium-1 .lb-p-rank-num { color:#0f766e; }
@@ -819,10 +819,10 @@ select.wr-input{cursor:pointer;appearance:none;}
 
 /* Avatar — podium only, medal colours */
 .lb-p-av {
-  width:44px; height:44px; border-radius:50%;
+  width:38px; height:38px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  font-size:15px; font-weight:700;
-  margin-bottom:14px;
+  font-size:13px; font-weight:700;
+  margin-bottom:10px;
   border:2px solid transparent;
   flex-shrink:0;
 }
@@ -832,25 +832,19 @@ select.wr-input{cursor:pointer;appearance:none;}
 .lb-av-neutral { background:var(--niond-bg,#f0f3f6); color:var(--niond-muted,#6b7d8a); border-color:var(--niond-border,#e8ecee); }
 [data-theme="dark"] .lb-av-neutral { background:var(--surface2); color:var(--muted); border-color:var(--border); }
 
-.lb-p-name { font-size:16px; font-weight:700; margin-bottom:2px; letter-spacing:-.02em; color:var(--niond-text,#0f1923); }
+.lb-p-name { font-size:14px; font-weight:700; margin-bottom:2px; letter-spacing:-.02em; color:var(--niond-text,#0f1923); }
 [data-theme="dark"] .lb-p-name { color:var(--text); }
-.lb-p-camp { font-size:11px; color:var(--niond-muted,#6b7d8a); margin-bottom:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lb-p-camp { font-size:11px; color:var(--niond-muted,#6b7d8a); margin-bottom:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 [data-theme="dark"] .lb-p-camp { color:var(--muted); }
 
 /* Score — big for 1st, solid for 2nd/3rd */
-.lb-p-score { font-size:30px; font-weight:900; letter-spacing:-.05em; line-height:1; color:var(--niond-text,#0f1923); margin-bottom:14px; }
+.lb-p-score { font-size:26px; font-weight:900; letter-spacing:-.05em; line-height:1; color:var(--niond-text,#0f1923); margin-bottom:0; }
 [data-theme="dark"] .lb-p-score { color:var(--text); }
-.lb-podium-1 .lb-p-score { font-size:36px; color:#0f766e; }
+.lb-podium-1 .lb-p-score { font-size:30px; color:#0f766e; }
 [data-theme="dark"] .lb-podium-1 .lb-p-score { color:#2dd4bf; }
 
-/* Podium progress bar */
-.lb-p-bar-wrap { height:5px; background:var(--niond-border,#e8ecee); border-radius:3px; overflow:hidden; margin-bottom:8px; }
-[data-theme="dark"] .lb-p-bar-wrap { background:var(--border); }
-.lb-p-bar { height:100%; border-radius:3px; background:linear-gradient(90deg,#0f766e,#14b8a6); transition:width .6s cubic-bezier(.4,0,.2,1); }
-.lb-p-bar-meta { font-size:11px; font-weight:600; color:var(--niond-muted,#6b7d8a); }
-[data-theme="dark"] .lb-p-bar-meta { color:var(--muted); }
-.lb-podium-1 .lb-p-bar-meta { color:#0f766e; }
-[data-theme="dark"] .lb-podium-1 .lb-p-bar-meta { color:#2dd4bf; }
+.lb-p-bar-wrap { display:none; }
+.lb-p-bar-meta { display:none; }
 
 /* ── Section header ── */
 .lb2-list-section { display:flex; flex-direction:column; }
@@ -863,7 +857,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 /* ── Table header ── */
 .lb2-table-hdr {
   display:grid;
-  grid-template-columns:52px 1fr 80px 140px;
+  grid-template-columns:52px 1fr auto;
   gap:12px;
   align-items:center;
   padding:0 16px 8px;
@@ -882,7 +876,7 @@ select.wr-input{cursor:pointer;appearance:none;}
   border-radius:10px;
   padding:11px 16px;
   display:grid;
-  grid-template-columns:52px 1fr 80px 140px;
+  grid-template-columns:52px 1fr auto;
   align-items:center;
   gap:12px;
   box-shadow:0 1px 2px rgba(0,0,0,.04);
@@ -898,10 +892,9 @@ select.wr-input{cursor:pointer;appearance:none;}
 .lb-row.lb-top {
   background:#fff;
   border-color:rgba(15,118,110,.35);
-  border-left:3px solid #0f766e;
   box-shadow:0 2px 10px rgba(15,118,110,.1);
 }
-[data-theme="dark"] .lb-row.lb-top { background:var(--surface); border-color:rgba(20,184,166,.3); border-left-color:#14b8a6; box-shadow:0 2px 10px rgba(20,184,166,.1); }
+[data-theme="dark"] .lb-row.lb-top { background:var(--surface); border-color:rgba(20,184,166,.3); box-shadow:0 2px 10px rgba(20,184,166,.1); }
 
 /* rank */
 .lb-rank { font-size:13px; font-weight:800; color:var(--niond-muted,#6b7d8a); text-align:center; }
@@ -910,7 +903,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 [data-theme="dark"] .lb-row.lb-top .lb-rank { color:#2dd4bf; }
 
 /* rep cell — NO avatar in list, just name + campaign */
-.lb-rep-cell { display:flex; flex-direction:column; justify-content:center; min-width:0; }
+.lb-rep-cell { display:flex; align-items:center; gap:10px; min-width:0; }
 .lb-row-name { font-size:13px; font-weight:600; letter-spacing:-.01em; color:var(--niond-text,#0f1923); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 [data-theme="dark"] .lb-row-name { color:var(--text); }
 .lb-row.lb-top .lb-row-name { color:#0f1923; font-weight:700; }
@@ -924,21 +917,16 @@ select.wr-input{cursor:pointer;appearance:none;}
 .lb-row.lb-top .lb-score { color:#0f766e; font-size:18px; }
 [data-theme="dark"] .lb-row.lb-top .lb-score { color:#2dd4bf; }
 
-/* bar cell — thicker, more purposeful */
-.lb-bar-cell { display:flex; align-items:center; gap:8px; }
-.lb-bar-wrap { flex:1; height:6px; background:var(--niond-border,#e8ecee); border-radius:4px; overflow:hidden; min-width:50px; }
-[data-theme="dark"] .lb-bar-wrap { background:var(--border); }
-.lb-bar { height:100%; border-radius:4px; background:linear-gradient(90deg,#0f766e,#14b8a6); transition:width .5s cubic-bezier(.4,0,.2,1); }
-.lb-row.lb-top .lb-bar { background:linear-gradient(90deg,#0a5550,#0f766e); }
-.lb-bar-pct { font-size:11px; font-weight:700; color:var(--niond-muted,#6b7d8a); white-space:nowrap; min-width:36px; text-align:right; }
-[data-theme="dark"] .lb-bar-pct { color:var(--muted); }
-.lb-row.lb-top .lb-bar-pct { color:#0f766e; }
-[data-theme="dark"] .lb-row.lb-top .lb-bar-pct { color:#2dd4bf; }
+.lb-bar-cell { display:none; }
 
 /* legacy */
 .lb-score-wrap { text-align:right; }
-/* keep unused av class safe */
-.lb-row-av { display:none; }
+.lb-row-av {
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700;
+  flex-shrink:0; border:1.5px solid transparent;
+}
 
 .lb-empty { text-align:center; padding:60px 20px; color:var(--niond-muted,#6b7d8a); font-size:14px; }
 [data-theme="dark"] .lb-empty { color:var(--muted); }
@@ -3628,8 +3616,6 @@ function lbRender(){
           <div class="lb-p-name">${esc(r.Agent)}</div>
           <div class="lb-p-camp">${esc(r.Campaign||'—')}</div>
           <div class="lb-p-score">${score.toLocaleString()}</div>
-          <div class="lb-p-bar-wrap"><div class="lb-p-bar" style="width:0%"></div></div>
-          <div class="lb-p-bar-meta">${pct}% of top</div>
         </div>`;
       }).join('')}</div>
     </div>`;
@@ -3651,42 +3637,21 @@ function lbRender(){
       </div>
       ${rows.map((r,i)=>{
         const score=lbNum(r[lbView]);
-        const pct=Math.round((score/maxScore)*100);
         return`<div class="lb-row ${i===0?'lb-top':''}">
           <div class="lb-rank">${i+1}</div>
           <div class="lb-rep-cell">
-            <div class="lb-row-name">${esc(r.Agent)}</div>
-            <div class="lb-row-camp">${esc(r.Campaign||'—')}</div>
+            <div class="lb-row-av lb-av-neutral">${lbAvInitials(r.Agent)}</div>
+            <div style="min-width:0;">
+              <div class="lb-row-name">${esc(r.Agent)}</div>
+              <div class="lb-row-camp">${esc(r.Campaign||'—')}</div>
+            </div>
           </div>
           <div class="lb-score">${score.toLocaleString()}</div>
-          <div class="lb-bar-cell">
-            <div class="lb-bar-wrap"><div class="lb-bar" style="width:0%"></div></div>
-            <span class="lb-bar-pct">${pct}%</span>
-          </div>
         </div>`;
       }).join('')}
     </div>`;
 
-  // Animate bars: set all to 0, then after a tick set real widths
-  // Podium bars
-  const podBars=document.querySelectorAll('.lb-p-bar');
-  podOrder.forEach((r,pi)=>{ if(podBars[pi])podBars[pi].style.width='0%'; });
-  // List bars
-  const listBars=document.querySelectorAll('.lb-bar');
-  listBars.forEach(b=>b.style.width='0%');
 
-  setTimeout(()=>{
-    podOrder.forEach((r,pi)=>{
-      if(!r||!podBars[pi])return;
-      const pct=Math.round((lbNum(r[lbView])/maxScore)*100);
-      podBars[pi].style.width=pct+'%';
-    });
-    listBars.forEach((b,i)=>{
-      if(!rows[i])return;
-      const pct=Math.round((lbNum(rows[i][lbView])/maxScore)*100);
-      b.style.width=pct+'%';
-    });
-  }, 40);
 }
 
 // ── Util ──────────────────────────────────────────────
