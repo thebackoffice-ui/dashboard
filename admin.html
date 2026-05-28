@@ -590,7 +590,7 @@ select.form-input { cursor: pointer; }
         <div class="step"><span>Delete existing code, paste in the <strong>Apps Script below</strong> (copy button top-right), and save</span></div>
         <div class="step"><span>Click <strong>Deploy → New deployment → Web app</strong> · Set "Who has access" to <strong>Anyone</strong> · Deploy · copy the URL</span></div>
         <div class="step"><span>In Apps Script go to <strong>Project Settings → Script Properties</strong> · Add property <code>TOKEN_SECRET</code> with a long random value (e.g. 40 random characters) — this secures admin tokens</span></div>
-        <div class="step"><span>Paste that URL here and also inside <code>manager.html</code> where it says <code>PASTE_YOUR_APPS_SCRIPT_URL_HERE</code></span></div>
+        <div class="step"><span>Paste that URL into the field below and click <strong>Save URL</strong> — <code>manager.html</code> reads it automatically from the same browser storage</span></div>
       </div>
       <div class="url-row">
         <input type="text" id="script-url-input" placeholder="https://script.google.com/macros/s/…/exec" />
@@ -610,7 +610,7 @@ select.form-input { cursor: pointer; }
 
     <div class="setup-card">
       <h3>Submission deadline reminder</h3>
-      <p>Automatically send a notification to managers who haven't submitted their weekly update by a set day/time. Runs each time the admin page is loaded while the deadline has passed this week.</p>
+      <p>Automatically send a notification to managers who haven't submitted their weekly update by a set day/time. Clicking <strong>Save &amp; activate</strong> installs a server-side Apps Script trigger that runs daily at 8am — this is the reliable mechanism and works even when nobody has the admin panel open. The admin page also runs a fallback check on load as a backup.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
         <div>
           <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">Deadline day</div>
@@ -754,22 +754,45 @@ function getPicFolder() { const folderName='BackOffice_ProfilePics'; const folde
 
 function doPost(e) {
   const data = JSON.parse(e.postData.contents);
+  // ── Rate limiting ─────────────────────────────────────
+  // Allow max 60 requests per manager/IP per minute for write actions
+  // Login attempts are stricter: max 10 per IP per 15 minutes
+  const cache = CacheService.getScriptCache();
+  const clientId = (data.manager || 'anon') + '_' + (e.parameter.ip || 'x');
+  const isLoginAction = data.action === 'adminLogin' || data.action === 'checkPassword';
+  const rateCacheKey = (isLoginAction ? 'rl_login_' : 'rl_') + clientId;
+  const rateLimit = isLoginAction ? 10 : 60;
+  const rateTtl = isLoginAction ? 900 : 60;
+  const current = parseInt(cache.get(rateCacheKey) || '0', 10);
+  if (current >= rateLimit) {
+    return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Too many requests. Please wait before trying again.'})).setMimeType(ContentService.MimeType.JSON);
+  }
+  cache.put(rateCacheKey, String(current + 1), rateTtl);
+  // ─────────────────────────────────────────────────────
   let result = {};
+
+  // ── Password hashing helpers ───────────────────────────────────
+  function hashPassword(pw) { const salt=Utilities.getUuid(); const hash=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,salt+pw); const hex=hash.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return salt+':'+hex; }
+  function verifyPassword(pw,stored) { if(!stored)return false; if(stored.indexOf(':')===-1)return stored===pw; const parts=stored.split(':'); const salt=parts[0],storedHex=parts[1]; const hash=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,salt+pw); const hex=hash.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return hex===storedHex; }
+  // ──────────────────────────────────────────────────────
 
   if (data.action === 'adminLogin') {
     const sh=getOrCreate('settings',['key','value','updatedAt']); const rows=sh.getDataRange().getValues().slice(1); const row=rows.find(r=>r[0]==='adminPassword'); const storedPw=row?String(row[1]):'';
-    if (!storedPw) { const nr=sh.getDataRange().getValues(); let f=false; for(let i=1;i<nr.length;i++){if(nr[i][0]==='adminPassword'){sh.getRange(i+1,2,1,2).setValues([[data.password,new Date().toISOString()]]);f=true;break;}} if(!f)sh.appendRow(['adminPassword',data.password,new Date().toISOString()]); result={ok:true,token:makeToken('admin'),firstSetup:true};
-    } else if (storedPw===String(data.password)) { result={ok:true,token:makeToken('admin')};
+    if (!storedPw) { const hashed=hashPassword(data.password); const nr=sh.getDataRange().getValues(); let f=false; for(let i=1;i<nr.length;i++){if(nr[i][0]==='adminPassword'){sh.getRange(i+1,2,1,2).setValues([[hashed,new Date().toISOString()]]);f=true;break;}} if(!f)sh.appendRow(['adminPassword',hashed,new Date().toISOString()]); result={ok:true,token:makeToken('admin'),firstSetup:true};
+    } else if (verifyPassword(data.password,storedPw)) { if(storedPw.indexOf(':')===-1){const hashed=hashPassword(data.password);const nr=sh.getDataRange().getValues();for(let i=1;i<nr.length;i++){if(nr[i][0]==='adminPassword'){sh.getRange(i+1,2,1,2).setValues([[hashed,new Date().toISOString()]]);break;}}} result={ok:true,token:makeToken('admin')};
     } else { result={ok:false,error:'Incorrect password.'}; }
 
   } else if (data.action === 'setAdminPassword') {
     if (!verifyToken(data.token||'','admin')) return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Unauthorised'})).setMimeType(ContentService.MimeType.JSON);
-    const sh=getOrCreate('settings',['key','value','updatedAt']); const rows=sh.getDataRange().getValues(); let f=false; for(let i=1;i<rows.length;i++){if(rows[i][0]==='adminPassword'){sh.getRange(i+1,2,1,2).setValues([[data.newPassword,new Date().toISOString()]]);f=true;break;}} if(!f)sh.appendRow(['adminPassword',data.newPassword,new Date().toISOString()]); result={ok:true};
+    const sh=getOrCreate('settings',['key','value','updatedAt']); const hashed=hashPassword(data.newPassword); const rows=sh.getDataRange().getValues(); let f=false; for(let i=1;i<rows.length;i++){if(rows[i][0]==='adminPassword'){sh.getRange(i+1,2,1,2).setValues([[hashed,new Date().toISOString()]]);f=true;break;}} if(!f)sh.appendRow(['adminPassword',hashed,new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'checkPassword') {
     const mh=getOrCreate('managers',['name','password']); const rows=mh.getDataRange().getValues().slice(1); const row=rows.find(r=>r[0]===data.manager);
     if (!row) { result={ok:false,error:'Manager not found.'};
-    } else { const sp=row.length>1?String(row[1]).trim():''; if(!sp){result={ok:false,noPassword:true,error:'No password set — contact your admin.'};} else if(sp===String(data.password)){result={ok:true};} else{result={ok:false,error:'Incorrect password.'};} }
+    } else { const sp=row.length>1?String(row[1]).trim():''; if(!sp){result={ok:false,noPassword:true,error:'No password set — contact your admin.'};} else if(verifyPassword(data.password,sp)){if(sp.indexOf(':')===-1){const hashed=hashPassword(data.password);const allRows=mh.getDataRange().getValues();for(let i=1;i<allRows.length;i++){if(allRows[i][0]===data.manager){mh.getRange(i+1,2).setValue(hashed);break;}}} result={ok:true,token:makeToken('mgr:'+data.manager)};} else{result={ok:false,error:'Incorrect password.'};} }
+
+  } else if (data.action === 'checkToken') {
+    result={ok: verifyToken(data.token||'','mgr:'+data.manager)};
 
   } else if (data.action === 'submit') {
     const sh=getOrCreate('submissions',['timestamp','manager','week','name','email','position','leaver']); const rows=sh.getDataRange().getValues();
@@ -812,7 +835,7 @@ function doPost(e) {
 
   } else if (data.action === 'setPassword') {
     const mh=getOrCreate('managers',['name','password']); const rows=mh.getDataRange().getValues();
-    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){mh.getRange(i+1,2).setValue(data.password);result={ok:true};break;}}
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){mh.getRange(i+1,2).setValue(hashPassword(data.password));result={ok:true};break;}}
 
   } else if (data.action === 'removeManager') {
     const mh=getOrCreate('managers',['name','password']); const rows=mh.getDataRange().getValues();
@@ -1617,7 +1640,9 @@ async function api(payload) {
   // Attach admin token to every request so Apps Script can validate it
   const body = JSON.stringify({ ...payload, token: adminToken });
   const res = await fetch(scriptUrl, { method:'POST', body });
-  return res.json();
+  const text = await res.text();
+  if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + text.slice(0, 200));
+  try { return JSON.parse(text); } catch(e) { throw new Error('Apps Script did not return JSON: ' + text.slice(0, 200)); }
 }
 
 // ── Upload reports ────────────────────────────────────

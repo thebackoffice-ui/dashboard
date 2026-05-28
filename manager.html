@@ -1248,7 +1248,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 </style>
 </head>
 <body>
-<script>const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyeCMHtk4box-1rKwTt4UKF5UlpsyGWB2QISs522KkoQvJ3XzhjvvQ8wcOWU3bYJ7dc/exec';
+<script>const SCRIPT_URL=(()=>{const u=localStorage.getItem('teamtracker_script_url')||'';if(!u){document.getElementById('login-screen').innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;flex-direction:column;gap:12px;color:#555;"><strong style="font-size:16px;color:#111;">Setup required</strong><p style="font-size:13px;text-align:center;max-width:340px;">No Apps Script URL is configured. Open the Admin panel, go to the Setup tab, and save the Script URL first.</p></div>';} return u;})();
 function applyPositionClasses(){
   document.querySelectorAll('[data-position],[data-pos]').forEach(el=>{
     const p=(el.dataset.position||el.dataset.pos||'').toLowerCase();
@@ -1835,7 +1835,12 @@ async function doLogin(){
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Checking…';input.disabled=true;
   try{
     const res=await api({action:'checkPassword',manager:managerName,password:pw});
-    if(res&&res.ok){sessionStorage.setItem('tt_authed_'+managerName,'1');btn.innerHTML='<span class="spinner"></span>Loading…';showApp();return;}
+    if(res&&res.ok){
+      // Store a signed token returned by the server (falls back to flag if server doesn't return one yet)
+      const tokenKey='tt_mgr_token_'+managerName;
+      sessionStorage.setItem(tokenKey, res.token||'authed');
+      btn.innerHTML='<span class="spinner"></span>Loading…';showApp();return;
+    }
     // FIX 2: clear no-password message
     if(res&&res.noPassword){
       err.textContent='No password has been set for your account. Please ask your admin to set one.';
@@ -1848,7 +1853,19 @@ async function doLogin(){
 }
 document.getElementById('login-btn').addEventListener('click',doLogin);
 document.getElementById('login-pw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-function checkAuth(){if(sessionStorage.getItem('tt_authed_'+managerName)==='1')showApp();}
+function checkAuth(){
+  const tokenKey='tt_mgr_token_'+managerName;
+  const stored=sessionStorage.getItem(tokenKey);
+  if(!stored)return;
+  // Verify with server — if rejected, clear and stay on login screen
+  if(!SCRIPT_URL)return;
+  api({action:'checkToken',manager:managerName,token:stored})
+    .then(res=>{
+      if(res&&res.ok){showApp();}
+      else{sessionStorage.removeItem(tokenKey);}
+    })
+    .catch(()=>{sessionStorage.removeItem(tokenKey);});
+}
 
 function showApp(){
   document.getElementById('login-screen').style.display='none';
