@@ -1214,19 +1214,21 @@ select.wr-input{cursor:pointer;appearance:none;}
 .dp-section-box-hdr.accent{background:var(--accent);color:#fff;}
 .dp-section-box-body{padding:6px 8px;}
 /* Event planner page */
-.dp-event-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 20px;}
-.dp-event-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.dp-event-quadrant{position:relative;height:140px;border-bottom:1px solid var(--border);}
-.dp-event-quadrant::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);}
-.dp-event-quadrant::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border);}
+.dp-event-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px 20px;}
+.dp-event-box{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.dp-event-box-hdr{background:var(--accent);color:#fff;padding:7px 12px;display:flex;align-items:center;}
+.dp-event-box-num{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.9;}
+.dp-event-quadrant{position:relative;height:150px;border-bottom:1px solid var(--border);}
+.dp-event-quadrant::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);z-index:0;}
+.dp-event-quadrant::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border);z-index:0;}
 .dp-event-qnames{display:grid;grid-template-columns:1fr 1fr;height:100%;}
-.dp-event-qname{padding:6px 8px;font-size:11px;color:var(--text);background:none;border:none;outline:none;font-family:var(--font);resize:none;line-height:1.4;}
+.dp-event-qname{padding:7px 9px;font-size:11px;color:var(--text);background:none;border:none;outline:none;font-family:var(--font);resize:none;line-height:1.5;position:relative;z-index:1;}
 .dp-event-qname:focus{background:var(--accent-soft);}
 .dp-event-qname::placeholder{color:var(--subtle);}
-.dp-event-footer{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);}
-.dp-event-footer-cell{padding:7px 8px;border-right:1px solid var(--border);display:flex;align-items:center;}
+.dp-event-footer{display:grid;grid-template-columns:1fr 1fr;background:var(--surface2);}
+.dp-event-footer-cell{padding:6px 10px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:2px;}
 .dp-event-footer-cell:last-child{border-right:none;}
-.dp-event-footer-lbl{font-size:9px;font-weight:800;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px;}
+.dp-event-footer-lbl{font-size:9px;font-weight:800;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;}
 .dp-event-footer-input{width:100%;background:none;border:none;color:var(--text);font-family:var(--font);font-size:12px;outline:none;padding:0;}
 .dp-event-footer-input::placeholder{color:var(--subtle);}
 /* Save bar */
@@ -4939,6 +4941,9 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
     const prefix = readOnly ? `ro_ev${i}` : `ev${i}`;
     html += `
       <div class="dp-event-box">
+        <div class="dp-event-box-hdr">
+          <span class="dp-event-box-num">Event ${i+1}</span>
+        </div>
         <div class="dp-event-quadrant">
           <div class="dp-event-qnames" style="position:relative;z-index:1;">
             <textarea class="dp-event-qname" ${ro} placeholder="Name…" id="${prefix}-q0" oninput="${readOnly?'':'dpMarkDirty()'}"\
@@ -4952,10 +4957,12 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
         </div>
         <div class="dp-event-footer">
           <div class="dp-event-footer-cell">
-            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-loc" value="${esc(ev.location||'')}" placeholder="Location…" oninput="${readOnly?'':'dpMarkDirty()'}"/>
+            <div class="dp-event-footer-lbl">📍 Location</div>
+            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-loc" value="${esc(ev.location||'')}" placeholder="Enter location…" oninput="${readOnly?'':'dpMarkDirty()'}"/>
           </div>
           <div class="dp-event-footer-cell">
-            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-be" value="${esc(ev.breakeven||'')}" placeholder="Breakeven…" oninput="${readOnly?'':'dpMarkDirty()'}"/>
+            <div class="dp-event-footer-lbl">⚡ Breakeven</div>
+            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-be" value="${esc(ev.breakeven||'')}" placeholder="e.g. 3 sales" oninput="${readOnly?'':'dpMarkDirty()'}"/>
           </div>
         </div>
       </div>`;
