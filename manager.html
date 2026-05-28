@@ -4701,21 +4701,27 @@ function dpInit(){
   dpLoadAndRender();
 }
 
+async function dpFetchGroup(){
+  // Returns true if assigned, false if not. Updates dpGroupOwner/Members/etc.
+  const prefRes = await api({action:'getDpSharing',manager:managerName});
+  dpSharedWith = prefRes.sharedWith||[];
+  dpAdminAssigned = prefRes.adminAssigned||false;
+  if(!dpAdminAssigned) return false;
+  dpGroupMembers = [managerName, ...dpSharedWith].sort();
+  dpGroupOwner = dpGroupMembers[0];
+  const badge = document.getElementById('dp-shared-badge');
+  if(badge) badge.style.display = dpSharedWith.length?'':'none';
+  return true;
+}
+
 async function dpLoadAndRender(silent=false){
   const dates = dpGetWeekDates();
   try{
-    const prefRes = await api({action:'getDpSharing',manager:managerName});
-    dpSharedWith = prefRes.sharedWith||[];
-    dpAdminAssigned = prefRes.adminAssigned||false;
-    // If not assigned by admin, show locked state
-    if(!dpAdminAssigned){
+    const assigned = await dpFetchGroup();
+    if(!assigned){
       dpRenderLocked();
       return;
     }
-    dpGroupMembers = [managerName, ...dpSharedWith].sort();
-    dpGroupOwner = dpGroupMembers[0];
-    const badge = document.getElementById('dp-shared-badge');
-    if(badge) badge.style.display = dpSharedWith.length?'':'none';
     // Load all 5 days from the group owner's planner
     const results = await Promise.all(dates.map(date=>api({action:'getDailyPlanner',manager:dpGroupOwner,date})));
     results.forEach((res,i)=>{
@@ -4750,13 +4756,28 @@ function dpRenderLocked(){
 
 async function dpPollForChanges(){
   try{
+    // Re-fetch group each poll so membership changes take effect live
+    const prevOwner = dpGroupOwner;
+    const assigned = await dpFetchGroup();
+    if(!assigned){
+      // Admin removed this manager from their group mid-session
+      clearInterval(dpPollTimer);
+      dpRenderLocked();
+      return;
+    }
+    // If the group owner changed (admin reassigned), do a full reload
+    if(prevOwner && prevOwner !== dpGroupOwner){
+      dpLastSavedHash = '';
+      dpPollInitialised = false;
+      await dpLoadAndRender();
+      return;
+    }
     const dates = dpGetWeekDates();
     const date = dates[dpActiveDayIdx];
-    const res = await api({action:'getDailyPlanner',manager:dpGroupOwner||managerName,date});
+    const res = await api({action:'getDailyPlanner',manager:dpGroupOwner,date});
     if(res.data){
       const incoming = res.data;
       if(dpPollInitialised && incoming !== dpLastSavedHash){
-        // Remote change — only apply if user isn't actively typing
         const active = document.activeElement;
         const editing = active && (active.tagName==='TEXTAREA'||active.tagName==='INPUT') && document.getElementById('dp-pages-wrap')?.contains(active);
         if(!editing){
