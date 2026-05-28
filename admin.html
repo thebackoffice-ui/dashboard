@@ -862,9 +862,10 @@ function doPost(e) {
   // Allow max 60 requests per manager/IP per minute for write actions
   // Login attempts are stricter: max 10 per IP per 15 minutes
   const cache = CacheService.getScriptCache();
-  const clientId = (data.manager || 'anon') + '_' + (e.parameter.ip || 'x');
+  // For login actions use a stable key; e.parameter is not available for POST
+  var clientKey = data.manager || data.action || 'anon';
   const isLoginAction = data.action === 'adminLogin' || data.action === 'checkPassword';
-  const rateCacheKey = (isLoginAction ? 'rl_login_' : 'rl_') + clientId;
+  const rateCacheKey = (isLoginAction ? 'rl_login_' : 'rl_') + clientKey;
   const rateLimit = isLoginAction ? 10 : 60;
   const rateTtl = isLoginAction ? 900 : 60;
   const current = parseInt(cache.get(rateCacheKey) || '0', 10);
@@ -1296,7 +1297,14 @@ async function doAdminLogin() {
   btn.disabled = true; btn.textContent = 'Checking…';
   try {
     const res = await fetch(scriptUrl, { method:'POST', body: JSON.stringify({ action:'adminLogin', password: val }) });
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) {
+      err.textContent = 'Apps Script returned an unexpected response. Check it is deployed correctly and set to "Anyone" access.';
+      err.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Sign in';
+      return;
+    }
     if (data.ok && data.token) {
       adminToken = data.token;
       sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
@@ -1345,17 +1353,24 @@ function checkAdminAuth() {
         if(inp){inp.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
         loadAll();
       } else {
-        // Token rejected or expired — clear it and show login
+        // Token rejected or expired — clear and show login screen
         sessionStorage.removeItem(ADMIN_TOKEN_KEY);
         adminToken = '';
+        document.getElementById('admin-login-screen').style.display = '';
+        document.getElementById('admin-main-wrap').style.display = 'none';
       }
     })
     .catch(() => {
-      // Network error — clear token, show login
+      // Network error — clear token and show login screen so user can retry
       sessionStorage.removeItem(ADMIN_TOKEN_KEY);
       adminToken = '';
+      document.getElementById('admin-login-screen').style.display = '';
+      document.getElementById('admin-main-wrap').style.display = 'none';
     });
-  return true; // Return true optimistically so the login screen stays hidden during the check
+  // Hide login screen optimistically while we verify — it snaps back if rejected
+  document.getElementById('admin-login-screen').style.display = 'none';
+  document.getElementById('admin-main-wrap').style.display = 'block';
+  return true;
 }
 
 // ── Theme ──────────────────────────────────────────────
