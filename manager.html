@@ -1021,32 +1021,37 @@ select.wr-input{cursor:pointer;appearance:none;}
 [data-theme="dark"] .ptc-stat{background:var(--surface2);}
 
 /* ══════════════════════════════════════════
-   NOTES TAB
+   NOTES TAB — v2
 ══════════════════════════════════════════ */
 .notes-shell{display:flex;height:100%;overflow:hidden;}
 /* Sidebar */
-.notes-sb{width:214px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.notes-sb{width:220px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
 .notes-sb-top{padding:14px 12px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .notes-sb-title{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
 .notes-new-btn{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:700;padding:8px 0;border-radius:6px;cursor:pointer;width:100%;transition:opacity .15s;}
 .notes-new-btn:hover{opacity:.85;}
 .notes-folder-scroll{flex:1;overflow-y:auto;padding:6px 8px;}
-.nf-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .12s;user-select:none;}
+.nf-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .12s;user-select:none;position:relative;}
 .nf-item:hover{background:var(--surface2);color:var(--text);}
 .nf-item.active{background:var(--accent-soft,rgba(15,118,110,.08));color:var(--accent);font-weight:700;}
 .nf-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.nf-count{margin-left:auto;font-size:10px;font-weight:700;color:var(--subtle);background:var(--surface2);border-radius:10px;padding:1px 6px;}
+.nf-count{font-size:10px;font-weight:700;color:var(--subtle);background:var(--surface2);border-radius:10px;padding:1px 6px;}
 .nf-item.active .nf-count{background:var(--accent-soft,rgba(15,118,110,.1));color:var(--accent);}
+.nf-del-btn{display:none;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 2px;line-height:1;margin-left:2px;flex-shrink:0;}
+.nf-item:hover .nf-del-btn{display:block;}
+.nf-del-btn:hover{color:var(--danger);}
 .nf-add-btn{display:flex;align-items:center;gap:6px;padding:7px 9px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:6px;border:none;background:none;width:100%;font-family:var(--font);transition:all .12s;}
 .nf-add-btn:hover{background:var(--surface2);color:var(--accent);}
 /* Main area */
 .notes-main{flex:1;display:flex;overflow:hidden;background:var(--bg);}
-.notes-list-col{width:260px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
-.notes-list-toolbar{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.notes-list-col{width:268px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.notes-list-toolbar{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .notes-list-search-wrap{position:relative;flex:1;}
 .notes-list-search{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:6px 10px 6px 28px;border-radius:20px;outline:none;transition:border-color .15s;}
 .notes-list-search:focus{border-color:var(--accent);}
 .nls-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;}
+.notes-sort-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--font);font-size:11px;padding:5px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.notes-sort-btn:hover{border-color:var(--accent);color:var(--accent);}
 .notes-list-items{flex:1;overflow-y:auto;padding:8px;}
 .n-card{border-radius:8px;padding:11px 12px;cursor:pointer;transition:all .15s;margin-bottom:4px;border:1px solid transparent;}
 .n-card:hover{background:var(--surface2);}
@@ -1055,30 +1060,66 @@ select.wr-input{cursor:pointer;appearance:none;}
 .n-card-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px;}
 .n-pin-ico{font-size:10px;color:var(--accent);flex-shrink:0;}
 .n-card-preview{font-size:11px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;}
-.n-card-meta{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.n-card-meta{display:flex;align-items:center;gap:5px;margin-top:6px;flex-wrap:wrap;}
 .n-folder-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid transparent;}
+.n-tag-pill{font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
 .n-date{font-size:10px;color:var(--subtle);margin-left:auto;}
-/* Editor */
+/* Rich text editor */
 .notes-editor-col{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.notes-editor-hdr{padding:12px 18px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.notes-editor-hdr{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .n-title-input{flex:1;background:none;border:none;color:var(--text);font-family:var(--font);font-size:15px;font-weight:700;outline:none;padding:0;}
 .n-title-input::placeholder{color:var(--subtle);}
-.n-ed-actions{display:flex;gap:6px;align-items:center;}
+.n-ed-actions{display:flex;gap:5px;align-items:center;}
 .n-ed-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .15s;}
 .n-ed-btn:hover{border-color:var(--accent);color:var(--accent);}
 .n-ed-btn.pinned{border-color:var(--accent);color:var(--accent);background:var(--accent-soft,rgba(15,118,110,.08));}
 .n-ed-btn.del:hover{border-color:var(--danger);color:var(--danger);}
-.notes-editor-body{flex:1;overflow-y:auto;padding:18px 20px;background:var(--surface);}
-.n-body-input{width:100%;height:100%;min-height:300px;background:none;border:none;color:var(--text);font-family:var(--font);font-size:13px;line-height:1.75;resize:none;outline:none;}
-.n-body-input::placeholder{color:var(--subtle);}
-.n-ed-folder-row{padding:8px 18px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.n-ed-folder-lbl{font-size:11px;color:var(--muted);font-weight:500;}
+/* Toolbar */
+.notes-toolbar{padding:6px 16px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:2px;flex-shrink:0;flex-wrap:wrap;}
+.nt-btn{background:none;border:1px solid transparent;color:var(--muted);font-family:var(--font);font-size:12px;font-weight:600;padding:4px 7px;border-radius:5px;cursor:pointer;transition:all .12s;line-height:1;min-width:28px;text-align:center;}
+.nt-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border);}
+.nt-btn.active{background:var(--accent-soft,rgba(15,118,110,.1));color:var(--accent);border-color:var(--accent-border,rgba(15,118,110,.25));}
+.nt-sep{width:1px;height:16px;background:var(--border);margin:0 4px;flex-shrink:0;}
+/* Editor body */
+.notes-editor-body{flex:1;overflow-y:auto;padding:20px 24px;background:var(--surface);}
+.n-rich-editor{width:100%;min-height:300px;outline:none;color:var(--text);font-family:var(--font);font-size:13.5px;line-height:1.8;caret-color:var(--accent);}
+.n-rich-editor:empty:before{content:attr(data-placeholder);color:var(--subtle);pointer-events:none;}
+.n-rich-editor h1{font-size:20px;font-weight:700;margin:0 0 10px;color:var(--text);}
+.n-rich-editor h2{font-size:16px;font-weight:700;margin:0 0 8px;color:var(--text);}
+.n-rich-editor h3{font-size:14px;font-weight:700;margin:0 0 6px;color:var(--text);}
+.n-rich-editor strong{font-weight:700;}
+.n-rich-editor em{font-style:italic;}
+.n-rich-editor s{text-decoration:line-through;color:var(--muted);}
+.n-rich-editor ul,.n-rich-editor ol{padding-left:22px;margin:4px 0;}
+.n-rich-editor li{margin:3px 0;}
+.n-rich-editor blockquote{border-left:3px solid var(--accent);padding:4px 12px;margin:6px 0;color:var(--muted);background:var(--accent-soft,rgba(15,118,110,.05));border-radius:0 4px 4px 0;}
+.n-rich-editor pre{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:12px;color:var(--text);overflow-x:auto;margin:6px 0;}
+.n-rich-editor hr{border:none;border-top:1px solid var(--border);margin:12px 0;}
+.n-rich-editor input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;margin-right:6px;cursor:pointer;vertical-align:middle;}
+/* Tags bar */
+.n-tags-row{padding:7px 16px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0;}
+.n-tag-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);cursor:default;}
+.n-tag-badge button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0;line-height:1;}
+.n-tag-badge button:hover{color:var(--danger);}
+.n-add-tag-btn{background:none;border:1px dashed var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:2px 9px;border-radius:20px;cursor:pointer;transition:all .15s;}
+.n-add-tag-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* Footer bar */
+.n-ed-footer{padding:7px 16px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.n-ed-folder-lbl{font-size:11px;color:var(--muted);font-weight:500;flex-shrink:0;}
 .n-ed-folder-sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:4px 8px;border-radius:6px;outline:none;cursor:pointer;}
-.n-ed-save-pill{margin-left:auto;font-size:11px;color:var(--subtle);}
+.n-ed-save-pill{font-size:11px;color:var(--subtle);}
+.n-history-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--font);font-size:11px;padding:3px 9px;border-radius:20px;cursor:pointer;transition:all .15s;margin-left:auto;}
+.n-history-btn:hover{border-color:var(--accent);color:var(--accent);}
 /* Empty states */
 .notes-blank{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-size:13px;background:var(--surface);}
 .notes-blank-ico{font-size:34px;opacity:.3;margin-bottom:4px;}
-/* Folder create modal */
+/* Templates bar */
+.notes-tmpl-bar{padding:7px 16px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.notes-tmpl-lbl{font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;}
+.notes-tmpl-sel{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:4px 8px;border-radius:6px;outline:none;cursor:pointer;}
+.notes-tmpl-save-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:3px 9px;border-radius:20px;cursor:pointer;transition:all .15s;}
+.notes-tmpl-save-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* Folder modal */
 .nf-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:700;display:flex;align-items:center;justify-content:center;}
 .nf-modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px;width:300px;box-shadow:0 16px 40px rgba(0,0,0,.2);}
 .nf-modal-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;}
@@ -1086,6 +1127,20 @@ select.wr-input{cursor:pointer;appearance:none;}
 .nf-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;}
 .nf-swatch.sel{border-color:var(--text);transform:scale(1.2);}
 .nf-modal-actions{display:flex;gap:8px;justify-content:flex-end;}
+/* History modal */
+.n-hist-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:700;display:flex;align-items:center;justify-content:center;}
+.n-hist-modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px;width:480px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 16px 40px rgba(0,0,0,.2);}
+.n-hist-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;flex-shrink:0;}
+.n-hist-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+.n-hist-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .15s;}
+.n-hist-item:hover{border-color:var(--accent);}
+.n-hist-meta{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.n-hist-preview{font-size:12px;color:var(--text);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;}
+/* Tag input popover */
+.n-tag-popover{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:600;display:flex;gap:6px;align-items:center;}
+.n-tag-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:5px 9px;border-radius:6px;outline:none;width:150px;transition:border-color .15s;}
+.n-tag-input:focus{border-color:var(--accent);}
+.n-tag-ok{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;}
 
 </style>
 </head>
@@ -1451,6 +1506,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
                 <svg class="nls-ico" width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                 <input class="notes-list-search" id="notes-search" type="text" placeholder="Search notes…" oninput="notesFilter()"/>
               </div>
+              <button class="notes-sort-btn" id="notes-sort-btn" onclick="notesCycleSort()" title="Change sort order">↕</button>
             </div>
             <div class="notes-list-items" id="notes-list-items"></div>
           </div>
@@ -1460,7 +1516,8 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
               <div style="font-weight:600;color:var(--text);">No note selected</div>
               <div style="font-size:12px;">Create a note or pick one from the list</div>
             </div>
-            <div id="notes-editor-wrap" style="display:none;flex:1;display:none;flex-direction:column;overflow:hidden;">
+            <div id="notes-editor-wrap" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+              <!-- Title row -->
               <div class="notes-editor-hdr">
                 <input class="n-title-input" id="n-title" placeholder="Untitled note" oninput="notesMarkDirty()"/>
                 <div class="n-ed-actions">
@@ -1468,13 +1525,59 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
                   <button class="n-ed-btn del" onclick="notesDeleteCurrent()">Delete</button>
                 </div>
               </div>
-              <div style="padding:6px 18px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-shrink:0;">
-                <span style="font-size:11px;color:var(--muted);font-weight:500;">Folder:</span>
-                <select class="n-ed-folder-sel" id="n-folder-sel" onchange="notesMarkDirty()"></select>
-                <span style="font-size:11px;color:var(--subtle);margin-left:auto;" id="n-saved-lbl"></span>
+              <!-- Template bar -->
+              <div class="notes-tmpl-bar">
+                <span class="notes-tmpl-lbl">Template:</span>
+                <select class="notes-tmpl-sel" id="n-tmpl-sel" onchange="notesApplyTemplate()">
+                  <option value="">— none —</option>
+                  <option value="1on1">1-to-1</option>
+                  <option value="perf">Performance review</option>
+                  <option value="action">Action items</option>
+                  <option value="onboard">Onboarding checklist</option>
+                  <option value="meeting">Meeting notes</option>
+                </select>
+                <button class="notes-tmpl-save-btn" onclick="notesSaveAsTemplate()">Save as template</button>
+                <select class="notes-tmpl-sel" id="n-saved-tmpl-sel" onchange="notesApplySavedTemplate()" style="margin-left:4px;">
+                  <option value="">— saved templates —</option>
+                </select>
               </div>
+              <!-- Formatting toolbar -->
+              <div class="notes-toolbar" id="notes-toolbar">
+                <button class="nt-btn" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+                <button class="nt-btn" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+                <button class="nt-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+                <div class="nt-sep"></div>
+                <button class="nt-btn" data-cmd="h1" title="Heading 1">H1</button>
+                <button class="nt-btn" data-cmd="h2" title="Heading 2">H2</button>
+                <button class="nt-btn" data-cmd="h3" title="Heading 3">H3</button>
+                <div class="nt-sep"></div>
+                <button class="nt-btn" data-cmd="insertUnorderedList" title="Bullet list">• List</button>
+                <button class="nt-btn" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+                <button class="nt-btn" data-cmd="checklist" title="Checklist">☑ Tasks</button>
+                <div class="nt-sep"></div>
+                <button class="nt-btn" data-cmd="blockquote" title="Quote">❝</button>
+                <button class="nt-btn" data-cmd="code" title="Code block">&lt;/&gt;</button>
+                <button class="nt-btn" data-cmd="insertHorizontalRule" title="Divider">—</button>
+                <div class="nt-sep"></div>
+                <button class="nt-btn" onclick="document.execCommand('undo')" title="Undo">↩</button>
+                <button class="nt-btn" onclick="document.execCommand('redo')" title="Redo">↪</button>
+              </div>
+              <!-- Tags row -->
+              <div class="n-tags-row" id="n-tags-row">
+                <span style="font-size:11px;color:var(--muted);font-weight:500;flex-shrink:0;">Tags:</span>
+                <div id="n-tags-list"></div>
+                <button class="n-add-tag-btn" onclick="notesShowTagInput(event)">+ tag</button>
+              </div>
+              <!-- Rich editor body -->
               <div class="notes-editor-body">
-                <textarea class="n-body-input" id="n-body" placeholder="Start writing…" oninput="notesMarkDirty()"></textarea>
+                <div class="n-rich-editor" id="n-body" contenteditable="true" data-placeholder="Start writing…" oninput="notesMarkDirty()"></div>
+              </div>
+              <!-- Footer: folder + save status + history -->
+              <div class="n-ed-footer">
+                <span class="n-ed-folder-lbl">Folder:</span>
+                <select class="n-ed-folder-sel" id="n-folder-sel" onchange="notesMarkDirty()"></select>
+                <span class="n-ed-save-pill" id="n-saved-lbl"></span>
+                <button class="n-history-btn" onclick="notesShowHistory()">⏱ History</button>
               </div>
             </div>
           </div>
@@ -1515,6 +1618,19 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
     </div>
   </div>
 </div>
+
+<!-- NOTE HISTORY MODAL -->
+<div id="n-hist-backdrop" class="n-hist-backdrop" style="display:none;" onclick="if(event.target===this)notesCloseHistory()">
+  <div class="n-hist-modal">
+    <div class="n-hist-title">Version history <span style="font-size:11px;font-weight:400;color:var(--muted);">— click a version to restore it</span></div>
+    <div class="n-hist-list" id="n-hist-list"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px;flex-shrink:0;">
+      <button class="modal-btn secondary" onclick="notesCloseHistory()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAG POPOVER (injected dynamically) -->
 
 <!-- Event modal -->
 <div id="event-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)closeEventModal()">
@@ -3971,20 +4087,24 @@ let notesDirtyTimer=null;
 let notesFolderPickedColor=NOTE_COLOURS[0];
 
 function notesInit(){
-  // `notes` is already loaded from the sheet by loadAll() via getNotes.
-  // It may be our JSON blob or legacy plain text — handle both.
+  // Load from sheet data first, then layer localStorage cache on top
   try{const p=JSON.parse(notes);if(p&&p.folders&&p.notes)notesData=p;}catch(e){}
-  // localStorage acts as an instant-load cache between sessions
   const cached=localStorage.getItem(`tt_notes_${managerName}`);
   if(cached){try{const p=JSON.parse(cached);if(p&&p.folders&&p.notes)notesData=p;}catch(e){}}
+  // Ensure every note has tags and history arrays
+  notesData.notes.forEach(n=>{if(!n.tags)n.tags=[];if(!n.history)n.history=[];});
+  // Ensure saved templates store
+  if(!notesData.savedTemplates)notesData.savedTemplates=[];
+  notesSortMode='date-desc';
   notesRenderFolders();
   notesRenderList();
+  notesRenderSavedTemplates();
+  notesInitToolbar();
 }
 
 function notesSave(){
   const json=JSON.stringify(notesData);
   localStorage.setItem(`tt_notes_${managerName}`,json);
-  // Reuse existing saveNotes action — same endpoint, same sheet cell, just JSON now
   notes=json;
   api({action:'saveNotes',manager:managerName,notes:json}).catch(()=>{});
 }
@@ -3993,21 +4113,87 @@ function notesMarkDirty(){
   clearTimeout(notesDirtyTimer);
   const lbl=document.getElementById('n-saved-lbl');
   if(lbl)lbl.textContent='Saving…';
-  notesDirtyTimer=setTimeout(()=>{notesFlushEdit();if(lbl)lbl.textContent='Saved ✓';},800);
+  notesDirtyTimer=setTimeout(()=>{notesFlushEdit();if(lbl)lbl.textContent='Saved ✓';setTimeout(()=>{if(lbl)lbl.textContent='';},2500);},800);
 }
 
 function notesFlushEdit(){
   if(!notesActiveNoteId)return;
   const note=notesData.notes.find(n=>n.id===notesActiveNoteId);
   if(!note)return;
+  const body=document.getElementById('n-body');
+  const newHtml=body?body.innerHTML:'';
+  // Snapshot history before overwriting (max 8 snapshots)
+  if(note.body!==undefined&&note.body!==newHtml){
+    if(!note.history)note.history=[];
+    note.history.unshift({html:note.body,savedAt:note.updatedAt||new Date().toISOString()});
+    if(note.history.length>8)note.history=note.history.slice(0,8);
+  }
   note.title=document.getElementById('n-title').value||'Untitled';
-  note.body=document.getElementById('n-body').value||'';
+  note.body=newHtml;
   note.folder=document.getElementById('n-folder-sel').value||'default';
   note.updatedAt=new Date().toISOString();
   notesRenderList();
   notesSave();
 }
 
+/* ── Toolbar ─────────────────────────────── */
+function notesInitToolbar(){
+  document.querySelectorAll('.nt-btn[data-cmd]').forEach(btn=>{
+    btn.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      const cmd=btn.dataset.cmd;
+      const editor=document.getElementById('n-body');
+      if(!editor)return;
+      editor.focus();
+      if(cmd==='h1'||cmd==='h2'||cmd==='h3'){
+        document.execCommand('formatBlock',false,cmd);
+      } else if(cmd==='blockquote'){
+        document.execCommand('formatBlock',false,'blockquote');
+      } else if(cmd==='code'){
+        document.execCommand('formatBlock',false,'pre');
+      } else if(cmd==='checklist'){
+        notesInsertChecklist();
+      } else {
+        document.execCommand(cmd,false,null);
+      }
+      notesMarkDirty();
+      notesUpdateToolbarState();
+    });
+  });
+  document.getElementById('n-body')?.addEventListener('keyup',notesUpdateToolbarState);
+  document.getElementById('n-body')?.addEventListener('mouseup',notesUpdateToolbarState);
+  // Keyboard shortcuts
+  document.getElementById('n-body')?.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();document.execCommand('bold',false,null);notesMarkDirty();}
+    if((e.ctrlKey||e.metaKey)&&e.key==='i'){e.preventDefault();document.execCommand('italic',false,null);notesMarkDirty();}
+    // Tab in editor → indent
+    if(e.key==='Tab'){e.preventDefault();document.execCommand('insertHTML',false,'&nbsp;&nbsp;&nbsp;&nbsp;');}
+  });
+}
+
+function notesUpdateToolbarState(){
+  document.querySelectorAll('.nt-btn[data-cmd]').forEach(btn=>{
+    const cmd=btn.dataset.cmd;
+    let active=false;
+    try{
+      if(['bold','italic','strikeThrough','insertUnorderedList','insertOrderedList'].includes(cmd)){
+        active=document.queryCommandState(cmd);
+      }
+    }catch(e){}
+    btn.classList.toggle('active',active);
+  });
+}
+
+function notesInsertChecklist(){
+  const editor=document.getElementById('n-body');
+  if(!editor)return;
+  const sel=window.getSelection();
+  const range=sel&&sel.rangeCount?sel.getRangeAt(0):null;
+  const html='<div><input type="checkbox" onchange="notesMarkDirty()"> <span contenteditable="true">Task item</span></div>';
+  document.execCommand('insertHTML',false,html);
+}
+
+/* ── Folders ─────────────────────────────── */
 function notesRenderFolders(){
   const all=notesData.notes.length;
   const pinned=notesData.notes.filter(n=>n.pinned).length;
@@ -4017,8 +4203,12 @@ function notesRenderFolders(){
     <div class="nf-dot" style="background:#f59e0b;"></div>📌 Pinned<span class="nf-count">${pinned}</span></div>`;}
   notesData.folders.forEach(f=>{
     const cnt=notesData.notes.filter(n=>n.folder===f.id).length;
-    html+=`<div class="nf-item ${notesActiveFolderId===f.id?'active':''}" onclick="notesSetFolder('${f.id}')">
-      <div class="nf-dot" style="background:${esc(f.color)};"></div>${esc(f.name)}<span class="nf-count">${cnt}</span></div>`;
+    html+=`<div class="nf-item ${notesActiveFolderId===f.id?'active':''}" onclick="notesSetFolder('${esc(f.id)}')">
+      <div class="nf-dot" style="background:${esc(f.color)};"></div>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(f.name)}</span>
+      <span class="nf-count">${cnt}</span>
+      <button class="nf-del-btn" onclick="notesDeleteFolder(event,'${esc(f.id)}')" title="Delete folder">×</button>
+    </div>`;
   });
   document.getElementById('nf-list').innerHTML=html;
 }
@@ -4029,36 +4219,88 @@ function notesSetFolder(id){
   notesRenderList();
 }
 
+function notesDeleteFolder(e,id){
+  e.stopPropagation();
+  const folder=notesData.folders.find(f=>f.id===id);
+  if(!folder)return;
+  const noteCount=notesData.notes.filter(n=>n.folder===id).length;
+  const msg=noteCount
+    ?`Delete folder "${folder.name}"? The ${noteCount} note${noteCount!==1?'s':''} inside will be moved to the first remaining folder.`
+    :`Delete folder "${folder.name}"?`;
+  if(!confirm(msg))return;
+  // Move notes to first remaining folder or create Uncategorised
+  const remaining=notesData.folders.filter(f=>f.id!==id);
+  const fallback=remaining[0]?.id||(()=>{
+    const uid='folder_uncategorised';
+    if(!notesData.folders.find(f=>f.id===uid))notesData.folders.push({id:uid,name:'Uncategorised',color:'#6b7d8a'});
+    return uid;
+  })();
+  notesData.notes.forEach(n=>{if(n.folder===id)n.folder=fallback;});
+  notesData.folders=notesData.folders.filter(f=>f.id!==id);
+  if(notesActiveFolderId===id)notesActiveFolderId='all';
+  notesSave();notesRenderFolders();notesRenderList();
+  showToast(`Folder "${folder.name}" deleted ✓`,'success');
+}
+
+/* ── Sort & filter ───────────────────────── */
+let notesSortMode='date-desc';
+const notesSortCycles=['date-desc','date-asc','alpha-asc','alpha-desc'];
+const notesSortLabels={'date-desc':'↓ Newest','date-asc':'↑ Oldest','alpha-asc':'A–Z','alpha-desc':'Z–A'};
+function notesCycleSort(){
+  const idx=notesSortCycles.indexOf(notesSortMode);
+  notesSortMode=notesSortCycles[(idx+1)%notesSortCycles.length];
+  const btn=document.getElementById('notes-sort-btn');
+  if(btn)btn.textContent=notesSortLabels[notesSortMode];
+  notesRenderList();
+}
 function notesFilter(){notesRenderList();}
 
 function notesRenderList(){
   const q=(document.getElementById('notes-search')?.value||'').toLowerCase();
-  let notes=[...notesData.notes];
-  if(notesActiveFolderId==='pinned')notes=notes.filter(n=>n.pinned);
-  else if(notesActiveFolderId!=='all')notes=notes.filter(n=>n.folder===notesActiveFolderId);
-  if(q)notes=notes.filter(n=>(n.title+n.body).toLowerCase().includes(q));
-  // Pinned first, then by updatedAt desc
-  notes.sort((a,b)=>{if(a.pinned&&!b.pinned)return-1;if(!a.pinned&&b.pinned)return 1;return(b.updatedAt||'').localeCompare(a.updatedAt||'');});
+  let list=[...notesData.notes];
+  if(notesActiveFolderId==='pinned')list=list.filter(n=>n.pinned);
+  else if(notesActiveFolderId!=='all')list=list.filter(n=>n.folder===notesActiveFolderId);
+  if(q)list=list.filter(n=>{
+    const tags=(n.tags||[]).join(' ').toLowerCase();
+    return(n.title+n.body+tags).toLowerCase().includes(q);
+  });
+  // Sort: pinned always first, then by selected mode
+  list.sort((a,b)=>{
+    if(a.pinned&&!b.pinned)return-1;
+    if(!a.pinned&&b.pinned)return 1;
+    if(notesSortMode==='date-asc')return(a.updatedAt||'').localeCompare(b.updatedAt||'');
+    if(notesSortMode==='alpha-asc')return(a.title||'').localeCompare(b.title||'');
+    if(notesSortMode==='alpha-desc')return(b.title||'').localeCompare(a.title||'');
+    return(b.updatedAt||'').localeCompare(a.updatedAt||'');
+  });
 
   const el=document.getElementById('notes-list-items');
   if(!el)return;
-  if(!notes.length){el.innerHTML=`<div style="text-align:center;padding:32px 0;font-size:12px;color:var(--muted);">${q?'No results':'No notes yet'}</div>`;return;}
+  if(!list.length){el.innerHTML=`<div style="text-align:center;padding:32px 0;font-size:12px;color:var(--muted);">${q?'No results':'No notes yet'}</div>`;return;}
 
-  el.innerHTML=notes.map(n=>{
+  el.innerHTML=list.map(n=>{
     const folder=notesData.folders.find(f=>f.id===n.folder);
-    const preview=(n.body||'').replace(/\n/g,' ').trim().slice(0,80);
+    // Strip HTML tags for plain text preview
+    const plainText=(n.body||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,80);
     const date=n.updatedAt?new Date(n.updatedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+    const tags=(n.tags||[]).slice(0,3);
+    const taskCount=(n.body||'').split('type="checkbox"').length-1;
+    const doneCount=(n.body||'').split('checked').length-1;
+    const taskStr=taskCount>0?`<span class="n-tag-pill">☑ ${doneCount}/${taskCount}</span>`:'';
     return`<div class="n-card ${n.pinned?'pinned':''} ${n.id===notesActiveNoteId?'active':''}" onclick="notesOpenNote('${n.id}')">
       <div class="n-card-title">${n.pinned?'<span class="n-pin-ico">📌</span>':''}${esc(n.title||'Untitled')}</div>
-      ${preview?`<div class="n-card-preview">${esc(preview)}</div>`:''}
+      ${plainText?`<div class="n-card-preview">${esc(plainText)}</div>`:''}
       <div class="n-card-meta">
         ${folder?`<span class="n-folder-pill" style="background:${folder.color}18;color:${folder.color};border-color:${folder.color}40;">${esc(folder.name)}</span>`:''}
+        ${tags.map(t=>`<span class="n-tag-pill">${esc(t)}</span>`).join('')}
+        ${taskStr}
         <span class="n-date">${date}</span>
       </div>
     </div>`;
   }).join('');
 }
 
+/* ── Open / create ───────────────────────── */
 function notesOpenNote(id){
   notesFlushEdit();
   notesActiveNoteId=id;
@@ -4068,16 +4310,26 @@ function notesOpenNote(id){
   const wrap=document.getElementById('notes-editor-wrap');
   wrap.style.display='flex';wrap.style.flexDirection='column';wrap.style.overflow='hidden';wrap.style.flex='1';
   document.getElementById('n-title').value=note.title||'';
-  document.getElementById('n-body').value=note.body||'';
+  // Rich editor: set innerHTML
+  const body=document.getElementById('n-body');
+  if(body)body.innerHTML=note.body||'';
   const pinBtn=document.getElementById('n-pin-btn');
   pinBtn.textContent=note.pinned?'📌 Unpin':'📌 Pin';
   pinBtn.className='n-ed-btn'+(note.pinned?' pinned':'');
   // Folder selector
   const sel=document.getElementById('n-folder-sel');
   sel.innerHTML=notesData.folders.map(f=>`<option value="${f.id}" ${note.folder===f.id?'selected':''}>${esc(f.name)}</option>`).join('');
+  // Tags
+  notesRenderTags();
+  // Reset template selects
+  const tmplSel=document.getElementById('n-tmpl-sel');
+  if(tmplSel)tmplSel.value='';
+  const savedTmplSel=document.getElementById('n-saved-tmpl-sel');
+  if(savedTmplSel)savedTmplSel.value='';
   const savedLbl=document.getElementById('n-saved-lbl');
   if(savedLbl)savedLbl.textContent='';
   notesRenderList();
+  notesUpdateToolbarState();
 }
 
 function notesNewNote(){
@@ -4086,7 +4338,7 @@ function notesNewNote(){
   const folderId=notesActiveFolderId==='all'||notesActiveFolderId==='pinned'
     ? (notesData.folders[0]?.id||'default')
     : notesActiveFolderId;
-  const note={id,title:'',body:'',folder:folderId,pinned:false,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  const note={id,title:'',body:'',folder:folderId,pinned:false,tags:[],history:[],createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
   notesData.notes.unshift(note);
   notesSave();
   notesRenderFolders();
@@ -4095,6 +4347,7 @@ function notesNewNote(){
   setTimeout(()=>document.getElementById('n-title')?.focus(),50);
 }
 
+/* ── Pin / delete ────────────────────────── */
 function notesTogglePin(){
   if(!notesActiveNoteId)return;
   const note=notesData.notes.find(n=>n.id===notesActiveNoteId);
@@ -4116,6 +4369,144 @@ function notesDeleteCurrent(){
   notesSave();notesRenderFolders();notesRenderList();
 }
 
+/* ── Tags ────────────────────────────────── */
+function notesRenderTags(){
+  const note=notesData.notes.find(n=>n.id===notesActiveNoteId);
+  if(!note)return;
+  const el=document.getElementById('n-tags-list');
+  if(!el)return;
+  el.innerHTML=(note.tags||[]).map(t=>`<span class="n-tag-badge">${esc(t)}<button onclick="notesRemoveTag('${esc(t)}')" title="Remove tag">×</button></span>`).join('');
+}
+
+function notesRemoveTag(tag){
+  const note=notesData.notes.find(n=>n.id===notesActiveNoteId);
+  if(!note)return;
+  note.tags=(note.tags||[]).filter(t=>t!==tag);
+  notesRenderTags();notesRenderList();notesSave();
+}
+
+function notesShowTagInput(e){
+  // Remove any existing popover
+  document.querySelectorAll('.n-tag-popover').forEach(p=>p.remove());
+  const btn=e.currentTarget;
+  const rect=btn.getBoundingClientRect();
+  const pop=document.createElement('div');
+  pop.className='n-tag-popover';
+  pop.innerHTML=`<input class="n-tag-input" id="n-tag-inp" placeholder="tag name…" maxlength="32"/>
+    <button class="n-tag-ok" onclick="notesAddTagFromInput()">Add</button>`;
+  pop.style.top=(rect.bottom+6)+'px';
+  pop.style.left=rect.left+'px';
+  document.body.appendChild(pop);
+  const inp=document.getElementById('n-tag-inp');
+  inp.focus();
+  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')notesAddTagFromInput();if(ev.key==='Escape')pop.remove();});
+  // Close on outside click
+  setTimeout(()=>document.addEventListener('click',function h(ev){if(!pop.contains(ev.target)&&ev.target!==btn){pop.remove();document.removeEventListener('click',h);}},true),0);
+}
+
+function notesAddTagFromInput(){
+  const inp=document.getElementById('n-tag-inp');
+  if(!inp)return;
+  const tag=inp.value.trim().toLowerCase().replace(/\s+/g,'-');
+  if(!tag){document.querySelectorAll('.n-tag-popover').forEach(p=>p.remove());return;}
+  const note=notesData.notes.find(n=>n.id===notesActiveNoteId);
+  if(!note)return;
+  if(!note.tags)note.tags=[];
+  if(!note.tags.includes(tag))note.tags.push(tag);
+  notesRenderTags();notesRenderList();notesSave();
+  document.querySelectorAll('.n-tag-popover').forEach(p=>p.remove());
+}
+
+/* ── Templates ───────────────────────────── */
+const NOTES_BUILTIN_TEMPLATES={
+  '1on1':{title:'1-to-1 — [Name]',body:'<h2>1-to-1 Notes</h2><p><strong>Date:</strong> </p><h3>How are they doing?</h3><p></p><h3>Wins this week</h3><ul><li></li></ul><h3>Challenges / blockers</h3><ul><li></li></ul><h3>Action items</h3><div><input type="checkbox"> <span contenteditable="true">Item 1</span></div><div><input type="checkbox"> <span contenteditable="true">Item 2</span></div>'},
+  'perf':{title:'Performance Review — [Name]',body:'<h2>Performance Review</h2><p><strong>Period:</strong> </p><h3>Strengths</h3><p></p><h3>Areas for development</h3><p></p><h3>Goals set</h3><ul><li></li></ul><h3>Overall rating</h3><p></p>'},
+  'action':{title:'Action Items',body:'<h2>Action Items</h2><p><strong>Date:</strong> </p><div><input type="checkbox"> <span contenteditable="true">Action item</span></div><div><input type="checkbox"> <span contenteditable="true">Action item</span></div><div><input type="checkbox"> <span contenteditable="true">Action item</span></div>'},
+  'onboard':{title:'Onboarding — [Name]',body:'<h2>Onboarding Checklist</h2><div><input type="checkbox"> <span contenteditable="true">Set up accounts & access</span></div><div><input type="checkbox"> <span contenteditable="true">Intro to team</span></div><div><input type="checkbox"> <span contenteditable="true">Systems walkthrough</span></div><div><input type="checkbox"> <span contenteditable="true">First week check-in</span></div><div><input type="checkbox"> <span contenteditable="true">30-day review</span></div>'},
+  'meeting':{title:'Meeting Notes — [Topic]',body:'<h2>Meeting Notes</h2><p><strong>Date:</strong> &nbsp;&nbsp;<strong>Attendees:</strong> </p><h3>Agenda</h3><ul><li></li></ul><h3>Discussion</h3><p></p><h3>Decisions made</h3><p></p><h3>Next steps</h3><div><input type="checkbox"> <span contenteditable="true">Action</span></div>'}
+};
+
+function notesApplyTemplate(){
+  const sel=document.getElementById('n-tmpl-sel');
+  if(!sel||!sel.value)return;
+  const tmpl=NOTES_BUILTIN_TEMPLATES[sel.value];
+  if(!tmpl)return;
+  if(!notesActiveNoteId){showToast('Open or create a note first','error');sel.value='';return;}
+  if(!confirm('Apply template? This will replace the current content.'))return;
+  document.getElementById('n-title').value=tmpl.title;
+  document.getElementById('n-body').innerHTML=tmpl.body;
+  notesMarkDirty();
+  sel.value='';
+}
+
+function notesRenderSavedTemplates(){
+  const sel=document.getElementById('n-saved-tmpl-sel');
+  if(!sel)return;
+  sel.innerHTML='<option value="">— saved templates —</option>'+(notesData.savedTemplates||[]).map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('');
+}
+
+function notesApplySavedTemplate(){
+  const sel=document.getElementById('n-saved-tmpl-sel');
+  if(!sel||!sel.value)return;
+  const tmpl=(notesData.savedTemplates||[]).find(t=>t.id===sel.value);
+  if(!tmpl)return;
+  if(!notesActiveNoteId){showToast('Open or create a note first','error');sel.value='';return;}
+  if(!confirm('Apply template? This will replace the current content.'))return;
+  document.getElementById('n-title').value=tmpl.title||'';
+  document.getElementById('n-body').innerHTML=tmpl.body||'';
+  notesMarkDirty();
+  sel.value='';
+}
+
+function notesSaveAsTemplate(){
+  if(!notesActiveNoteId){showToast('Open a note first','error');return;}
+  const name=prompt('Template name:');
+  if(!name)return;
+  const title=document.getElementById('n-title').value||'';
+  const body=document.getElementById('n-body').innerHTML||'';
+  if(!notesData.savedTemplates)notesData.savedTemplates=[];
+  notesData.savedTemplates.push({id:'stmpl_'+Date.now(),name,title,body});
+  notesSave();
+  notesRenderSavedTemplates();
+  showToast(`Template "${name}" saved ✓`,'success');
+}
+
+/* ── Version history ─────────────────────── */
+function notesShowHistory(){
+  const note=notesData.notes.find(n=>n.id===notesActiveNoteId);
+  if(!note)return;
+  const list=document.getElementById('n-hist-list');
+  const hist=note.history||[];
+  if(!hist.length){list.innerHTML='<div style="font-size:13px;color:var(--muted);">No history yet — versions are saved automatically as you edit.</div>';}
+  else{
+    list.innerHTML=hist.map((h,i)=>{
+      const d=new Date(h.savedAt).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+      const preview=(h.html||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,120);
+      return`<div class="n-hist-item" onclick="notesRestoreHistory(${i})">
+        <div class="n-hist-meta">${d} — version ${hist.length-i}</div>
+        <div class="n-hist-preview">${esc(preview)||'(empty)'}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('n-hist-backdrop').style.display='flex';
+}
+
+function notesCloseHistory(){document.getElementById('n-hist-backdrop').style.display='none';}
+
+function notesRestoreHistory(idx){
+  const note=notesData.notes.find(n=>n.id===notesActiveNoteId);
+  if(!note||!note.history||!note.history[idx])return;
+  if(!confirm('Restore this version? Your current content will be saved to history first.'))return;
+  // Save current as new history entry first
+  note.history.unshift({html:note.body,savedAt:new Date().toISOString()});
+  const restored=note.history.splice(idx+1,1)[0];
+  document.getElementById('n-body').innerHTML=restored.html||'';
+  notesMarkDirty();
+  notesCloseHistory();
+  showToast('Version restored ✓','success');
+}
+
+/* ── Folder modal ────────────────────────── */
 function notesShowFolderModal(){
   notesFolderPickedColor=NOTE_COLOURS[0];
   const row=document.getElementById('nf-colour-row');
