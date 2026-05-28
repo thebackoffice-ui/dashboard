@@ -3899,8 +3899,6 @@ window.addEventListener('resize',()=>{
 if(!managerName){document.getElementById('login-screen').innerHTML='<div class="login-box"><div class="login-logo">The <span>Back Office</span></div><h2 style="font-size:18px;margin-bottom:8px;text-align:center;">No manager specified</h2><p style="color:var(--muted);font-size:13px;text-align:center;">Add your name to the URL: manager.html?name=sarah</p></div>';}
 else{checkAuth();}
 </script>
-</body>
-</html>
 <script>
 // ── Manager Notifications ─────────────────────────────
 function updateNotifBadge(){
@@ -4804,7 +4802,7 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
 
   // Helper to make a textarea/input
   const ta = (id, val, rows, ph='') => `<textarea class="dp-field" ${ro} rows="${rows}" placeholder="${ph}" id="${readOnly?'ro_':''}${id}" oninput="${readOnly?'':'dpMarkDirty()'}">${esc(val||'')}</textarea>`;
-  const inp = (id, val, ph='') => `<input class="dp-field" ${ro} type="text" placeholder="${ph}" id="${readOnly?'ro_':''}${id}" value="${esc(val||'')}" oninput="${readOnly?'':'dpMarkDirty()}"/>`;
+  const inp = (id, val, ph='') => `<input class="dp-field" ${ro} type="text" placeholder="${ph}" id="${readOnly?'ro_':''}${id}" value="${esc(val||'')}" oninput="${readOnly?'':'dpMarkDirty()'}"/>`;
 
   // Team columns: trainees, solo, leaders (arrays stored as newline-separated strings)
   const trainees = Array.isArray(d.trainees)?d.trainees.join('\n'):(d.trainees||'');
@@ -5032,3 +5030,5 @@ async function dpSaveSharing(){
   }catch(e){ showToast('Failed to save sharing','error'); }
 }
 </script>
+</body>
+</html>
