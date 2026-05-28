@@ -868,7 +868,7 @@ function doPost(e) {
 
   } else if (data.action === 'saveReport') {
     if(!data.report||!data.report.url||!data.report.week){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Report must include url and week.'})).setMimeType(ContentService.MimeType.JSON);}
-    if(!/^https?:\/\//.test(data.report.url)){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Report URL must start with http:// or https://'})).setMimeType(ContentService.MimeType.JSON);}
+    if(!new RegExp('^https?://').test(data.report.url)){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Report URL must start with http:// or https://'})).setMimeType(ContentService.MimeType.JSON);}
     const rh=getOrCreate('reports',['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']); const r=data.report;
     rh.appendRow([r.id,r.type,r.url,r.campaign||'',String(r.week||''),(r.managers||[]).join(','),r.uploadedAt||'',r.officeWire||'',r.mgrTake||'']); result={ok:true};
 
@@ -915,7 +915,7 @@ function doPost(e) {
 
   } else if (data.action === 'saveCalEvent') {
     if(!data.event||!data.event.title||!data.event.date){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Calendar event must include title and date.'})).setMimeType(ContentService.MimeType.JSON);}
-    if(data.event.date&&!/^\d{4}-\d{2}-\d{2}$/.test(data.event.date)){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Invalid date format — expected YYYY-MM-DD.'})).setMimeType(ContentService.MimeType.JSON);}
+    if(data.event.date&&!new RegExp('^[0-9]{4}-[0-9]{2}-[0-9]{2}$').test(data.event.date)){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Invalid date format — expected YYYY-MM-DD.'})).setMimeType(ContentService.MimeType.JSON);}
     const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
     const ev=data.event; const rows=ch.getDataRange().getValues(); let found=false;
     const row=[ev.id,ev.manager||data.manager,ev.title||'',ev.date||'',ev.time||'',ev.notes||'',ev.reminder||'',ev.category||'personal',ev.pushedAt||new Date().toISOString(),ev.recurring?'yes':'no',ev.recurringGroupId||'',ev.recurringFreq||''];
