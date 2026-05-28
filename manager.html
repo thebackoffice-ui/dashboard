@@ -4705,11 +4705,9 @@ async function dpFetchGroup(){
   const prefRes = await api({action:'getDpSharing',manager:managerName});
   dpSharedWith = prefRes.sharedWith||[];
   dpAdminAssigned = prefRes.adminAssigned||false;
-  console.log('[DP GROUP] getDpSharing response for '+managerName+':', JSON.stringify(prefRes));
   if(!dpAdminAssigned) return false;
   dpGroupMembers = [managerName, ...dpSharedWith].sort();
-  dpGroupKey = 'group::' + (prefRes.groupName||dpGroupMembers.join(','));
-  console.log('[DP GROUP] members='+JSON.stringify(dpGroupMembers)+' key='+dpGroupKey);
+  dpGroupKey = 'group::' + (prefRes.groupId||prefRes.groupName||dpGroupMembers.join(','));
   const badge = document.getElementById('dp-shared-badge');
   if(badge) badge.style.display = dpSharedWith.length?'':'none';
   return true;
@@ -4759,15 +4757,13 @@ async function dpPollForChanges(){
   try{
     const prevKey = dpGroupKey;
     const assigned = await dpFetchGroup();
-    console.log('[DP POLL] assigned='+assigned+' key='+dpGroupKey+' members='+JSON.stringify(dpGroupMembers));
     if(!assigned){
       clearInterval(dpPollTimer);
       dpRenderLocked();
       return;
     }
     if(prevKey && prevKey !== dpGroupKey){
-      console.log('[DP POLL] group key changed from '+prevKey+' to '+dpGroupKey+' — reloading');
-      dpLastSavedHash = '';
+        dpLastSavedHash = '';
       dpPollInitialised = false;
       await dpLoadAndRender();
       return;
@@ -4776,14 +4772,12 @@ async function dpPollForChanges(){
     const date = dates[dpActiveDayIdx];
     const res = await api({action:'getDailyPlanner',manager:dpGroupKey,date});
     const incoming = res.data || null;
-    console.log('[DP POLL] date='+date+' incomingLen='+(incoming?incoming.length:0)+' lastHashLen='+dpLastSavedHash.length+' initialised='+dpPollInitialised+' match='+(incoming===dpLastSavedHash));
     if(incoming){
       if(dpPollInitialised && incoming !== dpLastSavedHash){
         const active = document.activeElement;
         const editing = active && (active.tagName==='TEXTAREA'||active.tagName==='INPUT') && document.getElementById('dp-pages-wrap')?.contains(active);
-        console.log('[DP POLL] remote change detected, editing='+editing);
-        if(!editing){
-          try{dpData[date]=JSON.parse(incoming);}catch(e){console.log('[DP POLL] parse error',e);}
+            if(!editing){
+          try{dpData[date]=JSON.parse(incoming);}catch(e){}
           dpLastSavedHash = incoming;
           dpRenderDay();
           dpSetSyncStatus('saved','Updated by teammate ✓');
@@ -4797,10 +4791,9 @@ async function dpPollForChanges(){
         dpPollInitialised = true;
       }
     } else {
-      console.log('[DP POLL] no data returned from server');
-      dpPollInitialised = true;
+        dpPollInitialised = true;
     }
-  }catch(e){ console.log('[DP POLL] error', e); }
+  }catch(e){}
 }
 
 function dpStartPoll(){
@@ -5078,15 +5071,12 @@ async function dpSaveCurrentDay(){
   const date = dates[dpActiveDayIdx];
   const owner = dpGroupKey||managerName;
   const payload = JSON.stringify(dpData[date]);
-  console.log('[DP SAVE] saving as key='+owner+' date='+date+' payloadLen='+payload.length);
   try{
     await api({action:'saveDailyPlanner',manager:owner,date,data:payload});
     dpLastSavedHash = payload;
-    console.log('[DP SAVE] saved ok, hash updated');
     dpSetSyncStatus('saved','Saved ✓');
     setTimeout(()=>dpSetSyncStatus('',''), 2500);
   }catch(e){
-    console.log('[DP SAVE] error', e);
     dpSetSyncStatus('error','Save failed — check connection');
   }
 }

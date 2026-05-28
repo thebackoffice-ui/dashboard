@@ -1037,8 +1037,8 @@ function doPost(e) {
     let groupMembers=[];let groupName='';
     for(const g of groups){const members=g[2]?String(g[2]).split(',').filter(Boolean):[];if(members.includes(data.manager)){groupMembers=members;groupName=String(g[1]);break;}}
     if(groupMembers.length>=1){
-      // adminAssigned=true for any manager in any group, even if solo in that group
-      result={sharedWith:groupMembers.filter(m=>m!==data.manager),groupName,adminAssigned:true};
+      const groupId=groups.find(g=>String(g[1])===groupName)?.[0]||'';
+      result={sharedWith:groupMembers.filter(m=>m!==data.manager),groupName,groupId,adminAssigned:true};
     } else {
       result={sharedWith:[],adminAssigned:false};
     }
