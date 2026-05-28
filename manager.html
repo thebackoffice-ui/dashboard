@@ -1910,8 +1910,9 @@ function posClass(pos){
 let roster=[],weekLeavers=new Set(),allReports=[],weekSubmitted=false,calEvents=[],announcement=null,notes='',lastWeekCount=0,ackDone=false,savedReviews=[],allPayData=[],managerNotifs=[];
 
 async function loadAll(){
+  const unwrap=r=>r.status==='fulfilled'?r.value:{};
   try{
-    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes,pdRes,picRes,revRes,notifRes]=await Promise.all([
+    const settled=await Promise.allSettled([
       api({action:'getRoster',manager:managerName}),
       api({action:'getSubmission',manager:managerName,week:weekKey}),
       api({action:'loadMap',manager:managerName}),
@@ -1925,6 +1926,8 @@ async function loadAll(){
       api({action:'getManagerReviews',manager:managerName}),
       api({action:'getNotifications',manager:managerName})
     ]);
+    settled.forEach((r,i)=>{if(r.status==='rejected')console.warn('loadAll action',i,'failed:',r.reason);});
+    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes,pdRes,picRes,revRes,notifRes]=settled.map(unwrap);
     if(rRes.roster)roster=rRes.roster;
     if(sRes.rows&&sRes.rows.length){weekSubmitted=true;document.getElementById('banner-done').style.display='block';weekLeavers=new Set(sRes.rows.filter(r=>r.leaver).map(r=>r.id).filter(Boolean));}
     if(mRes.mapData){try{const d=JSON.parse(mRes.mapData);sp.nodes=d.nodes||[];sp.edges=d.edges||[];}catch(e){}}
@@ -1935,19 +1938,16 @@ async function loadAll(){
     if(prevRes.count!==undefined)lastWeekCount=prevRes.count;
     if(sRes.acked)ackDone=true;
     if(pdRes.payData)allPayData=pdRes.payData;
-    // FIX 3: profile pic now a Drive URL not base64
     if(picRes.picUrl){
       const av=document.getElementById('sb-avatar');
       const dn=rawName.trim().charAt(0).toUpperCase()+rawName.trim().slice(1);
       av.innerHTML=`<img src="${picRes.picUrl}" alt="${dn}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>`;
     }
-    // Load saved reviews from sheet
     if(revRes.reviews)savedReviews=revRes.reviews;
-    // Load notifications and update badge
     if(notifRes.notifications)managerNotifs=notifRes.notifications;
     updateNotifBadge();
     renderAll();
-  }catch(e){console.error(e);showToast('Could not load data','error',5000);renderAll();}
+  }catch(e){console.error('loadAll fatal:',e);renderAll();}
 }
 
 function renderAll(){
