@@ -4702,13 +4702,14 @@ function dpInit(){
 }
 
 async function dpFetchGroup(){
-  // Returns true if assigned, false if not. Updates dpGroupOwner/Members/etc.
   const prefRes = await api({action:'getDpSharing',manager:managerName});
   dpSharedWith = prefRes.sharedWith||[];
   dpAdminAssigned = prefRes.adminAssigned||false;
+  console.log('[DP GROUP] getDpSharing response for '+managerName+':', JSON.stringify(prefRes));
   if(!dpAdminAssigned) return false;
   dpGroupMembers = [managerName, ...dpSharedWith].sort();
   dpGroupOwner = dpGroupMembers[0];
+  console.log('[DP GROUP] members='+JSON.stringify(dpGroupMembers)+' owner='+dpGroupOwner);
   const badge = document.getElementById('dp-shared-badge');
   if(badge) badge.style.display = dpSharedWith.length?'':'none';
   return true;
@@ -4756,17 +4757,16 @@ function dpRenderLocked(){
 
 async function dpPollForChanges(){
   try{
-    // Re-fetch group each poll so membership changes take effect live
     const prevOwner = dpGroupOwner;
     const assigned = await dpFetchGroup();
+    console.log('[DP POLL] assigned='+assigned+' owner='+dpGroupOwner+' members='+JSON.stringify(dpGroupMembers));
     if(!assigned){
-      // Admin removed this manager from their group mid-session
       clearInterval(dpPollTimer);
       dpRenderLocked();
       return;
     }
-    // If the group owner changed (admin reassigned), do a full reload
     if(prevOwner && prevOwner !== dpGroupOwner){
+      console.log('[DP POLL] owner changed from '+prevOwner+' to '+dpGroupOwner+' — reloading');
       dpLastSavedHash = '';
       dpPollInitialised = false;
       await dpLoadAndRender();
@@ -4775,29 +4775,32 @@ async function dpPollForChanges(){
     const dates = dpGetWeekDates();
     const date = dates[dpActiveDayIdx];
     const res = await api({action:'getDailyPlanner',manager:dpGroupOwner,date});
-    if(res.data){
-      const incoming = res.data;
+    const incoming = res.data || null;
+    console.log('[DP POLL] date='+date+' incomingLen='+(incoming?incoming.length:0)+' lastHashLen='+dpLastSavedHash.length+' initialised='+dpPollInitialised+' match='+(incoming===dpLastSavedHash));
+    if(incoming){
       if(dpPollInitialised && incoming !== dpLastSavedHash){
         const active = document.activeElement;
         const editing = active && (active.tagName==='TEXTAREA'||active.tagName==='INPUT') && document.getElementById('dp-pages-wrap')?.contains(active);
+        console.log('[DP POLL] remote change detected, editing='+editing);
         if(!editing){
-          try{dpData[date]=JSON.parse(incoming);}catch(e){}
+          try{dpData[date]=JSON.parse(incoming);}catch(e){console.log('[DP POLL] parse error',e);}
           dpLastSavedHash = incoming;
           dpRenderDay();
           dpSetSyncStatus('saved','Updated by teammate ✓');
           setTimeout(()=>dpSetSyncStatus('',''), 3000);
         } else {
-          // User is typing — update hash so next poll re-checks cleanly
           dpLastSavedHash = incoming;
         }
       } else {
         dpLastSavedHash = incoming;
-        // First successful poll — re-render collab bar now we know the group
-        if(!dpPollInitialised) dpRenderDay();
+        if(!dpPollInitialised){ dpRenderDay(); }
         dpPollInitialised = true;
       }
+    } else {
+      console.log('[DP POLL] no data returned from server');
+      dpPollInitialised = true;
     }
-  }catch(e){}
+  }catch(e){ console.log('[DP POLL] error', e); }
 }
 
 function dpStartPoll(){
@@ -5075,12 +5078,15 @@ async function dpSaveCurrentDay(){
   const date = dates[dpActiveDayIdx];
   const owner = dpGroupOwner||managerName;
   const payload = JSON.stringify(dpData[date]);
+  console.log('[DP SAVE] saving as owner='+owner+' date='+date+' payloadLen='+payload.length);
   try{
     await api({action:'saveDailyPlanner',manager:owner,date,data:payload});
     dpLastSavedHash = payload;
+    console.log('[DP SAVE] saved ok, hash updated');
     dpSetSyncStatus('saved','Saved ✓');
     setTimeout(()=>dpSetSyncStatus('',''), 2500);
   }catch(e){
+    console.log('[DP SAVE] error', e);
     dpSetSyncStatus('error','Save failed — check connection');
   }
 }
