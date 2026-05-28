@@ -1175,7 +1175,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 .dp-day-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .dp-day-tab:hover:not(.active){color:var(--text);}
 .dp-shared-badge{font-size:10px;font-weight:700;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);padding:2px 7px;border-radius:20px;}
-.dp-pages-wrap{flex:1;overflow-y:auto;padding:28px 24px;display:flex;flex-direction:column;gap:20px;background:var(--bg);align-items:center;}.dp-page-a4-wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:20px;}
+.dp-pages-wrap{flex:1;overflow-y:auto;padding:28px 24px;display:flex;flex-direction:column;gap:20px;background:var(--bg);align-items:center;}.dp-page-a4-wrap{width:100%;max-width:680px;display:flex;flex-direction:column;gap:20px;}
 /* Page card */
 .dp-page{background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.10),0 1px 4px rgba(0,0,0,.06);overflow:hidden;width:100%;}
 .dp-page-hdr{background:var(--accent);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
@@ -1214,7 +1214,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 .dp-section-box-hdr.accent{background:var(--accent);color:#fff;}
 .dp-section-box-body{padding:6px 8px;}
 /* Event planner page */
-.dp-event-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;}
+.dp-event-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 20px;}
 .dp-event-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
 .dp-event-quadrant{position:relative;height:140px;border-bottom:1px solid var(--border);}
 .dp-event-quadrant::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);}
@@ -1224,7 +1224,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 .dp-event-qname:focus{background:var(--accent-soft);}
 .dp-event-qname::placeholder{color:var(--subtle);}
 .dp-event-footer{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);}
-.dp-event-footer-cell{padding:5px 8px;border-right:1px solid var(--border);}
+.dp-event-footer-cell{padding:7px 8px;border-right:1px solid var(--border);display:flex;align-items:center;}
 .dp-event-footer-cell:last-child{border-right:none;}
 .dp-event-footer-lbl{font-size:9px;font-weight:800;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px;}
 .dp-event-footer-input{width:100%;background:none;border:none;color:var(--text);font-family:var(--font);font-size:12px;outline:none;padding:0;}
@@ -4990,11 +4990,9 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
         </div>
         <div class="dp-event-footer">
           <div class="dp-event-footer-cell">
-            <div class="dp-event-footer-lbl">Location</div>
             <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-loc" value="${esc(ev.location||'')}" placeholder="Location…" oninput="${readOnly?'':'dpMarkDirty()'}"/>
           </div>
           <div class="dp-event-footer-cell">
-            <div class="dp-event-footer-lbl">Breakeven</div>
             <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-be" value="${esc(ev.breakeven||'')}" placeholder="Breakeven…" oninput="${readOnly?'':'dpMarkDirty()'}"/>
           </div>
         </div>
@@ -5136,8 +5134,8 @@ async function dpDownloadPDF(){
 <style>
 ${styles}
 body{margin:0;padding:20px;background:#f8fafc;font-family:system-ui,sans-serif;}
-.dp-page{max-width:860px;margin:0 auto 24px;background:white;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;width:100%;}
-.dp-page-a4-wrap{max-width:860px;margin:0 auto;}
+.dp-page{max-width:680px;margin:0 auto 24px;background:white;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;width:100%;}
+.dp-page-a4-wrap{max-width:680px;margin:0 auto;}
 textarea,input{background:white!important;border-color:#e5e7eb!important;}
 @media print{body{padding:0;background:white;}.dp-page{box-shadow:none;border-color:#e5e7eb;page-break-after:always;max-width:100%;}}
 </style>
