@@ -178,6 +178,19 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
 
 .now-badge { font-size: 10px; font-weight: 600; background: var(--warning-soft); color: var(--warning); border: 1px solid rgba(217,119,6,0.2); padding: 2px 6px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
 
+/* ── Submission history chart ── */
+.chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow); margin-bottom:16px; }
+.chart-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.chart-title { font-size:11px; font-weight:600; color:var(--muted); letter-spacing:.07em; text-transform:uppercase; }
+.chart-svg { width:100%; overflow:visible; }
+
+/* ── Submission status panel ── */
+.submit-status-panel { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; align-items:center; }
+.submit-pill { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500; padding:5px 11px; border-radius:20px; border:1px solid transparent; }
+.submit-pill-done { color:var(--success); background:var(--success-soft); border-color:rgba(22,163,74,.2); }
+.submit-pill-missing { color:var(--danger); background:var(--danger-soft); border-color:rgba(220,38,38,.2); }
+.submit-status-lbl { font-size:11px; font-weight:600; color:var(--muted); letter-spacing:.07em; text-transform:uppercase; margin-right:4px; }
+
 /* ── Dynamic render utility classes ── */
 .dyn-row { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
 .dyn-row-col { flex-direction: column; align-items: flex-start; }
@@ -301,6 +314,7 @@ select.form-input { cursor: pointer; }
     <button class="tab-btn" onclick="switchTab('notifications')">Notifications</button>
     <button class="tab-btn" onclick="switchTab('planner')">Planner Groups</button>
     <button class="tab-btn" onclick="switchTab('setup')">Setup</button>
+    <button class="tab-btn" onclick="switchTab('audit')">Audit Log</button>
   </div>
 
   <!-- OVERVIEW -->
@@ -311,6 +325,13 @@ select.form-input { cursor: pointer; }
       <div class="stat-card"><div class="stat-lbl">Ever tracked</div><div class="stat-val" id="s-ever">—</div><div class="stat-sub">unique people</div></div>
       <div class="stat-card"><div class="stat-lbl">Leavers</div><div class="stat-val" id="s-leavers">—</div><div class="stat-sub">marked this week</div></div>
     </div>
+    <div class="chart-card" id="chart-card" style="display:none;">
+      <div class="chart-hdr">
+        <span class="chart-title">Submission rate — last 12 weeks</span>
+      </div>
+      <svg class="chart-svg" id="submission-chart" height="80"></svg>
+    </div>
+    <div class="submit-status-panel" id="submit-status-panel" style="display:none;"></div>
     <div class="sec-hdr"><span class="sec-lbl">Teams this week</span></div>
     <div class="teams-grid" id="teams-grid"><div class="loading-state"><span class="spinner"></span>Loading…</div></div>
   </div>
@@ -323,7 +344,7 @@ select.form-input { cursor: pointer; }
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Name</th><th>Email</th><th>Manager</th><th>Position</th><th>First seen</th><th>Status</th></tr></thead>
+        <thead><tr><th>Name</th><th>Email</th><th>Manager</th><th>Position</th><th>First seen</th><th>Status</th><th></th></tr></thead>
         <tbody id="people-tbody"><tr><td colspan="6" class="loading-state"><span class="spinner"></span>Loading…</td></tr></tbody>
       </table>
     </div>
@@ -700,11 +721,64 @@ select.form-input { cursor: pointer; }
     </div>
   </div>
 
+  <div class="tab-panel" id="tab-audit">
+    <div class="setup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <h3 style="margin-bottom:0;">Audit log</h3>
+        <button onclick="loadAuditLog()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);cursor:pointer;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">↻ Refresh</button>
+      </div>
+      <p>Last 200 admin actions — manager additions, deletions, password resets, notifications sent, reports uploaded/deleted.</p>
+      <div id="audit-log-list" style="margin-top:12px;display:flex;flex-direction:column;gap:4px;">
+        <div style="color:var(--muted);font-size:13px;">Click Refresh to load.</div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 </div><!-- /admin-main-wrap -->
 
 <div class="toast" id="toast"></div>
+
+<!-- Edit person modal -->
+<div class="modal-overlay" id="edit-person-modal">
+  <div class="modal">
+    <h3>Edit person</h3>
+    <div class="form-row">
+      <label class="form-lbl">Name</label>
+      <input type="text" id="ep-name" class="form-input" />
+    </div>
+    <div class="form-row">
+      <label class="form-lbl">Email</label>
+      <input type="text" id="ep-email" class="form-input" />
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-row">
+        <label class="form-lbl">Manager</label>
+        <select id="ep-manager" class="form-input"></select>
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">Position</label>
+        <select id="ep-position" class="form-input">
+          <option value="">—</option>
+          <option value="Trainee">Trainee</option>
+          <option value="Junior">Junior</option>
+          <option value="Solo">Solo</option>
+          <option value="Leader">Leader</option>
+          <option value="Core">Core</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+      <input type="checkbox" id="ep-leaver" style="cursor:pointer;accent-color:var(--accent);" />
+      <label for="ep-leaver" style="font-size:13px;cursor:pointer;">Mark as leaver</label>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closePersonEdit()">Cancel</button>
+      <button class="modal-save" onclick="savePersonEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
 
 <!-- Edit event modal -->
 <div class="modal-overlay" id="edit-event-modal">
@@ -728,6 +802,16 @@ select.form-input { cursor: pointer; }
     <div class="form-row">
       <label class="form-lbl">Notes</label>
       <input type="text" id="edit-event-notes" class="form-input" />
+    </div>
+    <!-- Shown only for recurring events -->
+    <div id="edit-scope-wrap" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:4px;">
+      <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">This is a recurring event</div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:6px;">
+        <input type="radio" name="edit-scope" value="one" checked style="accent-color:var(--accent);cursor:pointer;" /> Edit only this occurrence
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+        <input type="radio" name="edit-scope" value="series" style="accent-color:var(--accent);cursor:pointer;" /> Edit all occurrences in this series
+      </label>
     </div>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeEditModal()">Cancel</button>
@@ -849,15 +933,15 @@ function doPost(e) {
     const safeName=data.name.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
     if(!safeName){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Name must contain letters or numbers.'})).setMimeType(ContentService.MimeType.JSON);}
     const mh=getOrCreate('managers',['name','password']); const existing=mh.getDataRange().getValues().slice(1).map(r=>r[0]);
-    if(!existing.includes(safeName))mh.appendRow([safeName,'']); result={ok:true};
+    if(!existing.includes(safeName)){mh.appendRow([safeName,'']); writeAuditLog('addManager','admin','Added manager: '+safeName);} result={ok:true};
 
   } else if (data.action === 'setPassword') {
     const mh=getOrCreate('managers',['name','password']); const rows=mh.getDataRange().getValues();
-    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){mh.getRange(i+1,2).setValue(hashPassword(data.password));result={ok:true};break;}}
+    for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager){mh.getRange(i+1,2).setValue(hashPassword(data.password));writeAuditLog('setPassword','admin','Password set for: '+data.manager);result={ok:true};break;}}
 
   } else if (data.action === 'removeManager') {
     const mh=getOrCreate('managers',['name','password']); const rows=mh.getDataRange().getValues();
-    for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.name)mh.deleteRow(i+1);} result={ok:true};
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.name)mh.deleteRow(i+1);} writeAuditLog('removeManager','admin','Removed manager: '+data.name); result={ok:true};
 
   } else if (data.action === 'saveMap') {
     const mh=getOrCreate('maps',['manager','mapData','updatedAt']); const rows=mh.getDataRange().getValues(); let f=false;
@@ -870,7 +954,7 @@ function doPost(e) {
     if(!data.report||!data.report.url||!data.report.week){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Report must include url and week.'})).setMimeType(ContentService.MimeType.JSON);}
     if(!new RegExp('^https?://').test(data.report.url)){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Report URL must start with http:// or https://'})).setMimeType(ContentService.MimeType.JSON);}
     const rh=getOrCreate('reports',['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']); const r=data.report;
-    rh.appendRow([r.id,r.type,r.url,r.campaign||'',String(r.week||''),(r.managers||[]).join(','),r.uploadedAt||'',r.officeWire||'',r.mgrTake||'']); result={ok:true};
+    rh.appendRow([r.id,r.type,r.url,r.campaign||'',String(r.week||''),(r.managers||[]).join(','),r.uploadedAt||'',r.officeWire||'',r.mgrTake||'']); writeAuditLog('saveReport','admin',r.type+': '+(r.campaign||''),' w/c '+String(r.week||'')); result={ok:true};
 
   } else if (data.action === 'getAllReports') {
     const rh=getOrCreate('reports',['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']);
@@ -882,7 +966,7 @@ function doPost(e) {
 
   } else if (data.action === 'deleteReport') {
     const rh=getOrCreate('reports',['id','type','url','campaign','week','managers','uploadedAt']); const rows=rh.getDataRange().getValues();
-    for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.id){rh.deleteRow(i+1);break;}} result={ok:true};
+    for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.id){writeAuditLog('deleteReport','admin','Deleted report id: '+data.id);rh.deleteRow(i+1);break;}} result={ok:true};
 
   } else if (data.action === 'savePayData') {
     const ph=getOrCreate('pay_data',['manager','week','officeWire','mgrTake','updatedAt']); const rows=ph.getDataRange().getValues(); let f=false;
@@ -932,11 +1016,20 @@ function doPost(e) {
     const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
     const rows=ch.getDataRange().getValues();
     for(let i=1;i<rows.length;i++){
-      if(rows[i][0]===data.id){
+      const rowId=String(rows[i][0]||'');
+      const rowGroupId=String(rows[i][10]||'');
+      // Edit series: update all rows sharing the same recurringGroupId
+      const matchSeries = data.scope==='series' && data.groupId && rowGroupId===String(data.groupId);
+      // Edit one: update only the exact row by id
+      const matchOne = data.scope!=='series' && rowId===String(data.id);
+      if(matchSeries||matchOne){
         if(data.title!==undefined)ch.getRange(i+1,3).setValue(data.title);
-        if(data.date!==undefined)ch.getRange(i+1,4).setValue(data.date);
-        if(data.time!==undefined)ch.getRange(i+1,5).setValue(data.time);
         if(data.notes!==undefined)ch.getRange(i+1,6).setValue(data.notes);
+        // Only update date/time for single-event edits, not series
+        if(!matchSeries){
+          if(data.date!==undefined)ch.getRange(i+1,4).setValue(data.date);
+          if(data.time!==undefined)ch.getRange(i+1,5).setValue(data.time);
+        }
       }
     }
     result={ok:true};
@@ -1028,7 +1121,7 @@ function doPost(e) {
 
   } else if (data.action === 'saveNotification') {
     const nh=getOrCreate('notifications',['id','manager','title','message','sentAt','readAt']); const n=data.notification;
-    nh.appendRow([n.id,n.manager,n.title||'',n.message||'',n.sentAt||new Date().toISOString(),'']); result={ok:true};
+    nh.appendRow([n.id,n.manager,n.title||'',n.message||'',n.sentAt||new Date().toISOString(),'']); writeAuditLog('sendNotification','admin','To: '+n.manager+' — '+n.title); result={ok:true};
 
   } else if (data.action === 'getNotifications') {
     const nh=getOrCreate('notifications',['id','manager','title','message','sentAt','readAt']);
@@ -1104,7 +1197,21 @@ function doPost(e) {
 
   }
 
+  } else if (data.action === 'getAuditLog') {
+    const al=getOrCreate('audit_log',['timestamp','action','actor','detail']);
+    const rows=al.getDataRange().getValues().slice(1).reverse();
+    result={entries:rows.slice(0,200).map(r=>({timestamp:r[0]||'',action:r[1]||'',actor:r[2]||'',detail:r[3]||''}))};
+
+  }
+
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function writeAuditLog(action,actor,detail) {
+  try {
+    var al=getOrCreate('audit_log',['timestamp','action','actor','detail']);
+    al.appendRow([new Date().toISOString(),action,actor||'admin',detail||'']);
+  } catch(e) {}
 }
 
 function installDeadlineTrigger() {
@@ -1409,6 +1516,41 @@ function changeWeek(dir) {
   if (ni>=0&&ni<allWeeks.length) { viewWeekKey=allWeeks[ni]; renderOverview(); }
 }
 
+// ── Submission history chart ─────────────────────────────
+function renderSubmissionChart() {
+  const svg = document.getElementById('submission-chart');
+  const card = document.getElementById('chart-card');
+  if (!svg || !managers.length) return;
+  // Build last 12 weeks of data from allSubs
+  const weeks = allWeeks.slice(-12);
+  if (weeks.length < 2) { if(card) card.style.display='none'; return; }
+  if(card) card.style.display='block';
+  const total = managers.length;
+  const data = weeks.map(w => {
+    const submitted = new Set(allSubs.filter(s=>s.week===w).map(s=>s.manager)).size;
+    return { week: w, pct: total ? Math.round((submitted/total)*100) : 0, submitted, total };
+  });
+  const W = 12, gap = 4, h = 60, pad = 20;
+  const barW = Math.max(8, Math.floor((600 - pad*2 - gap*(weeks.length-1)) / weeks.length));
+  const svgW = pad*2 + barW*weeks.length + gap*(weeks.length-1);
+  svg.setAttribute('viewBox', `0 0 ${svgW} ${h+16}`);
+  svg.innerHTML = data.map((d, i) => {
+    const x = pad + i*(barW+gap);
+    const barH = Math.max(3, Math.round((d.pct/100)*h));
+    const y = h - barH;
+    const isNow = d.week === currentWeek;
+    const fill = isNow ? 'var(--accent)' : d.pct===100 ? 'var(--success)' : d.pct===0 ? 'var(--border2)' : 'var(--accent-soft)';
+    const stroke = isNow ? 'var(--accent-dark)' : d.pct===100 ? 'var(--success)' : 'var(--border)';
+    const label = d.week ? d.week.slice(5) : '';
+    return `<g>
+      <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="3" fill="${fill}" stroke="${stroke}" stroke-width="1">
+        <title>${d.week}: ${d.submitted}/${d.total} submitted (${d.pct}%)</title>
+      </rect>
+      <text x="${x+barW/2}" y="${h+12}" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="var(--font)">${label}</text>
+    </g>`;
+  }).join('');
+}
+
 // ── Overview ───────────────────────────────────────────
 function posClass(pos) {
   if (!pos) return '';
@@ -1430,6 +1572,19 @@ function renderOverview() {
   document.getElementById('s-headcount').textContent=rosterActive.length||ws.filter(s=>!s.leaver).length;
   document.getElementById('s-ever').textContent=everyName.size;
   document.getElementById('s-leavers').textContent=rosterLeavers.length||ws.filter(s=>s.leaver).length;
+  // Submission status panel
+  const statusPanel = document.getElementById('submit-status-panel');
+  if (statusPanel && managers.length) {
+    const submitted = managers.filter(m => submittedSet.has(m));
+    const missing = managers.filter(m => !submittedSet.has(m));
+    statusPanel.style.display = 'flex';
+    statusPanel.innerHTML =
+      '<span class="submit-status-lbl">This week</span>' +
+      submitted.map(m => `<span class="submit-pill submit-pill-done">✓ ${esc(m.charAt(0).toUpperCase()+m.slice(1))}</span>`).join('') +
+      missing.map(m => `<span class="submit-pill submit-pill-missing">✗ ${esc(m.charAt(0).toUpperCase()+m.slice(1))}</span>`).join('');
+  }
+
+  renderSubmissionChart();
   if (!managers.length) { showEmpty(); return; }
   document.getElementById('teams-grid').innerHTML = managers.map(m=>{
     const dn=m.charAt(0).toUpperCase()+m.slice(1);
@@ -1515,6 +1670,7 @@ function renderPeopleTable(rows) {
       <td>${r.position!=='—'?`<span class="pos-tag ${posClass(r.position)}">${esc(r.position)}</span>`:'<span style="color:var(--muted);">—</span>'}</td>
       <td style="font-size:12px;color:var(--muted);font-family:monospace;">${r.firstSeen}</td>
       <td><span class="badge ${r.active?'badge-active':'badge-leaver'}">${r.active?'Active':'Leaver'}</span></td>
+      <td><button class="edit-btn" data-name="${esc(r.name)}" data-email="${esc(r.email||'')}" data-manager="${esc(r.manager)}" data-position="${esc(r.position==='—'?'':r.position)}" data-leaver="${r.leaver?'1':'0'}" onclick="openPersonEdit(this)" style="font-size:11px;padding:3px 9px;">Edit</button></td>
     </tr>`).join('');
 }
 
@@ -1643,7 +1799,7 @@ function copyLink(url,btn) {
 
 // ── Tabs ───────────────────────────────────────────────
 function switchTab(tab) {
-  const tabNames = ['overview','people','upload','calendar','reviews','notifications','planner','setup'];
+  const tabNames = ['overview','people','upload','calendar','reviews','notifications','planner','setup','audit'];
   document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', tabNames[i] === tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`));
   if(tab==='upload'){renderUploadHistory();renderManagerCheckboxes();}
@@ -1660,12 +1816,36 @@ function switchTab(tab) {
     renderReviews();
   }
   if(tab==='notifications'){renderNotifManagerCheckboxes();refreshLiveNotifs();loadNotifTemplates();}
+  if(tab==='audit'){loadAuditLog();}
   // Show currently-viewed week in the people tab header
   if(tab==='people'){
     const lbl=document.querySelector('#tab-people .sec-lbl');
     if(lbl&&viewWeekKey!==currentWeek)lbl.textContent='All people ever tracked (viewing w/c '+formatWeek(viewWeekKey)+')';
     else if(lbl)lbl.textContent='All people ever tracked';
   }
+}
+
+async function loadAuditLog() {
+  const el = document.getElementById('audit-log-list');
+  if (!el || !scriptUrl) return;
+  el.innerHTML = '<div class="loading-state"><span class="spinner"></span>Loading…</div>';
+  try {
+    const res = await api({action:'getAuditLog'});
+    const entries = res.entries || [];
+    if (!entries.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;">No audit entries yet.</div>'; return; }
+    el.innerHTML = entries.map(e => {
+      const ts = e.timestamp ? new Date(e.timestamp).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      const actionColour = {
+        addManager:'var(--success)', removeManager:'var(--danger)', setPassword:'var(--warning)',
+        saveReport:'var(--accent)', deleteReport:'var(--danger)', sendNotification:'var(--accent)',
+      }[e.action] || 'var(--muted)';
+      return \`<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);font-size:12px;">
+        <span style="font-size:10px;font-weight:700;color:\${actionColour};background:var(--surface2);padding:2px 7px;border-radius:20px;white-space:nowrap;min-width:100px;text-align:center;">\${esc(e.action)}</span>
+        <span style="color:var(--muted);white-space:nowrap;font-family:monospace;font-size:11px;">\${ts}</span>
+        <span style="flex:1;color:var(--text);">\${esc(e.detail)}</span>
+      </div>\`;
+    }).join('');
+  } catch(err) { el.innerHTML = '<div style="color:var(--danger);font-size:13px;">Failed to load audit log.</div>'; }
 }
 
 function showEmpty() {
@@ -1943,6 +2123,54 @@ function renderCalHistory() {
 
 // Edit event modal
 let _editingEventId = null;
+function openPersonEdit(btn) {
+  const d = btn.dataset;
+  document.getElementById('ep-name').value = d.name;
+  document.getElementById('ep-email').value = d.email;
+  document.getElementById('ep-position').value = d.position;
+  document.getElementById('ep-leaver').checked = d.leaver === '1';
+  // Populate manager select
+  const sel = document.getElementById('ep-manager');
+  sel.innerHTML = managers.map(m => `<option value="${esc(m)}" ${m===d.manager?'selected':''}>${esc(m.charAt(0).toUpperCase()+m.slice(1))}</option>`).join('');
+  // Store original for lookup
+  sel.dataset.origManager = d.manager;
+  sel.dataset.origName = d.name;
+  document.getElementById('edit-person-modal').classList.add('open');
+}
+function closePersonEdit() {
+  document.getElementById('edit-person-modal').classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const m = document.getElementById('edit-person-modal');
+  if (m) m.addEventListener('click', e => { if (e.target === m) closePersonEdit(); });
+});
+async function savePersonEdit() {
+  const name = document.getElementById('ep-name').value.trim();
+  const email = document.getElementById('ep-email').value.trim();
+  const manager = document.getElementById('ep-manager').value;
+  const position = document.getElementById('ep-position').value;
+  const leaver = document.getElementById('ep-leaver').checked;
+  const origManager = document.getElementById('ep-manager').dataset.origManager;
+  const origName = document.getElementById('ep-manager').dataset.origName;
+  if (!name) { showToast('Name is required', 'error'); return; }
+  // Find the roster entry and update it
+  const rep = allRoster.find(r => r.name.toLowerCase()===origName.toLowerCase() && r.manager===origManager);
+  if (!rep) { showToast('Person not found in roster — they may only be in submission history', 'error'); return; }
+  rep.name = name; rep.email = email; rep.position = position; rep.leaver = leaver; rep.manager = manager;
+  try {
+    await api({action:'saveRep', manager, rep});
+    // If manager changed, also save under original manager to remove
+    if (manager !== origManager) {
+      const oldRep = {...rep, manager: origManager, leaver: true};
+      await api({action:'saveRep', manager: origManager, rep: oldRep});
+    }
+    allRoster = allRoster.map(r => (r.name.toLowerCase()===origName.toLowerCase()&&r.manager===origManager) ? rep : r);
+    renderPeople();
+    closePersonEdit();
+    showToast('Person updated ✓', 'success');
+  } catch(e) { showToast('Failed to save changes', 'error'); }
+}
+
 function openEditModalFromBtn(btn) {
   openEditModal(btn.dataset.id, btn.dataset.title, btn.dataset.date, btn.dataset.time, btn.dataset.notes);
 }
@@ -1953,6 +2181,15 @@ function openEditModal(id, title, date, time, notes) {
   document.getElementById('edit-event-date').value = date;
   document.getElementById('edit-event-time').value = time;
   document.getElementById('edit-event-notes').value = notes;
+  // Show scope selector only for recurring events
+  const ev = pushedCalEvents.find(e => e.id === id);
+  const scopeWrap = document.getElementById('edit-scope-wrap');
+  if (scopeWrap) {
+    scopeWrap.style.display = (ev && ev.recurring) ? 'block' : 'none';
+    // Reset to single-event edit by default
+    const radios = document.querySelectorAll('input[name="edit-scope"]');
+    if (radios.length) radios[0].checked = true;
+  }
   document.getElementById('edit-event-modal').classList.add('open');
 }
 function closeEditModal() {
@@ -1971,19 +2208,30 @@ async function saveEditedEvent() {
   const newNotes = document.getElementById('edit-event-notes').value.trim();
   if (!newTitle || !newDate) { showToast('Title and date required','error'); return; }
 
-  // Update in local pushedCalEvents — all editable fields
   const ev = pushedCalEvents.find(e => e.id === id);
   if (!ev) { showToast('Event not found','error'); return; }
-  ev.title = newTitle; ev.date = newDate; ev.time = newTime; ev.notes = newNotes;
 
-  // Update in all affected managers' calendars via single updateCalEvent call
+  // Determine scope — series edit uses recurringGroupId to update all occurrences
+  const scopeRadio = document.querySelector('input[name="edit-scope"]:checked');
+  const scope = (scopeRadio && ev.recurring) ? scopeRadio.value : 'one';
+  const groupId = (scope === 'series' && ev.recurringGroupId) ? ev.recurringGroupId : null;
+
+  // Update local cache
+  if (scope === 'series' && groupId) {
+    pushedCalEvents.forEach(e => {
+      if (e.recurringGroupId === groupId) { e.title = newTitle; e.notes = newNotes; }
+    });
+  } else {
+    ev.title = newTitle; ev.date = newDate; ev.time = newTime; ev.notes = newNotes;
+  }
+
   try {
-    await api({ action: 'updateCalEvent', id, title: newTitle, date: newDate, time: newTime, notes: newNotes });
+    await api({ action: 'updateCalEvent', id, title: newTitle, date: newDate, time: newTime, notes: newNotes, scope, groupId });
   } catch(e) { showToast('Failed to save changes', 'error'); return; }
 
   closeEditModal();
   renderCalHistory();
-  showToast('Event updated ✓','success');
+  showToast(scope==='series' ? 'All occurrences updated ✓' : 'Event updated ✓', 'success');
 }
 
 async function deleteCalEvent(id) {
