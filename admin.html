@@ -1202,8 +1202,6 @@ function doPost(e) {
       result={sharedWith:[],adminAssigned:false};
     }
 
-  }
-
   } else if (data.action === 'getAuditLog') {
     const al=getOrCreate('audit_log',['timestamp','action','actor','detail']);
     const rows=al.getDataRange().getValues().slice(1).reverse();
