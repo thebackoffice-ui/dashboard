@@ -419,7 +419,7 @@ select.form-input { cursor: pointer; }
             <input type="checkbox" id="cal-recurring" onchange="toggleRecurrence()" style="cursor:pointer;accent-color:var(--accent);" />
             <label for="cal-recurring" style="font-size:13px;font-weight:500;cursor:pointer;">Recurring event</label>
           </div>
-          <div id="recurrence-options" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div id="recurrence-options" style="display:none;grid-template-columns:1fr 1fr;gap:10px;">
             <div>
               <div class="form-lbl">Repeat every</div>
               <select id="cal-recur-freq" class="form-input">
@@ -589,6 +589,7 @@ select.form-input { cursor: pointer; }
         <div class="step"><span>In the sheet go to <strong>Extensions → Apps Script</strong></span></div>
         <div class="step"><span>Delete existing code, paste in the <strong>Apps Script below</strong> (copy button top-right), and save</span></div>
         <div class="step"><span>Click <strong>Deploy → New deployment → Web app</strong> · Set "Who has access" to <strong>Anyone</strong> · Deploy · copy the URL</span></div>
+        <div class="step"><span>In Apps Script go to <strong>Project Settings → Script Properties</strong> · Add property <code>TOKEN_SECRET</code> with a long random value (e.g. 40 random characters) — this secures admin tokens</span></div>
         <div class="step"><span>Paste that URL here and also inside <code>manager.html</code> where it says <code>PASTE_YOUR_APPS_SCRIPT_URL_HERE</code></span></div>
       </div>
       <div class="url-row">
@@ -726,7 +727,17 @@ const APPS_SCRIPT = `// The Back Office — Google Apps Script v${APPS_SCRIPT_VE
 
 const SS = SpreadsheetApp.getActiveSpreadsheet();
 
-const TOKEN_SECRET = 'TBO_CHANGE_ME_TO_SOMETHING_RANDOM_2024';
+// ⚠️ TOKEN_SECRET must be set in Apps Script Project Settings → Script Properties
+// Key: TOKEN_SECRET  Value: a long random string (e.g. 32+ random chars)
+// NEVER hardcode a real secret here — this file is embedded in admin.html source.
+function getTokenSecret() {
+  try {
+    const secret = PropertiesService.getScriptProperties().getProperty('TOKEN_SECRET');
+    if (secret) return secret;
+  } catch(e) {}
+  // Fallback for first-time setup only — change this in Script Properties immediately
+  return 'TBO_SET_TOKEN_SECRET_IN_SCRIPT_PROPERTIES';
+}
 const TOKEN_TTL_MS = 8 * 60 * 60 * 1000;
 
 function getOrCreate(name, headers) {
@@ -737,8 +748,8 @@ function getOrCreate(name, headers) {
   return sh;
 }
 function safeDate(val) { if (val instanceof Date) { return Utilities.formatDate(val, Session.getScriptTimeZone(), 'yyyy-MM-dd'); } return String(val||''); }
-function makeToken(role) { const expires=Date.now()+TOKEN_TTL_MS; const payload=role+':'+expires; const sig=Utilities.computeHmacSha256Signature(payload,TOKEN_SECRET); const sigHex=sig.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return payload+':'+sigHex; }
-function verifyToken(token,requiredRole) { try { const parts=token.split(':'); if(parts.length!==3)return false; const role=parts[0],expires=parseInt(parts[1],10),sigHex=parts[2]; if(role!==requiredRole)return false; if(Date.now()>expires)return false; const payload=role+':'+expires; const expected=Utilities.computeHmacSha256Signature(payload,TOKEN_SECRET); const expectedHex=expected.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return sigHex===expectedHex; } catch(e){return false;} }
+function makeToken(role) { const expires=Date.now()+TOKEN_TTL_MS; const payload=role+':'+expires; const sig=Utilities.computeHmacSha256Signature(payload,getTokenSecret()); const sigHex=sig.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return payload+':'+sigHex; }
+function verifyToken(token,requiredRole) { try { const parts=token.split(':'); if(parts.length!==3)return false; const role=parts[0],expires=parseInt(parts[1],10),sigHex=parts[2]; if(role!==requiredRole)return false; if(Date.now()>expires)return false; const payload=role+':'+expires; const expected=Utilities.computeHmacSha256Signature(payload,getTokenSecret()); const expectedHex=expected.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return sigHex===expectedHex; } catch(e){return false;} }
 function getPicFolder() { const folderName='BackOffice_ProfilePics'; const folders=DriveApp.getFoldersByName(folderName); if(folders.hasNext())return folders.next(); const folder=DriveApp.createFolder(folderName); folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW); return folder; }
 
 function doPost(e) {
@@ -1157,12 +1168,38 @@ async function doAdminLogin() {
 }
 
 function checkAdminAuth() {
-  if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) {
-    document.getElementById('admin-login-screen').style.display = 'none';
-    document.getElementById('admin-main-wrap').style.display = 'block';
-    return true;
-  }
-  return false;
+  const stored = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+  if (!stored || !scriptUrl) return false;
+  // Verify token with server before showing the app — avoids stale/forged tokens
+  adminToken = stored;
+  fetch(scriptUrl, { method:'POST', body: JSON.stringify({ action:'getAllData', token: stored }) })
+    .then(r => r.json())
+    .then(data => {
+      if (data && (data.managers !== undefined)) {
+        // Token accepted — show the app and load data
+        document.getElementById('admin-login-screen').style.display = 'none';
+        document.getElementById('admin-main-wrap').style.display = 'block';
+        const scriptInp = document.getElementById('script-url-input');
+        if (scriptInp) { scriptInp.value = scriptUrl; document.getElementById('url-status').textContent = '✓ Script URL saved'; }
+        renderLinks();
+        const calInp=document.getElementById('cal-date');
+        if(calInp){const t=new Date();calInp.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}
+        const d=new Date();d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
+        const inp=document.getElementById('ul-week');
+        if(inp){inp.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+        loadAll();
+      } else {
+        // Token rejected or expired — clear it and show login
+        sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+        adminToken = '';
+      }
+    })
+    .catch(() => {
+      // Network error — clear token, show login
+      sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+      adminToken = '';
+    });
+  return true; // Return true optimistically so the login screen stays hidden during the check
 }
 
 // ── Theme ──────────────────────────────────────────────
@@ -1217,24 +1254,10 @@ const currentWeek = getWeekKey(new Date());
 
 window.onload = () => {
   initTheme();
-  // Check auth — if already logged in this session, skip login screen
+  // Check auth — if already logged in this session, verify token and skip login screen
   const alreadyAuthed = checkAdminAuth();
-  if (!alreadyAuthed) return; // login screen shown, wait for doAdminLogin()
-  // Restore script URL
-  if (scriptUrl) {
-    document.getElementById('script-url-input').value = scriptUrl;
-    document.getElementById('url-status').textContent = '✓ Script URL saved';
-    loadAll();
-  } else { showEmpty(); }
-  renderLinks();
-  // Init calendar date
-  const calInp=document.getElementById('cal-date');
-  if(calInp){const t=new Date();const cy=t.getFullYear(),cm=String(t.getMonth()+1).padStart(2,'0'),cd=String(t.getDate()).padStart(2,'0');calInp.value=cy+'-'+cm+'-'+cd;}
-  // Init upload week
-  const d=new Date();
-  d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
-  const inp=document.getElementById('ul-week');
-  if(inp){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');inp.value=y+'-'+m+'-'+dy;}
+  if (alreadyAuthed) return; // checkAdminAuth handles loadAll + UI init asynchronously
+  // No session token — show login screen (already visible by default)
 };
 
 async function loadAll() {
@@ -1772,15 +1795,25 @@ async function pushCalendarEvent() {
   }));
 
   status.textContent = `Pushing to ${selectedMgrs.length} manager${selectedMgrs.length!==1?'s':''}…`;
-  const eventsForMgr = mgr => newEvents.map(ev => ({ ...ev, manager: mgr }));
-  const results = await Promise.allSettled(
-    selectedMgrs.map(mgr => api({ action: 'saveCalEvents', manager: mgr, events: eventsForMgr(mgr) }))
+  // Use saveCalEvent (singular) per event per manager — preserves existing events
+  const pushCalls = selectedMgrs.flatMap(mgr =>
+    newEvents.map(ev => api({ action: 'saveCalEvent', manager: mgr, event: { ...ev, manager: mgr } }))
   );
+  const results = await Promise.allSettled(pushCalls);
+  // Map results back to per-manager success/failure
+  const perMgr = {};
+  selectedMgrs.forEach(mgr => { perMgr[mgr] = true; });
+  results.forEach((r, i) => {
+    if (r.status !== 'fulfilled') {
+      const mgr = selectedMgrs[Math.floor(i / newEvents.length)];
+      perMgr[mgr] = false;
+    }
+  });
   const errors = [];
   let successCount = 0;
-  results.forEach((r, i) => {
-    if (r.status === 'fulfilled') successCount++;
-    else errors.push(selectedMgrs[i]);
+  selectedMgrs.forEach(mgr => {
+    if (perMgr[mgr]) successCount++;
+    else errors.push(mgr);
   });
 
   if (errors.length === 0) {
@@ -1870,7 +1903,7 @@ async function saveEditedEvent() {
   const newNotes = document.getElementById('edit-event-notes').value.trim();
   if (!newTitle || !newDate) { showToast('Title and date required','error'); return; }
 
-  // Update in local pushedCalEvents
+  // Update in local pushedCalEvents — all editable fields
   const ev = pushedCalEvents.find(e => e.id === id);
   if (!ev) { showToast('Event not found','error'); return; }
   ev.title = newTitle; ev.date = newDate; ev.time = newTime; ev.notes = newNotes;
