@@ -276,6 +276,10 @@
 .dp-collab-avatar{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:2px solid var(--surface);margin-left:-4px;}
 .dp-collab-avatar:first-child{margin-left:0;}
 .dp-live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:dp-pulse 2s infinite;}
+.dp-sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dp-sync-dot.saving{background:#f59e0b;animation:dp-pulse .8s infinite;}
+.dp-sync-dot.saved{background:#22c55e;}
+.dp-sync-dot.error{background:#ef4444;}
 @keyframes dp-pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
 /* PDF download btn */
@@ -1233,9 +1237,7 @@ select.wr-input{cursor:pointer;appearance:none;}
 .dp-event-footer-input::placeholder{color:var(--subtle);}
 /* Save bar */
 .dp-save-bar{padding:10px 24px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:12px;flex-shrink:0;}
-.dp-save-btn{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:600;padding:9px 20px;border-radius:var(--rsm);cursor:pointer;transition:opacity .15s;}
-.dp-save-btn:hover{opacity:.85;}
-.dp-save-status{font-size:12px;color:var(--muted);}
+.dp-save-status{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;min-height:20px;}
 /* Shared managers selector */
 .dp-shared-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;}
 .dp-shared-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
@@ -1705,11 +1707,9 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
         </div>
         <!-- Save bar -->
         <div class="dp-save-bar">
-          <button class="dp-save-btn" onclick="dpSave()">Save day</button>
           <span class="dp-save-status" id="dp-save-status"></span>
           <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
             <button class="dp-pdf-btn" onclick="dpDownloadPDF()" title="Download today as PDF">⬇ PDF</button>
-            <button id="dp-group-btn" style="display:none;background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--rsm);cursor:pointer;">👥 Group</button>
           </div>
         </div>
       </div>
@@ -4654,6 +4654,7 @@ let dpGroupMembers = [];      // all managers in my group (incl. me)
 let dpGroupOwner = null;      // the canonical owner of the shared planner
 let dpPollTimer = null;       // live-poll interval
 let dpLastSavedHash = '';     // for detecting remote changes
+let dpPollInitialised = false; // true after first load sets the baseline hash
 let dpAdminAssigned = false;  // true = admin controls the group, button hidden
 
 // Get Mon-Fri dates for the current week
@@ -4732,25 +4733,27 @@ async function dpLoadAndRender(silent=false){
 }
 
 async function dpPollForChanges(){
-  // Silently fetch current day from server; update if changed
   try{
     const dates = dpGetWeekDates();
     const date = dates[dpActiveDayIdx];
     const res = await api({action:'getDailyPlanner',manager:dpGroupOwner||managerName,date});
     if(res.data){
-      const hash = res.data;
-      if(hash !== dpLastSavedHash && dpLastSavedHash !== ''){
-        // Remote change detected — only apply if we're not currently editing
+      const incoming = res.data;
+      if(dpPollInitialised && incoming !== dpLastSavedHash){
+        // Remote change — only apply if user isn't actively typing
         const active = document.activeElement;
         const editing = active && (active.tagName==='TEXTAREA'||active.tagName==='INPUT') && document.getElementById('dp-pages-wrap')?.contains(active);
         if(!editing){
-          try{dpData[date]=JSON.parse(res.data);}catch(e){}
+          try{dpData[date]=JSON.parse(incoming);}catch(e){}
+          dpLastSavedHash = incoming;
           dpRenderDay();
-          const st=document.getElementById('dp-save-status');
-          if(st){st.textContent='Updated by teammate ✓';setTimeout(()=>st.textContent='',3000);}
+          dpSetSyncStatus('saved','Updated by teammate ✓');
+          setTimeout(()=>dpSetSyncStatus('',''), 3000);
         }
+      } else {
+        dpLastSavedHash = incoming;
+        dpPollInitialised = true;
       }
-      dpLastSavedHash = hash;
     }
   }catch(e){}
 }
@@ -4758,7 +4761,7 @@ async function dpPollForChanges(){
 function dpStartPoll(){
   clearInterval(dpPollTimer);
   if(dpGroupMembers.length>1){
-    dpPollTimer = setInterval(dpPollForChanges, 8000);
+    dpPollTimer = setInterval(dpPollForChanges, 4000);
   }
 }
 
@@ -4783,9 +4786,10 @@ function dpBlank(){
 }
 
 function dpSwitchDay(idx){
-  dpFlushCurrentDay(); // save before switching
+  dpFlushCurrentDay();
   dpActiveDayIdx = idx;
-  // Update tab highlight
+  dpLastSavedHash = '';
+  dpPollInitialised = false;
   document.querySelectorAll('.dp-day-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
   dpRenderDay();
 }
@@ -4822,7 +4826,7 @@ function dpRenderDay(){
 
   document.getElementById('dp-pages-wrap').innerHTML = html;
   // Store hash of loaded data for poll comparison
-  if(!dpLastSavedHash) dpLastSavedHash = JSON.stringify(dpData[date]||{});
+  // Baseline hash set by first successful poll, not here
 }
 
 function dpToggleSharedView(btn){
@@ -4978,9 +4982,15 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
 /* ── Flush / save ─────────────────────────── */
 function dpMarkDirty(){
   clearTimeout(dpSaveDirtyTimer);
-  const st = document.getElementById('dp-save-status');
-  if(st) st.textContent = 'Unsaved changes…';
+  dpSetSyncStatus('saving','Saving…');
   dpSaveDirtyTimer = setTimeout(()=>{ dpFlushCurrentDay(); dpSaveCurrentDay(); }, 1200);
+}
+
+function dpSetSyncStatus(state, msg){
+  const st = document.getElementById('dp-save-status');
+  if(!st) return;
+  if(!msg){ st.innerHTML=''; return; }
+  st.innerHTML = `<span class="dp-sync-dot ${state}"></span>${msg}`;
 }
 
 function dpFlushCurrentDay(){
@@ -5017,23 +5027,18 @@ function dpFlushCurrentDay(){
 async function dpSaveCurrentDay(){
   const dates = dpGetWeekDates();
   const date = dates[dpActiveDayIdx];
-  const st = document.getElementById('dp-save-status');
   const owner = dpGroupOwner||managerName;
   const payload = JSON.stringify(dpData[date]);
   try{
-    // Save under group owner key so all members read same data
     await api({action:'saveDailyPlanner',manager:owner,date,data:payload});
     dpLastSavedHash = payload;
-    if(st){st.textContent='Saved ✓';setTimeout(()=>st.textContent='',3000);}
+    dpSetSyncStatus('saved','Saved ✓');
+    setTimeout(()=>dpSetSyncStatus('',''), 2500);
   }catch(e){
-    if(st) st.textContent='Save failed — check connection';
+    dpSetSyncStatus('error','Save failed — check connection');
   }
 }
 
-function dpSave(){
-  dpFlushCurrentDay();
-  dpSaveCurrentDay();
-}
 
 
 /* ── PDF Download ─────────────────────────── */
