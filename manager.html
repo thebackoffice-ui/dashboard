@@ -624,8 +624,8 @@ select.wr-input{cursor:pointer;appearance:none;}
 
 /* ── CALENDAR ── */
 .cal-layout{display:flex;gap:16px;padding:20px;flex:1;overflow:hidden;min-height:0;background:var(--bg);}
-.cal-sidebar{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
-.cal-main{flex:1;background:#fff;border-radius:var(--rlg);box-shadow:var(--s1);overflow:hidden;display:flex;flex-direction:column;min-width:0;border:1px solid var(--border);}
+.cal-sidebar{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;overflow-y:auto;min-height:0;}
+.cal-main{flex:1;background:#fff;border-radius:var(--rlg);box-shadow:var(--s1);overflow:hidden;display:flex;flex-direction:column;min-width:0;min-height:0;border:1px solid var(--border);}
 [data-theme="dark"] .cal-main{background:var(--surface);box-shadow:var(--s2);}
 .cal-main-hdr{padding:18px 22px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
 .cal-main-month{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.02em;}
@@ -1077,6 +1077,11 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       </div>
       <div class="page-scroll"><div class="page-wrap">
 
+        <!-- Stat cards — shown per active report sub-tab -->
+        <div id="pay-summary-strip" style="margin-bottom:20px;"></div>
+        <div id="planner-summary-strip" style="display:none;margin-bottom:20px;"></div>
+        <div id="prolog-summary-strip" style="display:none;margin-bottom:20px;"></div>
+
         <!-- Pay trend chart — always visible at top of reports -->
         <div class="ptc-card" style="margin-bottom:20px;">
           <div class="ptc-card-hdr">
@@ -1108,15 +1113,12 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
           <button class="rtab-btn" onclick="switchReportTab('prolog')">📋 Pro-logs</button>
         </div>
         <div class="rtab-panel active" id="rtab-pay">
-          <div id="pay-summary-strip"></div>
           <div id="pay-reports-list"></div>
         </div>
         <div class="rtab-panel" id="rtab-planner">
-          <div id="planner-summary-strip"></div>
           <div id="planner-reports-list"></div>
         </div>
         <div class="rtab-panel" id="rtab-prolog">
-          <div id="prolog-summary-strip"></div>
           <div id="prolog-reports-list"></div>
         </div>
       </div></div>
@@ -1143,7 +1145,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
     </div>
 
     <!-- CALENDAR -->
-    <div class="tab-content" id="ptab-calendar">
+    <div class="tab-content" id="ptab-calendar" style="overflow:hidden;">
       <div class="topbar">
         <div class="topbar-title-block">
           <span class="topbar-title">Calendar</span>
@@ -2091,6 +2093,7 @@ async function submitWeek(){
 function switchReportTab(tab){
   document.querySelectorAll('.rtab-btn').forEach((b,i)=>{const tabs=['pay','planner','prolog'];b.classList.toggle('active',tabs[i]===tab);});
   document.querySelectorAll('.rtab-panel').forEach(p=>p.classList.toggle('active',p.id===`rtab-${tab}`));
+  ['pay','planner','prolog'].forEach(t=>{const el=document.getElementById(`${t}-summary-strip`);if(el)el.style.display=t===tab?'':'none';});
   const s=document.getElementById('rpt-search');if(s){s.value='';filterReports();}
 }
 
@@ -3388,6 +3391,8 @@ function switchTab(tab){
     if(nav)nav.classList.toggle('active',id===tab);
     if(panel)panel.classList.toggle('active',id===tab);
   });
+  const ca=document.querySelector('.content-area');
+  if(ca)ca.style.overflowY=tab==='calendar'?'hidden':'auto';
   if(tab==='map'){setTimeout(()=>{initMapPan();if(sp.nodes.length===0)rebuildMap();else{renderSpider();renderLegend();}applyTransform();},50);}
   if(tab==='home'&&typeof wireByWeekGlobal!=='undefined'){requestAnimationFrame(()=>drawProdChart(wireByWeekGlobal));}
   if(tab==='calendar')renderCalendar();
