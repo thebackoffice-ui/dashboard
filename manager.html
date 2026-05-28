@@ -777,11 +777,13 @@ select.wr-input{cursor:pointer;appearance:none;}
 
 /* ── Stats strip ── */
 .lb2-stats-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
-.lb-stat-card { background:var(--niond-surface,#fff); border:1px solid var(--niond-border,#e8ecee); border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,.05); position:relative; overflow:hidden; }
+.lb-stat-card { background:var(--niond-surface,#fff); border:1px solid var(--niond-border,#e8ecee); border-radius:12px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,.05); transition:box-shadow .18s; }
 [data-theme="dark"] .lb-stat-card { background:var(--surface); border-color:var(--border); }
-.lb-stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#0f766e,#14b8a6); border-radius:12px 12px 0 0; }
-.lb-stat-val { font-size:28px; font-weight:800; letter-spacing:-.04em; color:var(--niond-text,#0f1923); line-height:1; margin-top:4px; }
-[data-theme="dark"] .lb-stat-val { color:var(--text); }
+.lb-stat-card:hover { box-shadow:0 4px 14px rgba(15,118,110,.1), 0 1px 3px rgba(0,0,0,.04); border-color:rgba(15,118,110,.2); }
+[data-theme="dark"] .lb-stat-card:hover { box-shadow:0 4px 14px rgba(20,184,166,.1); border-color:rgba(20,184,166,.2); }
+
+.lb-stat-val { font-size:28px; font-weight:800; letter-spacing:-.04em; color:#0f766e; line-height:1; margin-top:4px; }
+[data-theme="dark"] .lb-stat-val { color:#2dd4bf; }
 .lb-stat-lbl { font-size:11px; color:var(--niond-muted,#6b7d8a); margin-top:6px; text-transform:uppercase; letter-spacing:.08em; font-weight:600; }
 
 /* ── Podium ── */
@@ -807,14 +809,8 @@ select.wr-input{cursor:pointer;appearance:none;}
 
 /* 1st place — teal border accent top + subtle teal glow, still using surface */
 .lb-podium-1 {
-  border-color:rgba(15,118,110,.35);
-  box-shadow:0 4px 20px rgba(15,118,110,.12), 0 1px 4px rgba(0,0,0,.05);
-}
-.lb-podium-1::before {
-  content:'';
-  position:absolute; top:0; left:0; right:0; height:3px;
-  background:linear-gradient(90deg,#0f766e,#14b8a6);
-  border-radius:14px 14px 0 0;
+  border-color:rgba(15,118,110,.3);
+  box-shadow:0 4px 20px rgba(15,118,110,.1), 0 1px 4px rgba(0,0,0,.04);
 }
 [data-theme="dark"] .lb-podium-1 { border-color:rgba(20,184,166,.3); box-shadow:0 4px 20px rgba(20,184,166,.1); }
 
