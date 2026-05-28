@@ -281,12 +281,18 @@ select.form-input { cursor: pointer; }
     <div class="admin-login-logo">THE BACK OFFICE <span>/ ADMIN</span></div>
     <div class="admin-login-title">Admin Access</div>
     <div class="admin-login-sub">Enter the admin password to continue</div>
+    <!-- Script URL field — shown when not yet configured -->
+    <div class="admin-login-field" id="login-url-field" style="display:none;">
+      <label class="admin-login-lbl">Apps Script URL</label>
+      <input type="text" id="login-script-url" class="admin-login-input" placeholder="https://script.google.com/macros/s/…/exec" />
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Paste your deployed Apps Script URL — find it in the Setup tab after first login, or from Google Apps Script → Deploy.</div>
+    </div>
     <div class="admin-login-field">
       <label class="admin-login-lbl">Password</label>
       <input type="password" id="admin-pw-input" class="admin-login-input" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doAdminLogin()" autofocus />
     </div>
     <button class="admin-login-btn" onclick="doAdminLogin()">Sign in</button>
-    <div class="admin-login-err" id="admin-login-err">Incorrect password. Try again.</div>
+    <div class="admin-login-err" id="admin-login-err" style="display:none;"></div>
   </div>
 </div>
 
@@ -1291,17 +1297,31 @@ async function doAdminLogin() {
   const val = document.getElementById('admin-pw-input').value.trim();
   const err = document.getElementById('admin-login-err');
   const btn = document.querySelector('.admin-login-btn');
+  const showErr = msg => { err.textContent = msg; err.style.display = 'block'; };
   err.style.display = 'none';
-  if (!val) { err.textContent = 'Please enter a password.'; err.style.display = 'block'; return; }
-  if (!scriptUrl) { err.textContent = 'No Script URL saved — open the page source and set scriptUrl first.'; err.style.display = 'block'; return; }
+
+  // If no scriptUrl, try to read it from the inline field on the login screen
+  if (!scriptUrl) {
+    const urlField = document.getElementById('login-script-url');
+    if (urlField && urlField.value.trim()) {
+      scriptUrl = urlField.value.trim();
+      localStorage.setItem('teamtracker_script_url', scriptUrl);
+    } else {
+      document.getElementById('login-url-field').style.display = 'block';
+      showErr('Please enter your Apps Script URL above first.');
+      document.getElementById('login-script-url').focus();
+      return;
+    }
+  }
+
+  if (!val) { showErr('Please enter a password.'); return; }
   btn.disabled = true; btn.textContent = 'Checking…';
   try {
     const res = await fetch(scriptUrl, { method:'POST', body: JSON.stringify({ action:'adminLogin', password: val }) });
     const text = await res.text();
     let data;
     try { data = JSON.parse(text); } catch(e) {
-      err.textContent = 'Apps Script returned an unexpected response. Check it is deployed correctly and set to "Anyone" access.';
-      err.style.display = 'block';
+      showErr('Apps Script returned an unexpected response — make sure it is deployed as a Web App with access set to "Anyone".');
       btn.disabled = false; btn.textContent = 'Sign in';
       return;
     }
@@ -1337,7 +1357,8 @@ function checkAdminAuth() {
   // Verify token with server before showing the app — avoids stale/forged tokens
   adminToken = stored;
   fetch(scriptUrl, { method:'POST', body: JSON.stringify({ action:'getAllData', token: stored }) })
-    .then(r => r.json())
+    .then(r => r.text())
+    .then(text => { try { return JSON.parse(text); } catch(e) { return null; } })
     .then(data => {
       if (data && (data.managers !== undefined)) {
         // Token accepted — show the app and load data
@@ -1425,6 +1446,10 @@ const currentWeek = getWeekKey(new Date());
 
 window.onload = () => {
   initTheme();
+  // If no scriptUrl, show the URL field on the login screen immediately
+  if (!scriptUrl) {
+    document.getElementById('login-url-field').style.display = 'block';
+  }
   // Check auth — if already logged in this session, verify token and skip login screen
   const alreadyAuthed = checkAdminAuth();
   if (alreadyAuthed) return; // checkAdminAuth handles loadAll + UI init asynchronously
