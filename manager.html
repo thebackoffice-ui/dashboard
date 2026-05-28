@@ -1214,12 +1214,12 @@ select.wr-input{cursor:pointer;appearance:none;}
 .dp-section-box-hdr.accent{background:var(--accent);color:#fff;}
 .dp-section-box-body{padding:6px 8px;}
 /* Event planner page */
-.dp-event-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:24px;}
+.dp-event-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;}
 .dp-event-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.dp-event-quadrant{position:relative;height:150px;border-bottom:1px solid var(--border);}
-.dp-event-quadrant::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border2,#cbd5e1);z-index:2;pointer-events:none;}
-.dp-event-quadrant::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border2,#cbd5e1);z-index:2;pointer-events:none;}
-.dp-event-qnames{display:grid;grid-template-columns:1fr 1fr;height:100%;position:relative;z-index:1;}
+.dp-event-quadrant{position:relative;height:140px;border-bottom:1px solid var(--border);}
+.dp-event-quadrant::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);}
+.dp-event-quadrant::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border);}
+.dp-event-qnames{display:grid;grid-template-columns:1fr 1fr;height:100%;}
 .dp-event-qname{padding:6px 8px;font-size:11px;color:var(--text);background:none;border:none;outline:none;font-family:var(--font);resize:none;line-height:1.4;}
 .dp-event-qname:focus{background:var(--accent-soft);}
 .dp-event-qname::placeholder{color:var(--subtle);}
@@ -4693,15 +4693,21 @@ let dpLastSavedHash = '';     // for detecting remote changes
 let dpAdminAssigned = false;  // true = admin controls the group, button hidden
 
 // Get Mon-Fri dates for the current week
+function dpLocalDateStr(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dy = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dy}`;
+}
+
 function dpGetWeekDates(){
   const d = new Date();
-  // Find Monday
   const dow = d.getDay() === 0 ? 6 : d.getDay() - 1;
   const mon = new Date(d); mon.setHours(0,0,0,0); mon.setDate(d.getDate() - dow);
   const dates = [];
   for(let i=0;i<5;i++){
     const dd = new Date(mon); dd.setDate(mon.getDate()+i);
-    dates.push(dd.toISOString().slice(0,10));
+    dates.push(dpLocalDateStr(dd));
   }
   return dates;
 }
@@ -4713,20 +4719,20 @@ function dpDateLabel(iso){
 
 function dpInit(){
   const dates = dpGetWeekDates();
-  // Update week pill
-  const pill = document.getElementById('dp-week-pill');
-  if(pill) pill.textContent = `w/c ${dpDateLabel(dates[0]).replace(/^[A-Za-z]+, /,'')}`;
-  // Build day tabs
-  const tabsEl = document.getElementById('dp-day-tabs');
-  const days = ['Mon','Tue','Wed','Thu','Fri'];
-  tabsEl.innerHTML = days.map((d,i)=>`<button class="dp-day-tab ${i===dpActiveDayIdx?'active':''}" onclick="dpSwitchDay(${i})">${d} <span style="font-weight:400;opacity:.7;">${dpDateLabel(dates[i]).split(' ').slice(1).join(' ')}</span></button>`).join('');
-  // Ensure today is selected on first open
+  // Work out today's index FIRST before building anything
   if(!dpInitDone){
-    const todayIso = new Date().toISOString().slice(0,10);
-    const todayIdx = dates.indexOf(todayIso);
+    const todayStr = dpLocalDateStr(new Date());
+    const todayIdx = dates.indexOf(todayStr);
     if(todayIdx>=0) dpActiveDayIdx = todayIdx;
     dpInitDone = true;
   }
+  // Update week pill
+  const pill = document.getElementById('dp-week-pill');
+  if(pill) pill.textContent = `w/c ${dpDateLabel(dates[0]).replace(/^[A-Za-z]+,? /,'')}`;
+  // Build day tabs with correct active state
+  const tabsEl = document.getElementById('dp-day-tabs');
+  const days = ['Mon','Tue','Wed','Thu','Fri'];
+  tabsEl.innerHTML = days.map((d,i)=>`<button class="dp-day-tab ${i===dpActiveDayIdx?'active':''}" onclick="dpSwitchDay(${i})">${d} <span style="font-weight:400;opacity:.7;">${dpDateLabel(dates[i]).split(' ').slice(1).join(' ')}</span></button>`).join('');
   dpLoadAndRender();
 }
 
@@ -4985,11 +4991,11 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
         <div class="dp-event-footer">
           <div class="dp-event-footer-cell">
             <div class="dp-event-footer-lbl">Location</div>
-            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-loc" value="${esc(ev.location||'')}" placeholder="" oninput="${readOnly?'':'dpMarkDirty()'}"/>
+            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-loc" value="${esc(ev.location||'')}" placeholder="Location…" oninput="${readOnly?'':'dpMarkDirty()'}"/>
           </div>
           <div class="dp-event-footer-cell">
             <div class="dp-event-footer-lbl">Breakeven</div>
-            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-be" value="${esc(ev.breakeven||'')}" placeholder="" oninput="${readOnly?'':'dpMarkDirty()'}"/>
+            <input class="dp-event-footer-input" ${ro} type="text" id="${prefix}-be" value="${esc(ev.breakeven||'')}" placeholder="Breakeven…" oninput="${readOnly?'':'dpMarkDirty()'}"/>
           </div>
         </div>
       </div>`;
