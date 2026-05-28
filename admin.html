@@ -4,12 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Back Office — Admin</title>
+<script>/* Prevent dark mode FOUC — runs before CSS loads */(function(){var t=localStorage.getItem('tt_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
   --bg: #f5f7f7;
+  /* Position colour system — keep in sync with manager.html */
+  --pos-trainee-bg: #a7ffdb; --pos-trainee-color: #007a4d; --pos-trainee-border: #00c97a;
+  --pos-solo-bg: #ffe0a0; --pos-solo-color: #b85c00; --pos-solo-border: #f08000;
+  --pos-leader-bg: #b3d4ff; --pos-leader-color: #1140cc; --pos-leader-border: #1d50ff;
+  --pos-core-bg: #d4b8ff; --pos-core-color: #5b1fd6; --pos-core-border: #6e2ff0;
+  --pos-junior-bg: #ffb8cc; --pos-junior-color: #c4002e; --pos-junior-border: #f0004d;
   --surface: #ffffff;
   --surface2: #eef2f2;
   --border: #dde5e5;
@@ -109,11 +116,12 @@ main { padding: 24px 28px; }
 .mem-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mem-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .pos-tag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
-.pos-Trainee { color: #0369a1; background: rgba(3,105,161,0.1); border: 1px solid rgba(3,105,161,0.2); }
-.pos-Solo { color: #7c3aed; background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2); }
-.pos-Leader { color: #b45309; background: rgba(180,83,9,0.1); border: 1px solid rgba(180,83,9,0.2); }
-.pos-Core { color: #059669; background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.2); }
-.pos-Junior { color: #be185d; background: rgba(190,24,93,0.1); border: 1px solid rgba(190,24,93,0.2); }
+/* Position colours — shared with manager.html via CSS variables */
+.pos-Trainee { color: var(--pos-trainee-color, #007a4d); background: var(--pos-trainee-bg, #a7ffdb); border: 1px solid var(--pos-trainee-border, #00c97a); }
+.pos-Solo { color: var(--pos-solo-color, #b85c00); background: var(--pos-solo-bg, #ffe0a0); border: 1px solid var(--pos-solo-border, #f08000); }
+.pos-Leader { color: var(--pos-leader-color, #1140cc); background: var(--pos-leader-bg, #b3d4ff); border: 1px solid var(--pos-leader-border, #1d50ff); }
+.pos-Core { color: var(--pos-core-color, #5b1fd6); background: var(--pos-core-bg, #d4b8ff); border: 1px solid var(--pos-core-border, #6e2ff0); }
+.pos-Junior { color: var(--pos-junior-color, #c4002e); background: var(--pos-junior-bg, #ffb8cc); border: 1px solid var(--pos-junior-border, #f0004d); }
 .leaver-tag { font-size: 10px; font-weight: 600; color: var(--warning); background: var(--warning-soft); border: 1px solid rgba(217,119,6,0.2); padding: 2px 6px; border-radius: 20px; }
 .no-data { background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius); padding: 48px; text-align: center; color: var(--muted); font-size: 14px; line-height: 1.7; }
 .no-data strong { color: var(--text); display: block; font-size: 16px; margin-bottom: 6px; font-weight: 500; }
@@ -169,6 +177,18 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
 .loading-state { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; }
 
 .now-badge { font-size: 10px; font-weight: 600; background: var(--warning-soft); color: var(--warning); border: 1px solid rgba(217,119,6,0.2); padding: 2px 6px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
+
+/* ── Dynamic render utility classes ── */
+.dyn-row { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.dyn-row-col { flex-direction: column; align-items: flex-start; }
+.dyn-title { font-size: 13px; font-weight: 500; }
+.dyn-meta { font-size: 11px; color: var(--muted); }
+.dyn-badge { font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+.dyn-muted-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 0 4px; line-height: 1; flex-shrink: 0; transition: color 0.15s; }
+.dyn-muted-btn:hover { color: var(--danger); }
+.dyn-unread-dot { font-size: 11px; font-weight: 600; color: var(--warning); }
+.dyn-read-dot { font-size: 11px; font-weight: 600; color: var(--success); }
+.dyn-mgr-label { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: capitalize; }
 
 /* ── Admin Login ── */
 .admin-login-wrap { position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:2000; }
@@ -236,11 +256,8 @@ pre { background: var(--surface2); border: 1px solid var(--border); border-radiu
 .form-input::placeholder { color: var(--muted); }
 select.form-input { cursor: pointer; }
 
-[data-theme="dark"] .pos-Trainee { color: #38bdf8; background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.2); }
-[data-theme="dark"] .pos-Solo { color: #a78bfa; background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.2); }
-[data-theme="dark"] .pos-Leader { color: #fbbf24; background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.2); }
-[data-theme="dark"] .pos-Core { color: #34d399; background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.2); }
-[data-theme="dark"] .pos-Junior { color: #f472b6; background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.2); }
+/* Dark mode: CSS variables handle this automatically via :root overrides in manager.html */
+/* No separate dark overrides needed — variables cascade correctly */
 </style>
 </head>
 <body>
@@ -460,7 +477,7 @@ select.form-input { cursor: pointer; }
       </div>
       <p>All events pushed to managers. Click Edit to adjust details or Remove to delete.</p>
       <div id="cal-history" style="display:flex;flex-direction:column;gap:8px;">
-        <div style="color:var(--muted);font-size:13px;">No events pushed yet.</div>
+        <div class="loading-state"><span class="spinner"></span>Loading…</div>
       </div>
     </div>
   </div>
@@ -830,8 +847,11 @@ function doPost(e) {
     };
 
   } else if (data.action === 'addManager') {
+    if(!data.name||typeof data.name!=='string'||data.name.trim().length<1||data.name.trim().length>40){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Invalid manager name.'})).setMimeType(ContentService.MimeType.JSON);}
+    const safeName=data.name.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
+    if(!safeName){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Name must contain letters or numbers.'})).setMimeType(ContentService.MimeType.JSON);}
     const mh=getOrCreate('managers',['name','password']); const existing=mh.getDataRange().getValues().slice(1).map(r=>r[0]);
-    if(!existing.includes(data.name))mh.appendRow([data.name,'']); result={ok:true};
+    if(!existing.includes(safeName))mh.appendRow([safeName,'']); result={ok:true};
 
   } else if (data.action === 'setPassword') {
     const mh=getOrCreate('managers',['name','password']); const rows=mh.getDataRange().getValues();
@@ -849,6 +869,8 @@ function doPost(e) {
     const mh=getOrCreate('maps',['manager','mapData','updatedAt']); const row=mh.getDataRange().getValues().slice(1).find(r=>r[0]===data.manager); result={mapData:row?row[1]:null};
 
   } else if (data.action === 'saveReport') {
+    if(!data.report||!data.report.url||!data.report.week){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Report must include url and week.'})).setMimeType(ContentService.MimeType.JSON);}
+    if(!/^https?:\/\//.test(data.report.url)){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Report URL must start with http:// or https://'})).setMimeType(ContentService.MimeType.JSON);}
     const rh=getOrCreate('reports',['id','type','url','campaign','week','managers','uploadedAt','officeWire','mgrTake']); const r=data.report;
     rh.appendRow([r.id,r.type,r.url,r.campaign||'',String(r.week||''),(r.managers||[]).join(','),r.uploadedAt||'',r.officeWire||'',r.mgrTake||'']); result={ok:true};
 
@@ -882,6 +904,10 @@ function doPost(e) {
     const rows=ch.getDataRange().getValues().slice(1).filter(r=>r[1]===data.manager);
     result={events:rows.map(r=>({id:String(r[0]),manager:r[1],title:r[2],date:safeDate(r[3]),time:r[4]||'',notes:r[5]||'',reminder:r[6]||'',category:r[7]||'personal',pushedAt:r[8]||'',recurring:r[9]==='yes'||r[9]===true,recurringGroupId:r[10]||null,recurringFreq:r[11]||null}))};
 
+  } else if (data.action === 'getAllCalEvents') {
+    const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
+    result={events:ch.getDataRange().getValues().slice(1).map(r=>({id:String(r[0]),manager:r[1],title:r[2],date:safeDate(r[3]),time:r[4]||'',notes:r[5]||'',reminder:r[6]||'',category:r[7]||'personal',pushedAt:r[8]||'',recurring:r[9]==='yes'||r[9]===true,recurringGroupId:r[10]||null,recurringFreq:r[11]||null}))};
+
   } else if (data.action === 'saveCalEvents') {
     const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
     const rows=ch.getDataRange().getValues();
@@ -890,6 +916,8 @@ function doPost(e) {
     result={ok:true};
 
   } else if (data.action === 'saveCalEvent') {
+    if(!data.event||!data.event.title||!data.event.date){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Calendar event must include title and date.'})).setMimeType(ContentService.MimeType.JSON);}
+    if(data.event.date&&!/^\d{4}-\d{2}-\d{2}$/.test(data.event.date)){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'Invalid date format — expected YYYY-MM-DD.'})).setMimeType(ContentService.MimeType.JSON);}
     const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
     const ev=data.event; const rows=ch.getDataRange().getValues(); let found=false;
     const row=[ev.id,ev.manager||data.manager,ev.title||'',ev.date||'',ev.time||'',ev.notes||'',ev.reminder||'',ev.category||'personal',ev.pushedAt||new Date().toISOString(),ev.recurring?'yes':'no',ev.recurringGroupId||'',ev.recurringFreq||''];
@@ -1323,23 +1351,22 @@ async function loadAll() {
 async function loadAllCalendarEvents() {
   if (!managers.length) return;
   pushedCalEvents = [];
-  const seen = new Set();
-  const results = await Promise.allSettled(managers.map(mgr => api({action:'getCalEvents', manager:mgr}).then(res => ({mgr, events: res.events||[]}))));
-  results.forEach(r => {
-    if (r.status !== 'fulfilled') return;
-    const {mgr, events} = r.value;
-    events.forEach(ev => {
+  // Single API call returns all managers' events — avoids N parallel requests
+  try {
+    const res = await api({action:'getAllCalEvents'});
+    const seen = new Set();
+    (res.events||[]).forEach(ev => {
       if (!seen.has(ev.id)) {
         seen.add(ev.id);
-        if (!ev.managers) ev.managers = [mgr];
+        if (!ev.managers) ev.managers = [ev.manager].filter(Boolean);
         pushedCalEvents.push(ev);
       } else {
         const existing = pushedCalEvents.find(e=>e.id===ev.id);
-        if (existing && !existing.managers.includes(mgr)) existing.managers.push(mgr);
+        if (existing && ev.manager && !existing.managers.includes(ev.manager)) existing.managers.push(ev.manager);
       }
     });
-  });
-  pushedCalEvents.sort((a,b)=>b.pushedAt?.localeCompare(a.pushedAt||'')||0);
+    pushedCalEvents.sort((a,b)=>b.pushedAt?.localeCompare(a.pushedAt||'')||0);
+  } catch(e) { console.warn('loadAllCalendarEvents failed:', e); }
   renderCalHistory();
 }
 
@@ -1624,8 +1651,23 @@ function switchTab(tab) {
   if(tab==='upload'){renderUploadHistory();renderManagerCheckboxes();}
   if(tab==='planner'){pgRender();}
   if(tab==='calendar'){renderCalManagerCheckboxes();renderCalHistory();}
-  if(tab==='reviews'){populateReviewFilters();renderReviews();}
+  if(tab==='reviews'){
+    // Pre-select the currently viewed week in the filter so context is preserved
+    populateReviewFilters();
+    const wkSel=document.getElementById('review-filter-week');
+    if(wkSel&&viewWeekKey&&viewWeekKey!==currentWeek){
+      const opt=Array.from(wkSel.options).find(o=>o.value===viewWeekKey);
+      if(opt){wkSel.value=viewWeekKey;}
+    }
+    renderReviews();
+  }
   if(tab==='notifications'){renderNotifManagerCheckboxes();refreshLiveNotifs();loadNotifTemplates();}
+  // Show currently-viewed week in the people tab header
+  if(tab==='people'){
+    const lbl=document.querySelector('#tab-people .sec-lbl');
+    if(lbl&&viewWeekKey!==currentWeek)lbl.textContent='All people ever tracked (viewing w/c '+formatWeek(viewWeekKey)+')';
+    else if(lbl)lbl.textContent='All people ever tracked';
+  }
 }
 
 function showEmpty() {
@@ -1894,7 +1936,7 @@ function renderCalHistory() {
         <div style="font-size:11px;color:var(--accent);margin-top:3px;">→ ${esc(mgrList)}</div>
       </div>
       <div class="event-item-actions">
-        <button class="edit-btn" onclick="openEditModal('${esc(e.id)}','${esc(e.title)}','${esc(e.date)}','${esc(e.time||'')}','${esc(e.notes||'')}')">Edit</button>
+        <button class="edit-btn" data-id="${esc(e.id)}" data-title="${esc(e.title)}" data-date="${esc(e.date)}" data-time="${esc(e.time||'')}" data-notes="${esc(e.notes||'')}" onclick="openEditModalFromBtn(this)">Edit</button>
         <button class="edit-btn" onclick="deleteCalEvent('${esc(e.id)}')" style="color:var(--danger);border-color:var(--danger);" onmouseover="this.style.background='var(--danger-soft)'" onmouseout="this.style.background='none'">Remove</button>
       </div>
     </div>`;
@@ -1903,6 +1945,9 @@ function renderCalHistory() {
 
 // Edit event modal
 let _editingEventId = null;
+function openEditModalFromBtn(btn) {
+  openEditModal(btn.dataset.id, btn.dataset.title, btn.dataset.date, btn.dataset.time, btn.dataset.notes);
+}
 function openEditModal(id, title, date, time, notes) {
   _editingEventId = id;
   document.getElementById('edit-event-id').value = id;
@@ -2000,7 +2045,7 @@ function renderReviews() {
           <div class="review-card-meta">Submitted ${submittedDate}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <button onclick="event.stopPropagation();exportReviewPDF('${esc(r.id)}')" style="background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);font-family:var(--font);font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;" title="Export as PDF">⬇ PDF</button>
+          <button onclick="event.stopPropagation();exportReviewPDF('${esc(r.id)}')" style="background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);font-family:var(--font);font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;" title="Export as PDF — opens print dialog">⬇ PDF</button>
           <span style="font-size:18px;color:var(--muted);transition:transform .2s;" id="rev-arrow-${esc(r.id)}">›</span>
         </div>
       </div>
@@ -2052,14 +2097,11 @@ function exportReviewPDF(id) {
   ${bodyHtml}
   </body></html>`;
 
-  const blob = new Blob([html], {type:'text/html'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `review_${r.manager}_${r.week}.html`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Review exported ✓','success');
+  // Open in a new window and trigger print-to-PDF (works without extra libs)
+  const win = window.open('', '_blank');
+  win.document.write(html + '<script>window.onload=function(){window.print();}<\/script>');
+  win.document.close();
+  showToast('Review opened — use Print → Save as PDF ✓','success');
 }
 
 function exportAllReviewsCSV() {
@@ -2464,16 +2506,17 @@ function pgAddGroup() {
   const id = 'g_' + Date.now();
   plannerGroups.push({id, name: 'Group ' + (plannerGroups.length + 1), members: []});
   pgRender();
-  pgSave();
+  pgSaveDebounced();
 }
 
 function pgRemoveGroup(gi) {
   if (!confirm('Remove this group? Managers will revert to private planners.')) return;
   plannerGroups.splice(gi, 1);
   pgRender();
-  pgSave();
+  pgSaveDebounced();
 }
 
+let _pgSaveTimer = null;
 function pgToggleMember(gi, mgr) {
   const g = plannerGroups[gi];
   const idx = g.members.indexOf(mgr);
@@ -2485,7 +2528,12 @@ function pgToggleMember(gi, mgr) {
     g.members.splice(idx, 1);
   }
   pgRender();
-  pgSave();
+  pgSaveDebounced();
+}
+
+function pgSaveDebounced() {
+  clearTimeout(_pgSaveTimer);
+  _pgSaveTimer = setTimeout(pgSave, 800);
 }
 
 async function pgSave() {
