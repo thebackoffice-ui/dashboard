@@ -1771,18 +1771,17 @@ async function pushCalendarEvent() {
     recurringFreq: isRecurring ? freq : null
   }));
 
-  status.textContent = 'Pushing…';
-  let successCount = 0;
+  status.textContent = `Pushing to ${selectedMgrs.length} manager${selectedMgrs.length!==1?'s':''}…`;
+  const eventsForMgr = mgr => newEvents.map(ev => ({ ...ev, manager: mgr }));
+  const results = await Promise.allSettled(
+    selectedMgrs.map(mgr => api({ action: 'saveCalEvents', manager: mgr, events: eventsForMgr(mgr) }))
+  );
   const errors = [];
-
-  for (const mgr of selectedMgrs) {
-    try {
-      for (const ev of newEvents) {
-        await api({ action: 'saveCalEvent', manager: mgr, event: { ...ev, manager: mgr } });
-      }
-      successCount++;
-    } catch(e) { errors.push(mgr); }
-  }
+  let successCount = 0;
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled') successCount++;
+    else errors.push(selectedMgrs[i]);
+  });
 
   if (errors.length === 0) {
     status.textContent = `✓ Pushed to ${successCount} manager${successCount!==1?'s':''}`;

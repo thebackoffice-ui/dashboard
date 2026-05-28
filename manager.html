@@ -4704,18 +4704,18 @@ function dpInit(){
 async function dpLoadAndRender(silent=false){
   const dates = dpGetWeekDates();
   try{
-    // Load sharing prefs to find group
     const prefRes = await api({action:'getDpSharing',manager:managerName});
     dpSharedWith = prefRes.sharedWith||[];
     dpAdminAssigned = prefRes.adminAssigned||false;
-    // Determine group & owner (lowest alpha name = owner to ensure everyone uses same planner)
+    // If not assigned by admin, show locked state
+    if(!dpAdminAssigned){
+      dpRenderLocked();
+      return;
+    }
     dpGroupMembers = [managerName, ...dpSharedWith].sort();
     dpGroupOwner = dpGroupMembers[0];
     const badge = document.getElementById('dp-shared-badge');
     if(badge) badge.style.display = dpSharedWith.length?'':'none';
-    // Hide/show the Group button depending on whether admin controls it
-    const groupBtn = document.getElementById('dp-group-btn');
-    if(groupBtn) groupBtn.style.display = dpAdminAssigned ? 'none' : '';
     // Load all 5 days from the group owner's planner
     const results = await Promise.all(dates.map(date=>api({action:'getDailyPlanner',manager:dpGroupOwner,date})));
     results.forEach((res,i)=>{
@@ -4730,6 +4730,22 @@ async function dpLoadAndRender(silent=false){
   }
   dpRenderDay();
   dpStartPoll();
+}
+
+function dpRenderLocked(){
+  clearInterval(dpPollTimer);
+  const wrap = document.getElementById('dp-pages-wrap');
+  if(wrap) wrap.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:340px;gap:14px;color:var(--muted);text-align:center;padding:32px;">
+      <div style="font-size:36px;">🔒</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);">Planner not assigned</div>
+      <div style="font-size:13px;max-width:300px;line-height:1.6;">Your admin hasn't assigned you to a planner group yet. Ask them to set this up in the Planner Groups tab.</div>
+    </div>`;
+  // Hide day tabs and save bar so there's nothing to interact with
+  const tabs = document.getElementById('dp-day-tabs');
+  const saveBar = document.querySelector('.dp-save-bar');
+  if(tabs) tabs.style.visibility = 'hidden';
+  if(saveBar) saveBar.style.visibility = 'hidden';
 }
 
 async function dpPollForChanges(){
@@ -4795,6 +4811,11 @@ function dpSwitchDay(idx){
 }
 
 function dpRenderDay(){
+  // Ensure tabs/save bar visible (may have been hidden by dpRenderLocked)
+  const tabs = document.getElementById('dp-day-tabs');
+  const saveBar = document.querySelector('.dp-save-bar');
+  if(tabs) tabs.style.visibility = '';
+  if(saveBar) saveBar.style.visibility = '';
   const dates = dpGetWeekDates();
   const date = dates[dpActiveDayIdx];
   const data = dpData[date] || dpBlank();
