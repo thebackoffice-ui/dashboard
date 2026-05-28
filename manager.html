@@ -1186,17 +1186,17 @@ select.wr-input{cursor:pointer;appearance:none;}
 .dp-sec-lbl{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
 /* Team columns row */
 .dp-team-row{display:grid;grid-template-columns:1fr 1fr 1fr 1.6fr;gap:10px;margin-bottom:14px;}
-.dp-team-col{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.dp-team-col{border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;}
 .dp-team-col-hdr{background:var(--surface2);padding:7px 10px;font-size:11px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);}
 .dp-team-col-hdr.accent{background:var(--accent);color:#fff;}
-.dp-team-body{padding:6px 8px;display:flex;flex-direction:column;gap:4px;}
-.dp-field{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:5px 8px;border-radius:5px;outline:none;transition:border-color .15s;width:100%;resize:none;}
+.dp-team-body{padding:6px 8px;display:flex;flex-direction:column;gap:4px;flex:1;}
+.dp-field{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:12px;padding:5px 8px;border-radius:5px;outline:none;transition:border-color .15s;width:100%;resize:none;flex:1;min-height:120px;}
 .dp-field:focus{border-color:var(--accent);}
 .dp-field::placeholder{color:var(--subtle);}
 /* Leaders meeting sub-grid */
 .dp-lm-top{min-height:60px;padding:6px 8px;}
-.dp-lm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border);}
-.dp-lm-cell{padding:4px 6px;border-right:1px solid var(--border);}
+.dp-lm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid var(--border);flex:1;}
+.dp-lm-cell{padding:4px 6px;border-right:1px solid var(--border);display:flex;flex-direction:column;}
 .dp-lm-cell:last-child{border-right:none;}
 .dp-lm-cell-hdr{font-size:10px;font-weight:700;color:var(--muted);text-align:center;padding:5px 4px;border-top:1px solid var(--border);border-right:1px solid var(--border);text-transform:uppercase;letter-spacing:.05em;background:var(--surface2);}
 .dp-lm-cell-hdr:last-child{border-right:none;}
@@ -1707,7 +1707,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
           <span class="dp-save-status" id="dp-save-status"></span>
           <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
             <button class="dp-pdf-btn" onclick="dpDownloadPDF()" title="Download today as PDF">⬇ PDF</button>
-            <button id="dp-group-btn" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--rsm);cursor:pointer;" onclick="dpShowShareModal()">👥 Group</button>
+            <button id="dp-group-btn" style="display:none;background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--rsm);cursor:pointer;">👥 Group</button>
           </div>
         </div>
       </div>
@@ -1760,18 +1760,6 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
 
 <!-- TAG POPOVER (injected dynamically) -->
 
-<!-- PLANNER SHARE MODAL -->
-<div id="dp-share-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:700;display:none;align-items:center;justify-content:center;" onclick="if(event.target===this)dpCloseShareModal()">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px;width:340px;box-shadow:0 16px 40px rgba(0,0,0,.2);">
-    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Planner Group</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Add managers to your planner group — everyone in the group edits the same planner together and sees changes in real time.</div>
-    <div id="dp-share-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;">
-      <button class="modal-btn secondary" onclick="dpCloseShareModal()">Cancel</button>
-      <button class="modal-btn primary" onclick="dpSaveSharing()">Save</button>
-    </div>
-  </div>
-</div>
 
 <!-- Event modal -->
 <div id="event-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)closeEventModal()">
@@ -1807,7 +1795,6 @@ const FLAGS=[{id:'Conversation',label:'Needs conversation',color:'#f97316'},{id:
 const CAT_NAMES={personal:'Personal',work:'Work',team:'Pink',reminder:'Yellow',admin:'Purple',orange:'Orange',rose:'Rose',cyan:'Cyan'};
 const PC={Trainee:{f:'#e6f7f0',s:'#40b890',t:'#2a9470'},Solo:{f:'#fef3e0',s:'#e09020',t:'#c87810'},Leader:{f:'#e6eef8',s:'#5888d8',t:'#3060c0'},Core:{f:'#ede8f8',s:'#9070c8',t:'#6848b0'},'Junior Partner +':{f:'#fde8ee',s:'#e06888',t:'#c84870'},Manager:{f:'#e6f4f2',s:'#2aaa98',t:'#0f766e'},default:{f:'#f2f4f6',s:'#8898b0',t:'#4a5870'}};
 const PCD={Trainee:{f:'#082818',s:'#40b890',t:'#90e8c8'},Solo:{f:'#281800',s:'#e09020',t:'#f8d080'},Leader:{f:'#081428',s:'#5888d8',t:'#a0c0f0'},Core:{f:'#180828',s:'#9070c8',t:'#c8b0f0'},'Junior Partner +':{f:'#280810',s:'#e06888',t:'#f0b0c8'},Manager:{f:'#001818',s:'#2aaa98',t:'#80d8c8'},default:{f:'#181E28',s:'#7088A8',t:'#B0C0D8'}};
-const CAMPAIGNS_WITH_VENUES=['SP Venues','Charity Venues'];
 
 // ── Theme ──────────────────────────────────────────────
 function initTheme(){const s=localStorage.getItem('tt_theme')||'light';document.documentElement.setAttribute('data-theme',s);document.getElementById('theme-lbl').textContent=s==='dark'?'Light mode':'Dark mode';}
@@ -1815,7 +1802,6 @@ function toggleTheme(){const c=document.documentElement.getAttribute('data-theme
 initTheme();
 function isDark(){return document.documentElement.getAttribute('data-theme')==='dark';}
 function pc(pos){const m=isDark()?PCD:PC;return m[pos]||m.default;}
-function posClass(p){if(!p)return'';const k=p.replace(/[^a-zA-Z]/g,'');return'pos-'+k.charAt(0).toUpperCase()+k.slice(1);}
 
 // ── Helpers ────────────────────────────────────────────
 function getWeekKey(d){const dt=new Date(d);dt.setHours(0,0,0,0);dt.setDate(dt.getDate()-(dt.getDay()===0?6:dt.getDay()-1));return fmtDate(dt);}
@@ -1915,18 +1901,6 @@ function posKey(pos){
   if(p.includes('junior'))return 'Junior';
   return '';
 }
-function posStyle(pos){
-  const k=posKey(pos);
-  const map={
-    Trainee:['#b7ffe3','#00d68f'],
-    Solo:['#ffe3b3','#ff9500'],
-    Leader:['#bfdcff','#2563ff'],
-    Core:['#dccbff','#7c3aed'],
-    Junior:['#ffc9d7','#ff3366']
-  };
-  if(!map[k])return '';
-  return `background:${map[k][0]};color:${map[k][1]};border:1px solid ${map[k][1]};`;
-}
 function posClass(pos){
   const k=posKey(pos);
   return k?`pos-colour-${k}`:'';
@@ -1996,6 +1970,11 @@ const SVG={
   arrow_up:'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 12V4M4 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   arrow_dn:'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 4v8M4 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   dash:'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8" stroke-linecap="round"/></svg>',
+  pound:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 5a4 4 0 0 0-7 2.5V11H4M4 14h12M6 11h6" stroke-linecap="round"/></svg>',
+  pay:'<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="12" rx="2"/><path d="M14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM2 9h16" stroke-linecap="round"/></svg>',
+  cal:'<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="13" rx="2"/><path d="M3 9h14M7 3v4M13 3v4" stroke-linecap="round"/></svg>',
+  chev:'<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  reps:'<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17a6 6 0 0 1 10 0M9 17a6 6 0 0 1 10 0" stroke-linecap="round"/></svg>',
 };
 
 const CAT_COLORS={personal:'#2563ff',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#7c3aed',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
@@ -2070,18 +2049,6 @@ function renderHome(){
     return`<div style="text-align:center;padding:5px 2px;border-radius:50%;font-size:11px;cursor:default;${c.o?'color:var(--subtle);':'color:var(--text);'}${isT?'background:#0f766e;color:#fff;border-radius:50%;font-weight:700;':''}${ev&&!isT?'font-weight:700;':''}position:relative;">${dayNum}${ev&&!isT?'<div style="position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:3px;height:3px;background:#0f766e;border-radius:50%;"></div>':''}</div>`}).join('');
 
   // SVGs
-  const ICO={
-    users:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/><path d="M4 17a7 7 0 0 1 12 0" stroke-linecap="round"/></svg>`,
-    warn:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3L2 17h16L10 3z" stroke-linejoin="round"/><path d="M10 9v4M10 15h.01" stroke-linecap="round"/></svg>`,
-    check:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 8l4 4L14 4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    clock:`<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2" stroke-linecap="round"/></svg>`,
-    pound:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 5a4 4 0 0 0-7 2.5V11H4M4 14h12M6 11h6" stroke-linecap="round"/></svg>`,
-    pay:`<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="12" rx="2"/><path d="M14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM2 9h16" stroke-linecap="round"/></svg>`,
-    cal:`<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="13" rx="2"/><path d="M3 9h14M7 3v4M13 3v4" stroke-linecap="round"/></svg>`,
-    doc:`<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h8l4 4v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v5h5M7 11h6M7 14h4" stroke-linecap="round"/></svg>`,
-    chev:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    reps:`<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17a6 6 0 0 1 10 0M9 17a6 6 0 0 1 10 0" stroke-linecap="round"/></svg>`,
-  };
 
   document.getElementById('home-grid').innerHTML=`
 
@@ -2092,28 +2059,28 @@ function renderHome(){
         <div style="font-size:11px;font-weight:700;color:#1a3870;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Active Reps</div>
         <div style="font-size:34px;font-weight:800;color:#0c2060;letter-spacing:-.03em;line-height:1;">${active.length}</div>
         <div style="font-size:11px;font-weight:600;color:#1a3870;margin-top:8px;">${delta>0?'▲ +'+delta+' from last week':delta<0?'▼ '+delta+' from last week':'— Same as last week'}</div>
-        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${ICO.users.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
+        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${SVG.users.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
 
       <div style="background:#abc9ff;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
         <div style="font-size:11px;font-weight:700;color:#1a3870;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Flagged</div>
         <div style="font-size:34px;font-weight:800;color:#0c2060;letter-spacing:-.03em;line-height:1;">${flagged.length}</div>
         <div style="font-size:11px;font-weight:600;color:#1a3870;margin-top:8px;">${leavers.length} leaver${leavers.length!==1?'s':''}</div>
-        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${ICO.warn.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
+        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${SVG.warning.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
 
       <div style="background:#abc9ff;border-radius:10px;padding:20px 22px;cursor:${weekSubmitted?'default':'pointer'};position:relative;overflow:hidden;" onclick="${weekSubmitted?'':String.raw`switchTab('weekly')`}">
         <div style="font-size:11px;font-weight:700;color:#1a3870;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Weekly Update</div>
         <div style="font-size:24px;font-weight:800;color:#0c2060;letter-spacing:-.02em;line-height:1.1;">${weekSubmitted?'Submitted':'Pending'}</div>
         <div style="font-size:11px;font-weight:600;color:#1a3870;margin-top:8px;">${weekSubmitted?'Done for this week':'Tap to submit'}</div>
-        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${(weekSubmitted?ICO.check:ICO.clock).replace(/width="1[68]"/,'width="56"').replace(/height="1[68]"/,'height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
+        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${(weekSubmitted?SVG.check:SVG.clock).replace(/width="1[68]"/,'width="56"').replace(/height="1[68]"/,'height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
 
       <div style="background:#1d9ba4;border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;">
         <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.82);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Latest Wire</div>
         <div style="font-size:34px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1;">${curWire?'£'+curWire.toLocaleString('en-GB'):'—'}</div>
         <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.8);margin-top:8px;">${prevWire?((wireDiff>=0?'▲ ':'▼ ')+'£'+Math.abs(wireDiff).toLocaleString('en-GB')+' vs prev week'):'&nbsp;'}</div>
-        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${ICO.pound.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
+        <div style="position:absolute;right:-8px;bottom:-8px;opacity:.15;">${SVG.pound.replace('width="18"','width="56"').replace('height="18"','height="56"').replace('stroke="currentColor"','stroke="#fff"')}</div>
       </div>
     </div>
 
@@ -2147,34 +2114,34 @@ function renderHome(){
 
         ${latestPay
           ?`<a href="${esc(latestPay.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:var(--niond-shadow);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03)'">
-              <div style="width:34px;height:34px;border-radius:8px;background:#E8F1FF;color:#2979FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.pay}</div>
+              <div style="width:34px;height:34px;border-radius:8px;background:#E8F1FF;color:#2979FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.pay}</div>
               <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);">Pay Report</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">${fmtReportDate(latestPay.week)}</div></div>
-              <div style="color:var(--muted);">${ICO.chev}</div>
+              <div style="color:var(--muted);">${SVG.chev}</div>
             </a>`
           :`<div style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;box-shadow:var(--niond-shadow);opacity:.55;">
-              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.pay}</div>
+              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.pay}</div>
               <div><div style="font-size:13px;font-weight:600;color:var(--muted);">Pay Report</div><div style="font-size:11px;color:var(--subtle);">Not uploaded yet</div></div>
             </div>`}
 
         ${latestPlanner
           ?`<a href="${esc(latestPlanner.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:var(--niond-shadow);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03)'">
-              <div style="width:34px;height:34px;border-radius:8px;background:#FFF4E0;color:#FFA800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.cal}</div>
+              <div style="width:34px;height:34px;border-radius:8px;background:#FFF4E0;color:#FFA800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.cal}</div>
               <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);">Daily Planner</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">${esc(latestPlanner.campaign||'')}</div></div>
-              <div style="color:var(--muted);">${ICO.chev}</div>
+              <div style="color:var(--muted);">${SVG.chev}</div>
             </a>`
           :`<div style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;box-shadow:var(--niond-shadow);opacity:.55;">
-              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.cal}</div>
+              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.cal}</div>
               <div><div style="font-size:13px;font-weight:600;color:var(--muted);">Daily Planner</div><div style="font-size:11px;color:var(--subtle);">Not uploaded yet</div></div>
             </div>`}
 
         ${latestProlog
           ?`<a href="${esc(latestProlog.url)}" target="_blank" style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;box-shadow:var(--niond-shadow);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03)'">
-              <div style="width:34px;height:34px;border-radius:8px;background:#E0F7F4;color:#00BFA5;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.doc}</div>
+              <div style="width:34px;height:34px;border-radius:8px;background:#E0F7F4;color:#00BFA5;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.doc}</div>
               <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);">Pro-log</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">${esc(latestProlog.campaign||'')}</div></div>
-              <div style="color:var(--muted);">${ICO.chev}</div>
+              <div style="color:var(--muted);">${SVG.chev}</div>
             </a>`
           :`<div style="background:#fff;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;box-shadow:var(--niond-shadow);opacity:.55;">
-              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICO.doc}</div>
+              <div style="width:34px;height:34px;border-radius:8px;background:#F2F4F6;color:#94A3B8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${SVG.doc}</div>
               <div><div style="font-size:13px;font-weight:600;color:var(--muted);">Pro-log</div><div style="font-size:11px;color:var(--subtle);">Not uploaded yet</div></div>
             </div>`}
 
@@ -2263,11 +2230,11 @@ function renderHome(){
                 <div style="font-size:11px;color:var(--muted);">${esc(r.position||'—')}</div>
               </div>
               ${fi?`<div style="width:6px;height:6px;border-radius:50%;background:${fi.color};flex-shrink:0;"></div>`:''}
-              <div style="color:var(--subtle);">${ICO.chev}</div>
+              <div style="color:var(--subtle);">${SVG.chev}</div>
             </div>`;
           }).join(''):`<div style="padding:16px 0;color:var(--muted);font-size:13px;">No reps yet.</div>`}
         </div>
-        <button onclick="switchTab('reps')" style="margin-top:14px;background:#F0E8FE;border:none;color:#8533F5;font-family:var(--font);font-size:12px;font-weight:700;padding:10px;border-radius:8px;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.background='#E4D4FC'" onmouseout="this.style.background='#F0E8FE'">${ICO.reps} View all ${active.length} reps</button>
+        <button onclick="switchTab('reps')" style="margin-top:14px;background:#F0E8FE;border:none;color:#8533F5;font-family:var(--font);font-size:12px;font-weight:700;padding:10px;border-radius:8px;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.background='#E4D4FC'" onmouseout="this.style.background='#F0E8FE'">${SVG.reps} View all ${active.length} reps</button>
       </div>
     </div>
   `;
@@ -2803,7 +2770,6 @@ let wrConvs=[];
 let wrNetworks=[];
 let wrNetGoals=[];
 let wrExpenses=[];
-let wrCampaign='';
 
 function showReviewForm(){
   document.getElementById('review-past-view').style.display='none';
@@ -3143,8 +3109,7 @@ function setField(val){
 }
 function checkVenueCampaign(val){
   const sec=document.getElementById('wr-expenses-section');
-  if(sec)sec.style.display=CAMPAIGNS_WITH_VENUES.includes(val)?'':'none';
-  wrCampaign=val;
+  if(sec)sec.style.display=['SP Venues','Charity Venues'].includes(val)?'':'none';
 }
 function setExpenses(val){
   reviewExpensesEnabled=val;
@@ -3353,7 +3318,6 @@ async function submitReview(){
     networks:wrNetworks.filter(n=>n.name),
     netGoals:wrNetGoals.filter(n=>n.name),
     additionalNotes:g('wr-additionalNotes'),
-    campaign:wrCampaign,
     expenses:reviewExpensesEnabled?wrExpenses.filter(e=>e.name):[],
     avgWire:reviewExpensesEnabled?g('wr-avgWire'):'',
     mapSnapshot:wrMapSnapshot,
@@ -3583,7 +3547,6 @@ function renderCalendar(){
   let nd=1;while(cells.length%7!==0)cells.push({date:fmtDate(new Date(calYear,calMonth+1,nd++)),other:true});
 
   // ── Main calendar grid ──
-  const CAT_C={personal:'#2563ff',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#7c3aed',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
   const CAT_BG={personal:'#dbeafe',work:'#dcfce7',team:'#fce7f3',reminder:'#fef9c3',admin:'#f0fdfa',orange:'#ffedd5',rose:'#ffe4e6',cyan:'#cffafe'};
   const CAT_TXT={personal:'#1d4ed8',work:'#15803d',team:'#be185d',reminder:'#92400e',admin:'#0f766e',orange:'#c2410c',rose:'#be123c',cyan:'#0e7490'};
 
@@ -3594,7 +3557,7 @@ function renderCalendar(){
     const isToday=c.date===today;
     const isSel=c.date===selectedDay;
     const evHtml=evs.slice(0,3).map(e=>{
-      const col=CAT_C[e.category||'personal']||'#2563ff';
+      const col=CAT_COLORS[e.category||'personal']||'#2563ff';
       const bg=CAT_BG[e.category||'personal']||'#dbeafe';
       const txt=CAT_TXT[e.category||'personal']||'#1d4ed8';
       return`<div class="cal-event" style="background:${bg};color:${txt};" onclick="openEditEvent(event,'${e.id}')" title="${esc(e.title)}">${esc(e.title)}</div>`;
@@ -3660,14 +3623,13 @@ function renderEventsList(){
   if(titleEl)titleEl.textContent=isToday?"Today's Events":"Events";
   if(dateEl)dateEl.textContent=dayLabel;
 
-  const CAT_C={personal:'#2563ff',work:'#22c55e',team:'#ec4899',reminder:'#f59e0b',admin:'#0f766e',orange:'#f97316',rose:'#f43f5e',cyan:'#06b6d4'};
   const evs=calEvents.filter(e=>e.date===day);
   if(!evs.length){
     listEl.innerHTML='<div class="event-list-empty">No events this day.<br><span style="font-size:11px;">Click + to add one.</span></div>';
     return;
   }
   listEl.innerHTML=evs.map(e=>{
-    const col=CAT_C[e.category||'personal']||'#2563ff';
+    const col=CAT_COLORS[e.category||'personal']||'#2563ff';
     return`<div class="event-list-row" onclick="openEditEvent(event,'${e.id}')">
       <div class="event-list-dot" style="background:${col};"></div>
       <div style="flex:1;min-width:0;">
@@ -4897,15 +4859,15 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
       <div class="dp-team-row">
         <div class="dp-team-col">
           <div class="dp-team-col-hdr">Trainees</div>
-          <div class="dp-team-body">${ta('dp-trainees',trainees,4,'Names…')}</div>
+          <div class="dp-team-body">${ta('dp-trainees',trainees,8,'Names…')}</div>
         </div>
         <div class="dp-team-col">
           <div class="dp-team-col-hdr">Solo</div>
-          <div class="dp-team-body">${ta('dp-solo',solo,4,'Names…')}</div>
+          <div class="dp-team-body">${ta('dp-solo',solo,8,'Names…')}</div>
         </div>
         <div class="dp-team-col">
           <div class="dp-team-col-hdr">Leaders</div>
-          <div class="dp-team-body">${ta('dp-leaders',leaders,4,'Names…')}</div>
+          <div class="dp-team-body">${ta('dp-leaders',leaders,8,'Names…')}</div>
         </div>
         <div class="dp-team-col">
           <div class="dp-team-col-hdr accent">Leaders Meeting</div>
@@ -4916,9 +4878,9 @@ function dpRenderDailyPageHTML(d, events, date, readOnly, mgrName){
             <div class="dp-lm-cell-hdr">Over</div>
           </div>
           <div class="dp-lm-grid">
-            <div class="dp-lm-cell">${ta('dp-lm-under',d.lmUnder,2,'')}</div>
-            <div class="dp-lm-cell">${ta('dp-lm-equal',d.lmEqual,2,'')}</div>
-            <div class="dp-lm-cell">${ta('dp-lm-over',d.lmOver,2,'')}</div>
+            <div class="dp-lm-cell">${ta('dp-lm-under',d.lmUnder,5,'')}</div>
+            <div class="dp-lm-cell">${ta('dp-lm-equal',d.lmEqual,5,'')}</div>
+            <div class="dp-lm-cell">${ta('dp-lm-over',d.lmOver,5,'')}</div>
           </div>
         </div>
       </div>
@@ -5066,47 +5028,6 @@ function dpSave(){
   dpSaveCurrentDay();
 }
 
-/* ── Share modal ─────────────────────────── */
-function dpShowShareModal(){
-  // Get all manager names from the system (reuse `managers` var if available, else parse from known data)
-  const allMgrs = (typeof managers!=='undefined'?managers:[]).filter(m=>m!==managerName);
-  const chips = document.getElementById('dp-share-chips');
-  if(!chips)return;
-  if(!allMgrs.length){
-    chips.innerHTML='<div style="font-size:12px;color:var(--muted);">No other managers found. Make sure the Script URL is configured.</div>';
-  } else {
-    chips.innerHTML = allMgrs.map(m=>{
-      const dn = m.charAt(0).toUpperCase()+m.slice(1);
-      const sel = dpSharedWith.includes(m)?'selected':'';
-      return`<div class="dp-mgr-chip ${sel}" onclick="this.classList.toggle('selected')" data-mgr="${esc(m)}">
-        <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${dn.charAt(0)}</span>
-        ${esc(dn)}
-      </div>`;
-    }).join('');
-  }
-  document.getElementById('dp-share-modal-backdrop').style.display='flex';
-}
-
-function dpCloseShareModal(){
-  document.getElementById('dp-share-modal-backdrop').style.display='none';
-}
-
-async function dpSaveSharing(){
-  const selected = [...document.querySelectorAll('.dp-mgr-chip.selected')].map(c=>c.dataset.mgr);
-  dpSharedWith = selected;
-  const week = dpGetWeekDates()[0];
-  try{
-    await api({action:'saveDpSharing',manager:managerName,sharedWith:selected,week});
-    dpCloseShareModal();
-    const names = selected.map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join(', ');
-    showToast(selected.length?`Group: you + ${names}  ✓`:'Solo planner  ✓','success');
-    // Rebuild group + reload shared planner
-    dpGroupMembers = [managerName,...selected].sort();
-    dpGroupOwner = dpGroupMembers[0];
-    dpLastSavedHash = '';
-    await dpLoadAndRender();
-  }catch(e){ showToast('Failed to save group','error'); }
-}
 
 /* ── PDF Download ─────────────────────────── */
 async function dpDownloadPDF(){
