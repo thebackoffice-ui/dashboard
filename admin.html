@@ -1310,7 +1310,8 @@ async function loadAll() {
     allWeeks=Array.from(ws).sort();
     if (!viewWeekKey||!allWeeks.includes(viewWeekKey)) viewWeekKey=currentWeek;
 
-    renderOverview(); renderPeople(); renderLinks(); await pgLoad();
+    renderOverview(); renderPeople(); renderLinks();
+    try { await pgLoad(); } catch(e) { console.warn('pgLoad failed:', e); }
     loadWeeklyReviews();
     loadReviewEmails();
 
@@ -2410,8 +2411,11 @@ async function deleteNotifTemplate(){
 async function pgLoad() {
   try {
     const res = await api({action:'getPlannerGroups'});
-    plannerGroups = res.groups || [];
-  } catch(e) {}
+    plannerGroups = (res && res.groups) || [];
+  } catch(e) {
+    // getPlannerGroups not deployed yet — silently ignore
+    plannerGroups = [];
+  }
   pgRender();
 }
 
