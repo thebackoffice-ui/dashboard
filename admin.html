@@ -845,13 +845,11 @@ function doPost(e) {
     for(let i=1;i<rows.length;i++){if(rows[i][0]===data.manager&&rows[i][1]===data.week){ah.getRange(i+1,3).setValue(new Date().toISOString());f=true;break;}} if(!f)ah.appendRow([data.manager,data.week,new Date().toISOString()]); result={ok:true};
 
   } else if (data.action === 'getCalEvents') {
-    // FIX 6: row-per-event schema
     const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
     const rows=ch.getDataRange().getValues().slice(1).filter(r=>r[1]===data.manager);
     result={events:rows.map(r=>({id:String(r[0]),manager:r[1],title:r[2],date:safeDate(r[3]),time:r[4]||'',notes:r[5]||'',reminder:r[6]||'',category:r[7]||'personal',pushedAt:r[8]||'',recurring:r[9]==='yes'||r[9]===true,recurringGroupId:r[10]||null,recurringFreq:r[11]||null}))};
 
   } else if (data.action === 'saveCalEvents') {
-    // FIX 6: delete all rows for this manager and re-insert
     const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
     const rows=ch.getDataRange().getValues();
     for(let i=rows.length-1;i>=1;i--){if(rows[i][1]===data.manager)ch.deleteRow(i+1);}
@@ -859,7 +857,6 @@ function doPost(e) {
     result={ok:true};
 
   } else if (data.action === 'saveCalEvent') {
-    // FIX 6: upsert a single event row
     const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
     const ev=data.event; const rows=ch.getDataRange().getValues(); let found=false;
     const row=[ev.id,ev.manager||data.manager,ev.title||'',ev.date||'',ev.time||'',ev.notes||'',ev.reminder||'',ev.category||'personal',ev.pushedAt||new Date().toISOString(),ev.recurring?'yes':'no',ev.recurringGroupId||'',ev.recurringFreq||''];
@@ -867,14 +864,12 @@ function doPost(e) {
     if(!found)ch.appendRow(row); result={ok:true};
 
   } else if (data.action === 'deleteCalEvent') {
-    // FIX 6: delete a single event by id across all manager rows
     const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
     const rows=ch.getDataRange().getValues();
     for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.id)ch.deleteRow(i+1);}
     result={ok:true};
 
   } else if (data.action === 'updateCalEvent') {
-    // FIX 6: update title/date/time/notes for all rows with this id
     const ch=getOrCreate('cal_events',['id','manager','title','date','time','notes','reminder','category','pushedAt','recurring','recurringGroupId','recurringFreq']);
     const rows=ch.getDataRange().getValues();
     for(let i=1;i<rows.length;i++){
@@ -887,7 +882,6 @@ function doPost(e) {
     }
     result={ok:true};
 
-  // ── FIX 4: Deadline settings in sheet + time-based trigger ──────────
   } else if (data.action === 'saveDeadlineSettings') {
     const sh=getOrCreate('settings',['key','value','updatedAt']);
     const keyMap={deadlineDay:data.day,deadlineTime:data.time,deadlineMsg:data.msg};
@@ -1005,7 +999,6 @@ function doPost(e) {
     const th=getOrCreate('notif_templates',['id','name','title','message','createdAt']); const rows=th.getDataRange().getValues();
     for(let i=rows.length-1;i>=1;i--){if(rows[i][0]===data.id){th.deleteRow(i+1);break;}} result={ok:true};
 
-  // ── Daily Planner ─────────────────────────────────────────────────────
   } else if (data.action === 'saveDailyPlanner') {
     const ph=getOrCreate('daily_planner',['manager','date','data','updatedAt']);
     const rows=ph.getDataRange().getValues(); let f=false;
@@ -1021,19 +1014,6 @@ function doPost(e) {
     const ph=getOrCreate('daily_planner',['manager','date','data','updatedAt']);
     const row=ph.getDataRange().getValues().slice(1).find(r=>r[0]===data.manager&&r[1]===data.date);
     result={data:row?row[2]:null};
-
-  } else if (data.action === 'saveDpSharing') {
-    // Saves who manager has shared their planner with for this week
-    const sh=getOrCreate('dp_sharing',['manager','week','sharedWith','updatedAt']);
-    const rows=sh.getDataRange().getValues(); let f=false;
-    const sw=(data.sharedWith||[]).join(',');
-    for(let i=1;i<rows.length;i++){
-      if(rows[i][0]===data.manager&&rows[i][1]===data.week){
-        sh.getRange(i+1,3,1,2).setValues([[sw,new Date().toISOString()]]);f=true;break;
-      }
-    }
-    if(!f)sh.appendRow([data.manager,data.week,sw,new Date().toISOString()]);
-    result={ok:true};
 
   } else if (data.action === 'savePlannerGroups') {
     // Admin saves group assignments: [{id, name, members:[]}]
@@ -1059,40 +1039,14 @@ function doPost(e) {
     if(groupMembers.length>1){
       result={sharedWith:groupMembers.filter(m=>m!==data.manager),groupName,adminAssigned:true};
     } else {
-      const sh=getOrCreate('dp_sharing',['manager','week','sharedWith','updatedAt']);
-      const row=sh.getDataRange().getValues().slice(1).filter(r=>r[0]===data.manager).pop();
-      result={sharedWith:row&&row[2]?String(row[2]).split(',').filter(Boolean):[],adminAssigned:false};
+      result={sharedWith:[],adminAssigned:false};
     }
 
-  } else if (data.action === 'getSharedPlanners') {
-    // Returns planner data for all managers who have shared with data.manager for this week
-    const sharingSheet=getOrCreate('dp_sharing',['manager','week','sharedWith','updatedAt']);
-    const plannerSheet=getOrCreate('daily_planner',['manager','date','data','updatedAt']);
-    const sharingRows=sharingSheet.getDataRange().getValues().slice(1);
-    const plannerRows=plannerSheet.getDataRange().getValues().slice(1);
-    // Find all managers who share with data.manager in data.week
-    const weekDates=[];
-    const mon=new Date(data.week+'T12:00:00');
-    for(let i=0;i<5;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);weekDates.push(Utilities.formatDate(d,Session.getScriptTimeZone(),'yyyy-MM-dd'));}
-    const sharedPlanners=[];
-    sharingRows.forEach(row=>{
-      const owner=row[0]; const week=row[1]; const sharedWith=row[2]?String(row[2]).split(','):[];
-      if(week===data.week&&sharedWith.includes(data.manager)){
-        weekDates.forEach(date=>{
-          const pRow=plannerRows.find(r=>r[0]===owner&&r[1]===date);
-          if(pRow&&pRow[2]){
-            try{const parsed=JSON.parse(pRow[2]);sharedPlanners.push({manager:owner,date,daily:parsed.daily||{},events:parsed.events||[]});}catch(e){}
-          }
-        });
-      }
-    });
-    result={planners:sharedPlanners};
   }
 
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
 }
 
-// ── FIX 4: Time-based trigger for deadline reminders ──────────────────
 function installDeadlineTrigger() {
   // Remove any existing deadline triggers first
   ScriptApp.getProjectTriggers()
@@ -1161,8 +1115,7 @@ document.getElementById('apps-script-pre').textContent = APPS_SCRIPT;
 document.getElementById('apps-script-version-lbl').textContent = `v${APPS_SCRIPT_VERSION} — copy and redeploy whenever this changes`;
 
 // ── Admin Auth (server-side token) ─────────────────────
-const ADMIN_SESSION_KEY = 'tt_admin_authed';
-const ADMIN_TOKEN_KEY   = 'tt_admin_token';
+const ADMIN_TOKEN_KEY = 'tt_admin_token';
 
 let adminToken = sessionStorage.getItem(ADMIN_TOKEN_KEY) || '';
 
@@ -1179,7 +1132,6 @@ async function doAdminLogin() {
     const data = await res.json();
     if (data.ok && data.token) {
       adminToken = data.token;
-      sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
       sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
       document.getElementById('admin-login-screen').style.display = 'none';
       document.getElementById('admin-main-wrap').style.display = 'block';
@@ -1205,7 +1157,7 @@ async function doAdminLogin() {
 }
 
 function checkAdminAuth() {
-  if (sessionStorage.getItem(ADMIN_SESSION_KEY) === '1') {
+  if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) {
     document.getElementById('admin-login-screen').style.display = 'none';
     document.getElementById('admin-main-wrap').style.display = 'block';
     return true;
@@ -1228,7 +1180,7 @@ function toggleTheme() {
 }
 // ── State ──────────────────────────────────────────────
 let scriptUrl = localStorage.getItem('teamtracker_script_url')||'';
-let managers=[], plannerGroups=[], allSubs=[], allPeople=[], allWeeks=[], viewWeekKey='', allRoster=[], managerPasswords={};
+let managers=[], plannerGroups=[], allSubs=[], allPeople=[], allWeeks=[], viewWeekKey='', allRoster=[];
 let managerPasswordStatus = {}; // manager -> true if password set
 let allProfilePics = {}; // manager -> Drive URL
 let pushedCalEvents = [];
@@ -1296,12 +1248,9 @@ async function loadAll() {
     ]);
     managers=data.managers||[]; allSubs=data.subs||[]; allPeople=data.people||[]; allRoster=data.roster||[];
     allUploadedReports=reportsData.reports||[];
-    // FIX 3: pics now stored as Drive URLs not base64
     (picsData.pics||[]).forEach(p => { if(p.picUrl) allProfilePics[p.manager] = p.picUrl; });
-    // FIX 2: password status from server
     if (data.managerPasswordStatus) managerPasswordStatus = data.managerPasswordStatus;
 
-    // FIX #12: Build week set including current week + 4 future weeks, not just submission weeks
     const ws=new Set();
     allSubs.forEach(s=>ws.add(s.week));
     ws.add(currentWeek);
@@ -1315,10 +1264,8 @@ async function loadAll() {
     loadWeeklyReviews();
     loadReviewEmails();
 
-    // FIX #5: Load all calendar events from all managers' sheets
     loadAllCalendarEvents();
 
-    // FIX #6: Run deadline check now that we have submission data
     loadDeadlineSettings();
     runDeadlineCheck();
   } catch(e) {
@@ -1327,30 +1274,25 @@ async function loadAll() {
   }
 }
 
-// FIX #5: Load calendar events from every manager and merge into pushedCalEvents
 async function loadAllCalendarEvents() {
   if (!managers.length) return;
   pushedCalEvents = [];
-  const seen = new Set(); // deduplicate by event id
-  for (const mgr of managers) {
-    try {
-      const res = await api({action:'getCalEvents', manager:mgr});
-      const events = res.events || [];
-      events.forEach(ev => {
-        if (!seen.has(ev.id)) {
-          seen.add(ev.id);
-          // Reconstruct managers list — we store it on the event when pushing
-          if (!ev.managers) ev.managers = [mgr];
-          pushedCalEvents.push(ev);
-        } else {
-          // Event already seen from another manager — merge manager into list
-          const existing = pushedCalEvents.find(e=>e.id===ev.id);
-          if (existing && !existing.managers.includes(mgr)) existing.managers.push(mgr);
-        }
-      });
-    } catch(e) {}
-  }
-  // Sort newest first
+  const seen = new Set();
+  const results = await Promise.allSettled(managers.map(mgr => api({action:'getCalEvents', manager:mgr}).then(res => ({mgr, events: res.events||[]}))));
+  results.forEach(r => {
+    if (r.status !== 'fulfilled') return;
+    const {mgr, events} = r.value;
+    events.forEach(ev => {
+      if (!seen.has(ev.id)) {
+        seen.add(ev.id);
+        if (!ev.managers) ev.managers = [mgr];
+        pushedCalEvents.push(ev);
+      } else {
+        const existing = pushedCalEvents.find(e=>e.id===ev.id);
+        if (existing && !existing.managers.includes(mgr)) existing.managers.push(mgr);
+      }
+    });
+  });
   pushedCalEvents.sort((a,b)=>b.pushedAt?.localeCompare(a.pushedAt||'')||0);
   renderCalHistory();
 }
@@ -1519,7 +1461,6 @@ function renderLinks() {
   list.innerHTML=managers.map(m=>{
     const url=`${MGR_BASE}?name=${encodeURIComponent(m)}`;
     const dn=m.charAt(0).toUpperCase()+m.slice(1);
-    const pw=managerPasswords[m]||'';
     const hasPassword = managerPasswordStatus[m] === true;
     const picSrc = allProfilePics[m];
     const picHtml = picSrc
@@ -1559,7 +1500,7 @@ function renderLinks() {
       <!-- Password -->
       <div style="display:flex;gap:8px;align-items:center;">
         <label style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;">Password</label>
-        <input type="text" id="pw-${m}" value="${esc(pw)}" placeholder="Set a password…" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:7px 11px;border-radius:8px;outline:none;" />
+        <input type="text" id="pw-${m}" value="" placeholder="Set a password…" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:7px 11px;border-radius:8px;outline:none;" />
         <button onclick="setPassword('${esc(m)}')" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:500;padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;">Save</button>
       </div>
     </div>`;
@@ -2019,7 +1960,6 @@ function toggleReview(id) {
   if (arrow) arrow.style.transform = open ? 'rotate(90deg)' : '';
 }
 
-// ── FIX #8: Review PDF Export ──────────────────────────
 function exportReviewPDF(id) {
   const r = allWeeklyReviews.find(x=>x.id===id);
   if (!r) { showToast('Review not found','error'); return; }
@@ -2092,8 +2032,6 @@ function exportAllReviewsCSV() {
   showToast(`Exported ${reviews.length} reviews ✓`,'success');
 }
 
-// ── FIX #6: Submission deadline reminder ──────────────
-// ── FIX 4: Deadline settings stored in sheet ──────────
 async function saveDeadlineSettings() {
   const day = document.getElementById('deadline-day').value;
   const time = document.getElementById('deadline-time').value;
@@ -2184,7 +2122,6 @@ async function runDeadlineCheck(force=false) {
   if(sent>0) showToast(`Deadline reminders sent to ${sent} manager${sent!==1?'s':''} ✓`,'success');
 }
 
-// ── FIX #9: Bulk actions ──────────────────────────────
 
 // Bulk clear read notifications
 async function bulkClearReadNotifs() {
@@ -2262,8 +2199,7 @@ async function setPassword(manager) {
   if (!pw) { showToast('Enter a password first', 'error'); return; }
   try {
     await api({ action: 'setPassword', manager, password: pw });
-    managerPasswords[manager] = pw;
-    managerPasswordStatus[manager] = true; // FIX 2: update local status immediately
+    managerPasswordStatus[manager] = true;
     renderLinks();
     showToast(`Password set for ${manager} ✓`, 'success');
   } catch(e) { showToast('Failed to save password', 'error'); }
