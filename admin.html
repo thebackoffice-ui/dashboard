@@ -769,6 +769,9 @@ function makeToken(role) { const expires=Date.now()+TOKEN_TTL_MS; const payload=
 function verifyToken(token,requiredRole) { try { const parts=token.split(':'); if(parts.length!==3)return false; const role=parts[0],expires=parseInt(parts[1],10),sigHex=parts[2]; if(role!==requiredRole)return false; if(Date.now()>expires)return false; const payload=role+':'+expires; const expected=Utilities.computeHmacSha256Signature(payload,getTokenSecret()); const expectedHex=expected.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return sigHex===expectedHex; } catch(e){return false;} }
 function getPicFolder() { const folderName='BackOffice_ProfilePics'; const folders=DriveApp.getFoldersByName(folderName); if(folders.hasNext())return folders.next(); const folder=DriveApp.createFolder(folderName); folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW); return folder; }
 
+function hashPassword(pw) { var salt=Utilities.getUuid(); var hash=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,salt+pw); var hex=hash.map(function(b){return ('0'+(b&0xff).toString(16)).slice(-2);}).join(''); return salt+':'+hex; }
+function verifyPassword(pw,stored) { if(!stored)return false; if(stored.indexOf(':')===-1)return stored===pw; var parts=stored.split(':'); var salt=parts[0],storedHex=parts[1]; var hash=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,salt+pw); var hex=hash.map(function(b){return ('0'+(b&0xff).toString(16)).slice(-2);}).join(''); return hex===storedHex; }
+
 function doPost(e) {
   const data = JSON.parse(e.postData.contents);
   // ── Rate limiting ─────────────────────────────────────
@@ -787,11 +790,6 @@ function doPost(e) {
   cache.put(rateCacheKey, String(current + 1), rateTtl);
   // ─────────────────────────────────────────────────────
   let result = {};
-
-  // ── Password hashing helpers ───────────────────────────────────
-  function hashPassword(pw) { const salt=Utilities.getUuid(); const hash=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,salt+pw); const hex=hash.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return salt+':'+hex; }
-  function verifyPassword(pw,stored) { if(!stored)return false; if(stored.indexOf(':')===-1)return stored===pw; const parts=stored.split(':'); const salt=parts[0],storedHex=parts[1]; const hash=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,salt+pw); const hex=hash.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join(''); return hex===storedHex; }
-  // ──────────────────────────────────────────────────────
 
   if (data.action === 'adminLogin') {
     const sh=getOrCreate('settings',['key','value','updatedAt']); const rows=sh.getDataRange().getValues().slice(1); const row=rows.find(r=>r[0]==='adminPassword'); const storedPw=row?String(row[1]):'';
