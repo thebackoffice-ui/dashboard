@@ -5526,6 +5526,12 @@ function rp_renderRoot(){
   }
 }
 
+// ── Roster match helper ──
+function rp_matchRoster(csvName){
+  const n=(csvName||'').trim().toLowerCase();
+  return roster.find(r=>!r.leaver&&(r.name||'').trim().toLowerCase()===n)||null;
+}
+
 // ── Team / manager view ──
 function rp_renderTeamView(){
   const root=document.getElementById('rp-root');
@@ -5561,6 +5567,9 @@ function rp_renderTeamView(){
 
   const sorted=[...data].sort((a,b)=>rp_num(b['Total Pay'])-rp_num(a['Total Pay']));
 
+  // Build set of pay CSV names (lowercased) for roster-absent detection
+  const payNames=new Set(sorted.map(d=>rp_clean(d['Name']).toLowerCase()));
+
   const agentRows=sorted.map((d,i)=>{
     const name    =rp_clean(d['Name']);
     const pay     =rp_num(d['Total Pay']);
@@ -5570,11 +5579,18 @@ function rp_renderTeamView(){
     const rs      =rp_rateClass(rate);
     const barCol  =rp_barColor(rate);
     const subCls  =rs==='warn'?'rp-agent-sub warn-text':rs==='bad'?'rp-agent-sub bad-text':'rp-agent-sub';
+    const rRep    =rp_matchRoster(name);
+    const pos     =rRep?rRep.position||'':'';
+    const posTag  =pos?`<span class="pos-tag ${posClass(pos)}" style="font-size:10px;padding:2px 7px;">${esc(pos)}</span>`
+                      :`<span style="font-size:10px;color:var(--muted);font-style:italic;">not on roster</span>`;
     return`<div class="rp-agent-row" data-name="${esc(name.toLowerCase())}" onclick="rp_openRep(${esc(JSON.stringify(name))})">
       <div class="rp-rank${i===0?' gold':''}">${i+1}</div>
-      <div class="rp-av" style="${rp_avatarStyle(name)}">${rp_initials(name)}</div>
+      <div class="rp-av" style="${avStyle(name,pos)}">${rp_initials(name)}</div>
       <div class="rp-agent-mid">
-        <div class="rp-agent-name">${esc(name)}</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <div class="rp-agent-name">${esc(name)}</div>
+          ${posTag}
+        </div>
         <div class="rp-agent-rate-row">
           <div class="rp-rate-track"><div class="rp-rate-bar" style="width:${rate}%;background:${barCol}"></div></div>
           <span class="${subCls}">${rate}% · ${payable} payable</span>
@@ -5586,6 +5602,25 @@ function rp_renderTeamView(){
       </div>
     </div>`;
   }).join('');
+
+  // Roster reps with NO pay data this week
+  const absentRows=roster.filter(r=>!r.leaver&&!payNames.has((r.name||'').trim().toLowerCase()))
+    .map(r=>{
+      const ini=(r.name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+      const pos=r.position||'';
+      return`<div class="rp-agent-row" style="opacity:.45;">
+        <div class="rp-rank" style="background:transparent;"></div>
+        <div class="rp-av" style="${avStyle(r.name,pos)}">${ini}</div>
+        <div class="rp-agent-mid">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <div class="rp-agent-name">${esc(r.name)}</div>
+            ${pos?`<span class="pos-tag ${posClass(pos)}" style="font-size:10px;padding:2px 7px;">${esc(pos)}</span>`:''}
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">No data this week</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);flex-shrink:0;">—</div>
+      </div>`;
+    }).join('');
 
   root.innerHTML=`
     <div class="rp-stat-grid">
@@ -5643,7 +5678,7 @@ function rp_renderTeamView(){
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input class="rp-search" id="rp-search" type="text" placeholder="Search agents…" oninput="rp_filterAgents()" autocomplete="off"/>
     </div>
-    <div class="rp-card" id="rp-agent-list">${agentRows}</div>
+    <div class="rp-card" id="rp-agent-list">${agentRows}${absentRows?`<div style="border-top:1px solid var(--niond-border);margin:0;padding:8px 18px 4px;font-size:10px;font-weight:700;color:var(--niond-muted);letter-spacing:.07em;text-transform:uppercase;">Not in this week's data</div>${absentRows}`:''}</div>
   `;
 
   requestAnimationFrame(()=>{
@@ -5694,6 +5729,8 @@ function rp_renderRepReport(name){
   const primaryRow=rows[0];
   const nameVal    =rp_clean(primaryRow['Name']);
   const officeVal  =rp_clean(primaryRow['Office'])||'—';
+  const rRep       =rp_matchRoster(nameVal);
+  const repPos     =rRep?rRep.position||'':'';
   const multiCamp  =rows.length>1;
 
   const totalPay      =rows.reduce((s,r)=>s+rp_num(r['Total Pay']),0);
@@ -5741,9 +5778,15 @@ function rp_renderRepReport(name){
     <!-- Hero stat row -->
     <div class="rp-card" style="margin-bottom:16px;">
       <div class="rp-card-hdr">
-        <div>
-          <div class="rp-card-title">${esc(nameVal)}</div>
-          <div class="rp-card-sub">${esc(officeVal)} Office · ${esc(rp_activeLabel)}</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="rp-av" style="${avStyle(nameVal,repPos)};width:40px;height:40px;font-size:14px;flex-shrink:0;">${rp_initials(nameVal)}</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div class="rp-card-title">${esc(nameVal)}</div>
+              ${repPos?`<span class="pos-tag ${posClass(repPos)}" style="font-size:10px;padding:2px 7px;">${esc(repPos)}</span>`:''}
+            </div>
+            <div class="rp-card-sub">${esc(officeVal)} Office · ${esc(rp_activeLabel)}${rRep&&rRep.email?` · ${esc(rRep.email)}`:''}</div>
+          </div>
         </div>
         <span class="rp-stat-chip ${state}" style="font-size:12px;padding:5px 11px;">${rateIcon} ${pct}% rate</span>
       </div>
