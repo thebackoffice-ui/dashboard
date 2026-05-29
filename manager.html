@@ -752,6 +752,16 @@ select.field-input{cursor:pointer;appearance:none;}
 .week-row-sub{font-size:11px;color:var(--muted);}
 .leaver-toggle{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .15s;}
 .leaver-toggle:hover,.week-row.is-leaver .leaver-toggle{border-color:var(--warning);color:var(--warning);background:var(--warning-soft);}
+.promoted-toggle{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.promoted-toggle:hover,.week-row.is-promoted .promoted-toggle{border-color:#7c3aed;color:#7c3aed;background:rgba(124,58,237,.08);}
+.week-row.is-promoted{border-color:rgba(124,58,237,.25);background:rgba(124,58,237,.03);}
+.promoted-tag{font-size:11px;font-weight:600;color:#7c3aed;background:rgba(124,58,237,.09);border:1px solid rgba(124,58,237,.2);padding:2px 7px;border-radius:20px;}
+.wk-headcount-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:14px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);}
+.wk-headcount-bar strong{color:var(--text);}
+.wk-hc-delta{font-size:11px;font-weight:600;padding:1px 6px;border-radius:10px;}
+.wk-hc-up{color:#16a34a;background:rgba(22,163,74,.1);}
+.wk-hc-down{color:var(--warning);background:var(--warning-soft);}
+.wk-hc-same{color:var(--muted);background:var(--surface2);}
 .banner-ok{background:var(--success-soft);border:1px solid rgba(22,163,74,.2);border-left:3px solid var(--success);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--muted);}
 .banner-ok strong{color:var(--success);display:block;font-weight:600;margin-bottom:1px;}
 .submit-wrap{margin-top:20px;border-top:1px solid var(--border);padding-top:18px;}
@@ -759,12 +769,11 @@ select.field-input{cursor:pointer;appearance:none;}
 .submit-btn:hover{opacity:.88;}.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
 
 /* ── WEEKLY UPDATE DESCRIPTION ── */
-.weekly-update-desc{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r);padding:14px 16px;margin-bottom:18px;box-shadow:var(--niond-shadow);}
+.weekly-update-desc{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:18px;box-shadow:var(--niond-shadow);}
 .wud-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
 .wud-body{flex:1;min-width:0;}
 .wud-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
 .wud-text{font-size:12px;color:var(--muted);line-height:1.5;}
-[data-theme="dark"] .weekly-update-desc{background:var(--surface);border-left-color:var(--accent);}
 
 /* ── REPORTS TABS ── */
 .report-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
@@ -1619,9 +1628,10 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
           <div class="wud-icon">👥</div>
           <div class="wud-body">
             <div class="wud-title">Review your team for this week</div>
-            <div class="wud-text">Check everyone below is still active. Mark anyone who has left this week as a leaver, then hit submit.</div>
+            <div class="wud-text">Check everyone below is correct. Mark leavers, flag any promotions, then submit.</div>
           </div>
         </div>
+        <div id="wk-headcount-bar" class="wk-headcount-bar" style="display:none;"></div>
         <div class="sec-lbl">Your team this week</div>
         <div class="week-list" id="week-list"><div class="empty-state"><strong>No reps yet</strong>Add reps on My Reps first.</div></div>
         <div class="submit-wrap"><button class="submit-btn" id="submit-btn" onclick="submitWeek()">Submit team for this week</button></div>
@@ -2886,27 +2896,93 @@ async function addRep(){
 }
 
 // ── WEEKLY UPDATE ─────────────────────────────────────
+let weekPromoted = new Set();
 function renderWeekly(){
   const list=document.getElementById('week-list');
   const active=roster.filter(r=>!r.leaver);
+
+  // Headcount bar
+  const hcBar=document.getElementById('wk-headcount-bar');
+  if(hcBar&&lastWeekCount>0){
+    const thisWeek=active.length-weekLeavers.size;
+    const delta=thisWeek-lastWeekCount;
+    const deltaHtml=delta===0
+      ?`<span class="wk-hc-delta wk-hc-same">= same</span>`
+      :delta>0
+        ?`<span class="wk-hc-delta wk-hc-up">▲ +${delta}</span>`
+        :`<span class="wk-hc-delta wk-hc-down">▼ ${delta}</span>`;
+    hcBar.style.display='flex';
+    hcBar.innerHTML=`Last week <strong>${lastWeekCount}</strong> → This week <strong>${thisWeek}</strong> ${deltaHtml}`;
+  } else if(hcBar){hcBar.style.display='none';}
+
   if(!active.length){list.innerHTML='<div class="empty-state"><strong>No active reps</strong>Add reps on My Reps first.</div>';return;}
-  list.innerHTML=active.map(r=>{const wl=weekLeavers.has(r.id);const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);const pos=r.Position||r.position||r.Pos||r.pos||'';return`<div class="week-row ${wl?'is-leaver':''}" id="wr-${r.id}">
-    <div data-position="${pos}" class="av av28 ${posClass(pos)}" style="${avStyle(r.name,pos)}">${ini}</div>
-    <div class="week-row-info"><div class="week-row-name" style="${wl?'text-decoration:line-through;color:var(--subtle);':''}">${esc(r.name)}</div><div class="week-row-sub">${r.position||'—'}${r.email?` · ${esc(r.email)}`:''}</div></div>
-    ${wl?'<span class="leaver-tag">Leaving</span>':''}
-    <button class="leaver-toggle" onclick="toggleWeekLeaver('${r.id}')">${wl?'Undo':'Left this week'}</button>
-  </div>`;}).join('');
+  list.innerHTML=active.map(r=>{
+    const wl=weekLeavers.has(r.id);
+    const wp=weekPromoted.has(r.id);
+    const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const pos=r.position||'';
+    return`<div class="week-row ${wl?'is-leaver':''} ${wp?'is-promoted':''}" id="wr-${r.id}">
+      <div data-position="${pos}" class="av av28 ${posClass(pos)}" style="${avStyle(r.name,pos)}">${ini}</div>
+      <div class="week-row-info">
+        <div class="week-row-name" style="${wl?'text-decoration:line-through;color:var(--subtle);':''}">${esc(r.name)}</div>
+        <div class="week-row-sub" style="display:flex;align-items:center;gap:5px;">
+          ${pos?`<span class="pos-tag ${posClass(pos)}" style="font-size:10px;padding:1px 6px;">${esc(pos)}</span>`:'<span style="color:var(--muted);">—</span>'}
+          ${r.email?`<span style="color:var(--muted);">· ${esc(r.email)}</span>`:''}
+        </div>
+      </div>
+      ${wl?'<span class="leaver-tag">Leaving</span>':wp?'<span class="promoted-tag">⬆ Promoted</span>':''}
+      <div style="display:flex;gap:5px;flex-shrink:0;">
+        ${!wl?`<button class="promoted-toggle" onclick="toggleWeekPromoted('${r.id}')">${wp?'Undo':'Promoted'}</button>`:''}
+        <button class="leaver-toggle" onclick="toggleWeekLeaver('${r.id}')">${wl?'Undo':'Left this week'}</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Update submit button text
+  const btn=document.getElementById('submit-btn');
+  if(btn&&!btn.disabled) btn.textContent=weekSubmitted?'Update submission':'Submit team for this week';
 }
-function toggleWeekLeaver(id){if(weekLeavers.has(id))weekLeavers.delete(id);else weekLeavers.add(id);renderWeekly();}
+function toggleWeekLeaver(id){
+  if(weekLeavers.has(id)){weekLeavers.delete(id);}
+  else{weekLeavers.add(id);weekPromoted.delete(id);}  // can't be both
+  renderWeekly();
+}
+function toggleWeekPromoted(id){
+  if(weekPromoted.has(id)){weekPromoted.delete(id);}
+  else{weekPromoted.add(id);weekLeavers.delete(id);}  // can't be both
+  renderWeekly();
+}
 async function submitWeek(){
-  const rows=roster.filter(r=>!r.leaver).map(r=>({id:r.id,name:r.name,email:r.email||'',position:r.position||'',leaver:weekLeavers.has(r.id)}));
+  const leaverIds=[...weekLeavers];
+  if(leaverIds.length>0){
+    const names=leaverIds.map(id=>{const r=roster.find(x=>x.id===id);return r?r.name:id;}).join(', ');
+    if(!confirm(`Marking ${leaverIds.length} person${leaverIds.length!==1?'s':''} as leaving this week:\n${names}\n\nAre you sure?`))return;
+  }
+  const rows=roster.filter(r=>!r.leaver).map(r=>({id:r.id,name:r.name,email:r.email||'',position:r.position||'',leaver:weekLeavers.has(r.id),promoted:weekPromoted.has(r.id)}));
   if(!rows.length){showToast('No active reps to submit','error');return;}
   const btn=document.getElementById('submit-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Saving…';
   try{
     const res=await api({action:'submit',manager:managerName,week:weekKey,rows});
-    if(res&&res.ok){btn.innerHTML='Submit team for this week';btn.disabled=false;weekSubmitted=true;document.getElementById('banner-done').style.display='block';weekLeavers.forEach(id=>{const r=roster.find(x=>x.id===id);if(r){r.leaver=true;api({action:'saveRep',manager:managerName,rep:r});}});weekLeavers.clear();showToast('Team submitted ✓','success');renderAll();}
-    else throw new Error(JSON.stringify(res));
-  }catch(e){btn.innerHTML='Submit team for this week';btn.disabled=false;showToast('Submit failed','error');console.error(e);}
+    if(res&&res.ok){
+      weekSubmitted=true;
+      document.getElementById('banner-done').style.display='block';
+      // Apply leavers to roster
+      weekLeavers.forEach(id=>{const r=roster.find(x=>x.id===id);if(r){r.leaver=true;api({action:'saveRep',manager:managerName,rep:r});}});
+      // Apply promotions — update position one step up
+      const PROMO_MAP={'Trainee':'Solo','Solo':'Leader','Leader':'Core','Junior':'Solo'};
+      weekPromoted.forEach(id=>{
+        const r=roster.find(x=>x.id===id);
+        if(r){
+          const next=PROMO_MAP[r.position]||r.position;
+          if(next!==r.position){r.position=next;api({action:'saveRep',manager:managerName,rep:r});}
+        }
+      });
+      weekLeavers.clear();weekPromoted.clear();
+      btn.disabled=false;btn.textContent='Update submission';
+      showToast('Team submitted ✓','success');
+      renderAll();
+    }else throw new Error(JSON.stringify(res));
+  }catch(e){btn.disabled=false;btn.textContent=weekSubmitted?'Update submission':'Submit team for this week';showToast('Submit failed','error');console.error(e);}
 }
 
 // ── REPORTS ───────────────────────────────────────────
