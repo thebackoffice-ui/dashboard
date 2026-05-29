@@ -2198,9 +2198,10 @@ async function pushCalendarEvent() {
   const count = isRecurring ? Math.max(1, parseInt(document.getElementById('cal-recur-count').value)||10) : 1;
   const dates = isRecurring ? generateRecurringDates(date, freq, count) : [date];
 
-  const groupId = isRecurring ? 'rg'+Date.now() : null;
+  const baseTs = Date.now();
+  const groupId = isRecurring ? 'rg'+baseTs : null;
   const newEvents = dates.map((d,i) => ({
-    id: 'ev'+Date.now()+'_'+i,
+    id: 'ev'+baseTs+'_'+i,
     title, date:d, time:time||'', notes:notes||'', reminder:reminder||'', category:category||'personal',
     pushedAt: new Date().toISOString(),
     recurring: isRecurring,
@@ -2209,26 +2210,20 @@ async function pushCalendarEvent() {
   }));
 
   status.textContent = `Pushing to ${selectedMgrs.length} manager${selectedMgrs.length!==1?'s':''}…`;
-  // Use saveCalEvent (singular) per event per manager — preserves existing events
-  const pushCalls = selectedMgrs.flatMap(mgr =>
-    newEvents.map(ev => api({ action: 'saveCalEvent', manager: mgr, event: { ...ev, manager: mgr } }))
-  );
-  const results = await Promise.allSettled(pushCalls);
-  // Map results back to per-manager success/failure
-  const perMgr = {};
-  selectedMgrs.forEach(mgr => { perMgr[mgr] = true; });
-  results.forEach((r, i) => {
-    if (r.status !== 'fulfilled') {
-      const mgr = selectedMgrs[Math.floor(i / newEvents.length)];
-      perMgr[mgr] = false;
-    }
-  });
+  // Push sequentially per manager to avoid Apps Script concurrency/lock errors
   const errors = [];
   let successCount = 0;
-  selectedMgrs.forEach(mgr => {
-    if (perMgr[mgr]) successCount++;
+  for (const mgr of selectedMgrs) {
+    let mgrOk = true;
+    for (const ev of newEvents) {
+      try {
+        const res = await api({ action: 'saveCalEvent', manager: mgr, event: { ...ev, manager: mgr } });
+        if (!res || res.ok === false) { mgrOk = false; break; }
+      } catch(e) { mgrOk = false; break; }
+    }
+    if (mgrOk) successCount++;
     else errors.push(mgr);
-  });
+  }
 
   if (errors.length === 0) {
     status.textContent = `✓ Pushed to ${successCount} manager${successCount!==1?'s':''}`;
