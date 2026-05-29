@@ -4224,7 +4224,57 @@ function openScorecard(repId){
     ? `<div class="sc-note-list">${notes.map((n,i)=>`<div class="sc-note-card"><div class="sc-note-text">${esc(n.text)}</div><div class="sc-note-meta">${esc(n.date)}</div></div>`).join('')}</div>`
     : `<div class="sc-empty-msg">No notes yet — add one below.</div>`;
 
+  // ── Pay data for this rep ──
+  const scRepName = rep.name||'';
+  // Current week stats from loaded CSV
+  let scPayHtml = '';
+  if(rp_csvRows && rp_csvHeaders){
+    const headers = rp_csvHeaders;
+    const matchingRows = rp_csvRows.slice(1)
+      .filter(r => {
+        const csvName = r[0]?.trim()||'';
+        return rp_matchRoster(csvName)?.id === repId;
+      })
+      .map(r=>{const d={};headers.forEach((h,i)=>d[h]=r[i]);return d;});
+    if(matchingRows.length){
+      const totalPay   = matchingRows.reduce((s,r)=>s+rp_num(r['Total Pay']),0);
+      const submitted  = matchingRows.reduce((s,r)=>s+rp_num(r['Submitted 1'])+rp_num(r['Submitted 2']),0);
+      const payable    = matchingRows.reduce((s,r)=>s+rp_num(r['Payable 1'])+rp_num(r['Payable 2']),0);
+      const cancelled  = submitted - payable;
+      const pct        = submitted>0?Math.round((payable/submitted)*100):0;
+      const state      = rp_rateClass(pct);
+      scPayHtml = `
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--niond-border,#e8ecee);border-radius:10px;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:12px 14px;border-right:1px solid var(--niond-border,#e8ecee);text-align:center;">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;">Pay</div>
+            <div style="font-size:16px;font-weight:800;color:var(--niond-text,#0f1923);">${rp_fmt(totalPay)}</div>
+          </div>
+          <div style="padding:12px 14px;border-right:1px solid var(--niond-border,#e8ecee);text-align:center;">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;">Submitted</div>
+            <div style="font-size:16px;font-weight:800;color:var(--niond-text,#0f1923);">${submitted}</div>
+          </div>
+          <div style="padding:12px 14px;border-right:1px solid var(--niond-border,#e8ecee);text-align:center;">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;">Payable</div>
+            <div style="font-size:16px;font-weight:800;color:var(--niond-text,#0f1923);">${payable}</div>
+          </div>
+          <div style="padding:12px 14px;text-align:center;">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;">Rate</div>
+            <div style="font-size:16px;font-weight:800;color:${state==='good'?'#0f766e':state==='warn'?'#d97706':'#dc2626'};">${pct}%</div>
+          </div>
+        </div>`;
+    }
+  }
+  const scHasHistory = rp_weekIndex.length >= 2;
+
   body.innerHTML=`
+    <div>
+      <div class="sc-sec-title">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Pay — ${esc(rp_activeLabel||'Current week')}
+      </div>
+      ${scPayHtml || `<div class="sc-empty-msg">No pay data loaded — open the Pay tab first.</div>`}
+      ${scHasHistory ? `<div id="sc-pay-history" class="rp-history-card" style="margin-bottom:0;"></div>` : ''}
+    </div>
     <div>
       <div class="sc-sec-title">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5L8 2z" stroke-linejoin="round"/></svg>
@@ -4253,6 +4303,21 @@ function openScorecard(repId){
 
   document.getElementById('scorecard-backdrop').style.display='flex';
   document.body.style.overflow='hidden';
+
+  // Lazy load history chart after scorecard is visible
+  if(scHasHistory){
+    // find the csv name that matched this rep id
+    let csvMatchName = scRepName;
+    if(rp_csvRows && rp_csvHeaders){
+      const headers = rp_csvHeaders;
+      const matchRow = rp_csvRows.slice(1).find(r=>{
+        const csvName = r[0]?.trim()||'';
+        return rp_matchRoster(csvName)?.id === repId;
+      });
+      if(matchRow) csvMatchName = matchRow[0]?.trim()||scRepName;
+    }
+    requestAnimationFrame(()=>rp_loadRepHistory(csvMatchName,'sc-pay-history'));
+  }
 }
 
 function closeScorecard(){
@@ -5353,6 +5418,7 @@ let rp_repWeeksWithData = new Set();
 let rp_historyLoaded = false;
 let rp_view        = 'team'; // 'team' | 'rep'
 let rp_activeRep   = null;
+const rp_csvCache  = new Map(); // url → parsed rows, shared across pay tab + scorecard
 
 // ── Helpers ──
 function rp_clean(v){return(v==null||v==='')?'0':String(v).trim();}
@@ -5526,8 +5592,14 @@ async function rp_loadWeek(url){
   if(!root)return;
   root.innerHTML=`<div class="rp-loading"><div class="rp-spinner"></div>Loading ${esc(rp_activeLabel)}…</div>`;
   try{
-    const text=await(await fetch(url)).text();
-    const rows=rp_parseCSV(text);
+    let rows;
+    if(rp_csvCache.has(url)){
+      rows=rp_csvCache.get(url);
+    }else{
+      const text=await(await fetch(url)).text();
+      rows=rp_parseCSV(text);
+      rp_csvCache.set(url,rows);
+    }
     rp_csvHeaders=rows[0].map(h=>h.trim());
     rp_csvRows=rows;
   }catch(e){
@@ -5905,8 +5977,8 @@ function rp_renderRepReport(name){
 }
 
 // ── Earnings history chart ──
-async function rp_loadRepHistory(name){
-  const el=document.getElementById('rp-history-chart');
+async function rp_loadRepHistory(name, targetId='rp-history-chart'){
+  const el=document.getElementById(targetId);
   if(!el)return;
   el.innerHTML=`<div class="rp-loading" style="padding:16px 0;"><div class="rp-spinner"></div><span style="font-size:12px;color:var(--muted);">Loading history…</span></div>`;
   el.style.display='block';
@@ -5914,8 +5986,14 @@ async function rp_loadRepHistory(name){
   const results=await Promise.allSettled(
     rp_weekIndex.map(async(w,i)=>{
       try{
-        const text=await(await fetch(w.url)).text();
-        const rows=rp_parseCSV(text);
+        let rows;
+        if(rp_csvCache.has(w.url)){
+          rows=rp_csvCache.get(w.url);
+        }else{
+          const text=await(await fetch(w.url)).text();
+          rows=rp_parseCSV(text);
+          rp_csvCache.set(w.url,rows);
+        }
         const headers=rows[0].map(h=>h.trim());
         const match=rows.slice(1).find(r=>r[0]?.trim().toLowerCase()===name.trim().toLowerCase());
         if(!match)return{label:w.label,pay:0,found:false,idx:i};
