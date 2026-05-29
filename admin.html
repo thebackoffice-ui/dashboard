@@ -1223,6 +1223,20 @@ function doPost(e) {
     const rows=al.getDataRange().getValues().slice(1).reverse();
     result={entries:rows.slice(0,200).map(r=>({timestamp:r[0]||'',action:r[1]||'',actor:r[2]||'',detail:r[3]||''}))};
 
+  } else if (data.action === 'savePayIndexUrl') {
+    const sh=getOrCreate('settings',['key','value','updatedAt']);
+    const rows=sh.getDataRange().getValues();
+    let found=false;
+    for(let i=1;i<rows.length;i++){if(rows[i][0]==='payIndexUrl'){sh.getRange(i+1,2,1,2).setValues([[data.url,new Date().toISOString()]]);found=true;break;}}
+    if(!found)sh.appendRow(['payIndexUrl',data.url,new Date().toISOString()]);
+    result={ok:true};
+
+  } else if (data.action === 'getPayIndexUrl') {
+    const sh=getOrCreate('settings',['key','value','updatedAt']);
+    const rows=sh.getDataRange().getValues().slice(1);
+    const row=rows.find(r=>r[0]==='payIndexUrl');
+    result={url:row?String(row[1]||''):''};
+
   }
 
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
@@ -1509,6 +1523,7 @@ async function loadAll(force=false) {
       _loadReviewsData(),
       _loadPlannerData(),
       loadDeadlineSettings(),
+      loadPayIndexUrl(),
     ]).then(() => { runDeadlineCheck(); });
 
   } catch(e) {
@@ -1890,9 +1905,19 @@ function saveScriptUrl() {
 function savePayIndexUrl() {
   const v=document.getElementById('pay-index-url-input').value.trim();
   if (!v) { showToast('Enter a URL first','error'); return; }
-  localStorage.setItem('tt_pay_index_url', v);
-  document.getElementById('pay-index-url-status').textContent='✓ Saved — managers will see pay reports on next load.';
-  showToast('Pay index URL saved ✓','success');
+  const statusEl=document.getElementById('pay-index-url-status');
+  statusEl.textContent='Saving…';
+  api({ action:'savePayIndexUrl', url:v })
+    .then(()=>{
+      localStorage.setItem('tt_pay_index_url',v); // keep local copy as fallback
+      statusEl.textContent='✓ Saved to sheet — all managers will load this automatically.';
+      showToast('Pay index URL saved ✓','success');
+    })
+    .catch(()=>{
+      localStorage.setItem('tt_pay_index_url',v); // at least save locally
+      statusEl.textContent='⚠ Saved locally only — sheet save failed. Check script URL.';
+      showToast('Saved locally only','error');
+    });
 }
 
 function copyScript(btn) {
@@ -2555,6 +2580,22 @@ async function loadDeadlineSettings() {
     const msg = localStorage.getItem('tt_deadline_msg') || '⏰ Reminder: Your weekly update is overdue. Please submit it now.';
     const ddEl = document.getElementById('deadline-day'); const dtEl = document.getElementById('deadline-time'); const dmEl = document.getElementById('deadline-msg');
     if (ddEl) ddEl.value = day; if (dtEl) dtEl.value = time; if (dmEl) dmEl.value = msg;
+  }
+}
+
+async function loadPayIndexUrl() {
+  try {
+    const res = await api({ action:'getPayIndexUrl' });
+    const url = res.url || localStorage.getItem('tt_pay_index_url') || '';
+    if (url) localStorage.setItem('tt_pay_index_url', url); // keep local copy in sync
+    const inp = document.getElementById('pay-index-url-input');
+    const statusEl = document.getElementById('pay-index-url-status');
+    if (inp && url) { inp.value = url; if(statusEl) statusEl.textContent = '✓ Pay index URL saved'; }
+  } catch(e) {
+    // Fallback to localStorage
+    const url = localStorage.getItem('tt_pay_index_url') || '';
+    const inp = document.getElementById('pay-index-url-input');
+    if (inp && url) inp.value = url;
   }
 }
 

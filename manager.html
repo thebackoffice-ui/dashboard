@@ -5249,10 +5249,9 @@ async function dpSaveCurrentDay(){
    Reads from the same Week Index tab used by index.html
    ═══════════════════════════════════════════════════════ */
 
-// ── Config — set this to your Week Index CSV URL ──
-// Same format as INDEX_SHEET_URL in index.html:
-//   https://docs.google.com/spreadsheets/d/.../gviz/tq?tqx=out:csv&sheet=Week%20Index
-const RP_INDEX_URL = localStorage.getItem('tt_pay_index_url') || '';
+// ── Config — loaded from backend settings sheet on init ──
+// Falls back to localStorage if backend fetch fails (set via admin Setup tab)
+let RP_INDEX_URL = localStorage.getItem('tt_pay_index_url') || '';
 
 // ── State ──
 let rp_weekIndex   = [];   // [{label, url}] newest first
@@ -5352,6 +5351,17 @@ async function rpInit(){
 
   const root=document.getElementById('rp-root');
   if(!root)return;
+
+  // Try to fetch URL from backend if not already known
+  if(!RP_INDEX_URL){
+    try{
+      const res=await api({action:'getPayIndexUrl'});
+      if(res&&res.url){
+        RP_INDEX_URL=res.url;
+        localStorage.setItem('tt_pay_index_url',res.url);
+      }
+    }catch(e){}
+  }
 
   // No index URL configured
   if(!RP_INDEX_URL){
