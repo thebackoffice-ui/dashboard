@@ -4052,7 +4052,7 @@ function lbAvInitials(name){const parts=(name||'?').trim().split(/\s+/);return(p
 const LB_CAMPAIGN_COLOURS={"charit":{bg:"#ffb8cc",color:"#c4002e",border:"#f0004d"},"venue":{bg:"#b3d4ff",color:"#1140cc",border:"#1d50ff"},"door":{bg:"#fef9c3",color:"#92400e",border:"#f59e0b"},"wight":{bg:"#d4b8ff",color:"#5b1fd6",border:"#6e2ff0"}};
 const LB_CAMP_FALLBACK=[{bg:"#a7ffdb",color:"#007a4d",border:"#00c97a"},{bg:"#ffe0a0",color:"#b85c00",border:"#f08000"},{bg:"#ffd6f0",color:"#9d0063",border:"#e0009b"},{bg:"#c8f7c5",color:"#1a6b17",border:"#3dba38"},{bg:"#ffddc1",color:"#7a3200",border:"#c25a00"}];
 function lbCampColour(camp){const c=(camp||"").toLowerCase();for(const[kw,col]of Object.entries(LB_CAMPAIGN_COLOURS)){if(c.includes(kw))return col;}let h=0;for(const ch of c)h=(h*31+ch.charCodeAt(0))&0xffff;return LB_CAMP_FALLBACK[h%LB_CAMP_FALLBACK.length];}
-function lbAvStyle(name,campaign){const col=lbCampColour(campaign);return"background:"+col.bg+";color:"+col.color+";border:2px solid "+col.border+";";}
+function lbAvStyle(name,campaign){const col=lbCampColour(campaign);return"background:"+col.bg+";color:"+col.color+";border:none;";}
 
 function lbRender(){
   const rows=lbFiltered();
