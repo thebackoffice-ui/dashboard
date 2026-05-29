@@ -674,6 +674,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .expand-btn{background:none;border:none;color:var(--subtle);cursor:pointer;padding:4px;font-size:15px;line-height:1;font-family:var(--font);}
 .rep-card-body{padding:0 14px 14px;display:none;border-top:1px solid var(--border);}
 .rep-card-body.open{display:block;}
+
+/* ── Position filter pills ── */
+.rep-filter-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.rep-fpill{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;cursor:pointer;transition:all .15s;}
+.rep-fpill:hover{border-color:var(--accent);color:var(--accent);}
+.rep-fpill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* ── Group section headers ── */
+.rep-group-hdr{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--subtle);padding:4px 2px 6px;margin-top:10px;}
+.rep-group-hdr:first-child{margin-top:0;}
+
+/* ── Flag quick-dot on card head ── */
+.rep-flag-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;cursor:pointer;border:1.5px solid transparent;transition:transform .15s;position:relative;}
+.rep-flag-dot:hover{transform:scale(1.3);}
+.rep-flag-dot.no-flag{background:var(--border2);border-color:var(--border2);}
+
+/* ── Promotion modal ── */
+.promo-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:9999;}
+.promo-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:min(340px,92vw);box-shadow:0 16px 48px rgba(0,0,0,.18);}
+[data-theme="dark"] .promo-modal{box-shadow:0 16px 48px rgba(0,0,0,.5);}
+.promo-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.promo-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.promo-from-to{display:flex;align-items:center;gap:8px;margin-bottom:18px;}
+.promo-label{font-size:11px;font-weight:600;color:var(--subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.promo-sel{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 10px;border-radius:var(--rsm);margin-bottom:16px;outline:none;}
+.promo-btns{display:flex;gap:8px;justify-content:flex-end;}
+.promo-cancel{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:7px 14px;border-radius:var(--rsm);cursor:pointer;}
+.promo-confirm{background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:7px 16px;border-radius:var(--rsm);cursor:pointer;}
+.promo-confirm:hover{opacity:.88;}
 .rep-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
 .field-group{display:flex;flex-direction:column;gap:4px;}
 .field-group.full{grid-column:1/-1;}
@@ -1575,6 +1604,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
           <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           <input id="rep-search" type="text" placeholder="Search by name or position…" oninput="filterReps()" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px 9px 34px;border-radius:var(--r);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
         </div>
+        <div class="rep-filter-pills" id="rep-filter-pills"></div>
         <div class="sec-lbl" style="margin-bottom:10px;">Team roster</div>
         <div class="rep-list" id="rep-list"><div class="empty-state"><strong>No reps yet</strong>Add your first rep above.</div></div>
       </div></div>
@@ -1947,6 +1977,19 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
 </div><!-- /app-shell -->
 
 <!-- SCORECARD MODAL -->
+<div id="promo-backdrop" class="promo-backdrop" onclick="if(event.target===this)closePromo()">
+  <div class="promo-modal">
+    <div class="promo-title" id="promo-title">Log promotion</div>
+    <div class="promo-sub" id="promo-sub"></div>
+    <div class="promo-label">New position</div>
+    <select class="promo-sel" id="promo-pos-sel"></select>
+    <div class="promo-btns">
+      <button class="promo-cancel" onclick="closePromo()">Cancel</button>
+      <button class="promo-confirm" onclick="confirmPromo()">Log promotion</button>
+    </div>
+  </div>
+</div>
+
 <div id="scorecard-backdrop" class="scorecard-backdrop" style="display:none;" onclick="if(event.target===this)closeScorecard()">
   <div class="scorecard-modal">
     <div class="sc-hdr">
@@ -2595,35 +2638,57 @@ async function acknowledgeReport(){
 async function saveNotes(){const val=document.getElementById('notes-area').value;notes=val;try{await api({action:'saveNotes',manager:managerName,notes:val});showToast('Notes saved ✓','success');}catch(e){showToast('Could not save notes','error');}}
 
 // ── MY REPS ───────────────────────────────────────────
+let rp_posFilter = 'All';
+
 function renderReps(){
-  const list=document.getElementById('rep-list');
-  if(!roster.length){list.innerHTML='<div class="empty-state"><strong>No reps yet</strong>Add your first rep above.</div>';return;}
+  const list = document.getElementById('rep-list');
+  if(!roster.length){list.innerHTML='<div class="empty-state"><strong>No reps yet</strong>Add your first rep above.</div>';renderRepPills();return;}
+
   const mgrEntry={id:'__mgr__',name:getMgrDisplay(),position:'Manager'};
   const REPORTABLE_POSITIONS=['Leader','Core','Junior Partner +'];
   const leaders=[mgrEntry,...roster.filter(r=>REPORTABLE_POSITIONS.includes(r.position)&&!r.leaver)];
-  list.innerHTML=roster.map(r=>{
+
+  // Split active vs leavers, leavers always sink to bottom
+  const active  = roster.filter(r=>!r.leaver);
+  const leavers = roster.filter(r=>r.leaver);
+
+  // Position group order
+  const GROUP_ORDER = [...POSITIONS, ''];  // '' = unassigned
+  const grouped = {};
+  GROUP_ORDER.forEach(p=>grouped[p]=[]);
+  active.forEach(r=>{
+    const p = r.position||'';
+    if(grouped[p]!==undefined) grouped[p].push(r);
+    else grouped[''].push(r);
+  });
+
+  function repCardHtml(r){
     const ini=(r.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     const leaderOpts=leaders.filter(l=>l.id!==r.id).map(l=>`<option value="${esc(l.id)}" ${r.leader===l.id?'selected':''}>${esc(l.name)} (${esc(l.position)})</option>`).join('');
     const flagOpts=FLAGS.map(f=>`<option value="${f.id}" ${r.flag===f.id?'selected':''}>${f.label}</option>`).join('');
     const flagInfo=r.flag?FLAGS.find(f=>f.id===r.flag):null;
-    const pos=r.Position||r.position||r.Pos||r.pos||'';
+    const pos=r.position||'';
+    const dotCol=flagInfo?flagInfo.color:'';
+    const dotCls=flagInfo?'':'no-flag';
+    const dotTitle=flagInfo?flagInfo.label:'Set flag';
     return`<div class="rep-card ${r.leaver?'is-leaver':''}" id="rc-${r.id}">
       <div class="rep-card-head" onclick="toggleCard('${r.id}')">
         <div data-position="${pos}" class="av av34 ${posClass(pos)}" style="${avStyle(r.name,pos)}">${ini}</div>
         <div class="rep-info">
           <div class="rep-name">${esc(r.name)}</div>
           <div class="rep-meta">
-            ${r.position?`<span class="pos-tag ${posClass(r.position)}">${esc(r.position)}</span>`:''}
+            ${pos?`<span class="pos-tag ${posClass(pos)}">${esc(pos)}</span>`:''}
             ${r.leaver?'<span class="leaver-tag">Leaver</span>':''}
             ${r.leader?(()=>{if(r.leader==='__mgr__')return`<span>→${esc(getMgrDisplay())}</span>`;const l=roster.find(x=>x.id===r.leader);return l?`<span>→${esc(l.name)}</span>`:''})():''}
-            ${flagInfo?`<span class="rep-flag-indicator" style="font-size:11px;font-weight:600;color:${flagInfo.color};">● ${esc(flagInfo.label)}</span>`:`<span class="rep-flag-indicator" style="display:none;font-size:11px;font-weight:600;"></span>`}
+            <span class="rep-flag-indicator" style="${flagInfo?`font-size:11px;font-weight:600;color:${flagInfo.color};`:'display:none;font-size:11px;font-weight:600;'}">${flagInfo?`● ${esc(flagInfo.label)}`:''}</span>
           </div>
         </div>
+        <div class="rep-flag-dot ${dotCls}" id="fd-${r.id}" title="${dotTitle}" style="${flagInfo?`background:${dotCol};border-color:${dotCol};`:''}" onclick="event.stopPropagation();cycleFlag('${r.id}')"></div>
         <button class="expand-btn" id="eb-${r.id}">›</button>
         <button class="sc-trigger-btn" onclick="event.stopPropagation();openScorecard('${r.id}')">Scorecard</button>
       </div>
       <div class="rep-card-body" id="rb-${r.id}">
-        <div class="rep-fields">
+        <div class="rep-fields" style="margin-top:14px;">
           <div class="field-group"><label class="field-lbl">Name</label><input class="field-input" type="text" value="${esc(r.name||'')}" onchange="updateRep('${r.id}','name',this.value)"/></div>
           <div class="field-group"><label class="field-lbl">Email</label><input class="field-input" type="email" placeholder="Optional" value="${esc(r.email||'')}" onchange="updateRep('${r.id}','email',this.value)"/></div>
           <div class="field-group"><label class="field-lbl">Position</label>
@@ -2644,12 +2709,126 @@ function renderReps(){
           <div class="field-group"><label class="field-lbl">Notes</label><input class="field-input" type="text" placeholder="Any notes…" value="${esc(r.notes||'')}" onchange="updateRep('${r.id}','notes',this.value)"/></div>
         </div>
         <div class="rep-foot">
+          <button class="tag-btn" onclick="event.stopPropagation();openPromo('${r.id}')">⬆ Log promotion</button>
           <button class="tag-btn ${r.leaver?'warn':''}" onclick="toggleLeaver('${r.id}')">${r.leaver?'✓ Leaver':'Mark as leaver'}</button>
           <button class="save-btn-sm" onclick="saveRep('${r.id}')">Save changes</button>
         </div>
       </div>
     </div>`;
-  }).join('');
+  }
+
+  // Build filtered + grouped HTML
+  const q = (document.getElementById('rep-search')?.value||'').toLowerCase();
+  function matchesSearch(r){
+    if(!q) return true;
+    return (r.name||'').toLowerCase().includes(q)||(r.position||'').toLowerCase().includes(q);
+  }
+  function matchesFilter(r){
+    if(rp_posFilter==='All') return true;
+    if(rp_posFilter==='Leavers') return r.leaver;
+    return (r.position||'')=== rp_posFilter && !r.leaver;
+  }
+
+  let html = '';
+
+  if(rp_posFilter==='All' || rp_posFilter==='Leavers'){
+    // Grouped view for All; flat for Leavers filter
+    if(rp_posFilter==='All'){
+      GROUP_ORDER.forEach(p=>{
+        const reps = grouped[p].filter(r=>matchesSearch(r));
+        if(!reps.length) return;
+        const label = p||'Unassigned';
+        html += `<div class="rep-group-hdr">${esc(label)}</div>`;
+        html += reps.map(repCardHtml).join('');
+      });
+      // Leavers section at bottom
+      const leaverFiltered = leavers.filter(r=>matchesSearch(r));
+      if(leaverFiltered.length){
+        html += `<div class="rep-group-hdr" style="margin-top:14px;color:var(--warning);">Leavers</div>`;
+        html += leaverFiltered.map(repCardHtml).join('');
+      }
+    } else {
+      // Leavers filter pill selected
+      const shown = leavers.filter(r=>matchesSearch(r));
+      html = shown.length ? shown.map(repCardHtml).join('') : '<div class="sc-empty-msg">No leavers.</div>';
+    }
+  } else {
+    // Specific position filter — flat list, no group headers
+    const shown = active.filter(r=>matchesFilter(r)&&matchesSearch(r));
+    html = shown.length ? shown.map(repCardHtml).join('') : `<div class="sc-empty-msg">No reps with position "${esc(rp_posFilter)}".</div>`;
+  }
+
+  list.innerHTML = html || '<div class="empty-state"><strong>No results</strong>Try a different filter.</div>';
+  renderRepPills();
+}
+
+function renderRepPills(){
+  const wrap = document.getElementById('rep-filter-pills');
+  if(!wrap) return;
+  const positions = POSITIONS.filter(p=>roster.some(r=>r.position===p&&!r.leaver));
+  const hasLeavers = roster.some(r=>r.leaver);
+  const pills = ['All', ...positions, ...(hasLeavers?['Leavers']:[])];
+  wrap.innerHTML = pills.map(p=>`<button class="rep-fpill${rp_posFilter===p?' active':''}" onclick="setRepFilter('${p}')">${esc(p)}</button>`).join('');
+}
+
+function setRepFilter(p){
+  rp_posFilter=p;
+  renderReps();
+}
+
+// ── Flag cycle on dot click ──
+function cycleFlag(id){
+  const r=roster.find(x=>x.id===id);if(!r)return;
+  const flagIds=['', ...FLAGS.map(f=>f.id)];
+  const cur=flagIds.indexOf(r.flag||'');
+  const next=flagIds[(cur+1)%flagIds.length];
+  r.flag=next||'';
+  // update dot in-place
+  const dot=document.getElementById(`fd-${id}`);
+  const fi=next?FLAGS.find(f=>f.id===next):null;
+  if(dot){
+    dot.style.background=fi?fi.color:'var(--border2)';
+    dot.style.borderColor=fi?fi.color:'var(--border2)';
+    dot.className=`rep-flag-dot${fi?'':' no-flag'}`;
+    dot.title=fi?fi.label:'Set flag';
+  }
+  // update text indicator
+  const fm=document.querySelector(`#rc-${id} .rep-flag-indicator`);
+  if(fm){fm.style.color=fi?fi.color:'';fm.textContent=fi?`● ${fi.label}`:'';fm.style.display=fi?'':'none';}
+  // sync flag dropdown if card is open
+  const sel=document.querySelector(`#rb-${id} select[onchange*="flag"]`);
+  if(sel) sel.value=r.flag||'';
+}
+
+// ── Promotion modal ──
+let promoRepId = null;
+function openPromo(id){
+  const r=roster.find(x=>x.id===id);if(!r)return;
+  promoRepId=id;
+  document.getElementById('promo-title').textContent=`Log promotion — ${r.name.split(' ')[0]}`;
+  document.getElementById('promo-sub').textContent=`Current position: ${r.position||'None'}`;
+  const sel=document.getElementById('promo-pos-sel');
+  sel.innerHTML=POSITIONS.filter(p=>p!==r.position).map(p=>`<option value="${p}">${p}</option>`).join('');
+  document.getElementById('promo-backdrop').style.display='flex';
+}
+function closePromo(){
+  document.getElementById('promo-backdrop').style.display='none';
+  promoRepId=null;
+}
+async function confirmPromo(){
+  const r=roster.find(x=>x.id===promoRepId);if(!r)return;
+  const newPos=document.getElementById('promo-pos-sel').value;
+  if(!newPos){closePromo();return;}
+  const today=new Date();
+  const dateStr=today.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  if(!r.positionHistory) r.positionHistory=[];
+  if(r.position) r.positionHistory.unshift({position:r.position,date:dateStr,type:'previous'});
+  r.position=newPos;
+  r.positionHistory.unshift({position:newPos,date:dateStr,type:'promoted'});
+  closePromo();
+  try{await api({action:'saveRep',manager:managerName,rep:r});showToast(`${r.name} promoted to ${newPos} ✓`,'success');}
+  catch(e){showToast('Saved locally — sheet sync failed','error');}
+  renderReps();renderHome();
 }
 function toggleCard(id){const b=document.getElementById(`rb-${id}`);const e=document.getElementById(`eb-${id}`);const o=b.classList.toggle('open');e.textContent=o?'∨':'›';}
 function updateRep(id,f,v){const r=roster.find(x=>x.id===id);if(!r)return;r[f]=v;
@@ -2671,7 +2850,7 @@ function updateRep(id,f,v){const r=roster.find(x=>x.id===id);if(!r)return;r[f]=v
 }
 function toggleLeaver(id){const r=roster.find(x=>x.id===id);if(!r)return;r.leaver=!r.leaver;renderReps();setTimeout(()=>{const b=document.getElementById(`rb-${id}`);if(b){b.classList.add('open');document.getElementById(`eb-${id}`).textContent='∨';}},0);}
 async function saveRep(id){const r=roster.find(x=>x.id===id);if(!r)return;try{await api({action:'saveRep',manager:managerName,rep:r});showToast(`${r.name} saved ✓`,'success');renderReps();renderHome();}catch(e){showToast('Save failed','error');}}
-function filterReps(){const q=(document.getElementById('rep-search').value||'').toLowerCase();const cards=document.querySelectorAll('.rep-card');let shown=0;cards.forEach(card=>{const name=(card.querySelector('.rep-name')||{textContent:''}).textContent.toLowerCase();const pos=(card.querySelector('.pos-tag')||{textContent:''}).textContent.toLowerCase();const match=!q||name.includes(q)||pos.includes(q);card.style.display=match?'':'none';if(match)shown++;});const empty=document.querySelector('#rep-list .empty-state');if(empty)empty.style.display=shown===0&&q?'block':'none';}
+function filterReps(){renderReps();}
 function refreshAddLeaderDropdown(){
   // Populate position options
   const posSel=document.getElementById('add-rep-position');
