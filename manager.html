@@ -1052,6 +1052,19 @@ select.wr-input{cursor:pointer;appearance:none;}
 .lb-podium-1 .lb-p-rank-num { color:#0f766e; }
 [data-theme="dark"] .lb-podium-1 .lb-p-rank-num { color:#2dd4bf; }
 
+/* Rank number-box on podium cards */
+.lb-p-rank-box {
+  width:32px; height:32px; border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:900; flex-shrink:0; margin-bottom:10px;
+}
+.lb-podium-1 .lb-p-rank-box { background:#fef9c3; color:#92400e; }
+.lb-podium-2 .lb-p-rank-box { background:#f1f5f9; color:#475569; }
+.lb-podium-3 .lb-p-rank-box { background:#fff7ed; color:#7c2d12; }
+[data-theme="dark"] .lb-podium-1 .lb-p-rank-box { background:rgba(254,249,195,.15); color:#fde68a; }
+[data-theme="dark"] .lb-podium-2 .lb-p-rank-box { background:rgba(241,245,249,.1); color:#94a3b8; }
+[data-theme="dark"] .lb-podium-3 .lb-p-rank-box { background:rgba(255,247,237,.1); color:#fdba74; }
+
 /* Avatar — podium only, medal colours */
 .lb-p-av {
   width:38px; height:38px; border-radius:50%;
@@ -1104,53 +1117,56 @@ select.wr-input{cursor:pointer;appearance:none;}
 [data-theme="dark"] .lb2-th { color:var(--muted); }
 .lb2-th.right { text-align:right; }
 
-/* ── List rows ── */
+/* ── List rows — pay-row style ── */
 .lb-row {
-  background:var(--niond-surface,#fff);
-  border:1px solid var(--niond-border,#e8ecee);
-  border-radius:10px;
-  padding:11px 16px;
-  display:grid;
-  grid-template-columns:52px 1fr auto;
+  display:flex;
   align-items:center;
   gap:12px;
-  box-shadow:var(--niond-shadow);
-  transition:all .16s cubic-bezier(.4,0,.2,1);
+  padding:11px 18px;
+  border-bottom:1px solid var(--niond-border,#e8ecee);
+  transition:background .1s;
   cursor:default;
-  margin-bottom:4px;
+  margin-bottom:0;
+  background:none;
+  border-radius:0;
+  border-left:none;
+  border-right:none;
+  border-top:none;
+  box-shadow:none;
 }
-[data-theme="dark"] .lb-row { background:var(--surface); border-color:var(--border); box-shadow:none; }
-.lb-row:hover { box-shadow:var(--niond-shadow-md); border-color:rgba(15,118,110,.2); }
-[data-theme="dark"] .lb-row:hover { border-color:rgba(20,184,166,.22); box-shadow:0 3px 12px rgba(0,0,0,.22); }
+.lb-row:last-child { border-bottom:none; }
+[data-theme="dark"] .lb-row { border-bottom-color:var(--border); }
+.lb-row:hover { background:var(--niond-bg,#f0f3f6); }
+[data-theme="dark"] .lb-row:hover { background:var(--surface2); }
+.lb-row.lb-top { background:none; border-color:var(--niond-border,#e8ecee); box-shadow:none; }
+[data-theme="dark"] .lb-row.lb-top { background:none; border-color:var(--border); box-shadow:none; }
 
-/* #1 row: solid white with proper left teal border — clearly distinct from the grey bg */
-.lb-row.lb-top {
-  background:#fff;
-  border-color:rgba(15,118,110,.35);
-  box-shadow:0 2px 10px rgba(15,118,110,.1);
+/* rank number-box */
+.lb-rank {
+  width:28px; height:28px; border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800; flex-shrink:0;
+  background:var(--niond-bg,#f0f3f6); color:var(--niond-muted,#6b7d8a);
 }
-[data-theme="dark"] .lb-row.lb-top { background:var(--surface); border-color:rgba(20,184,166,.3); box-shadow:0 2px 10px rgba(20,184,166,.1); }
+[data-theme="dark"] .lb-rank { background:var(--surface2); color:var(--muted); }
+.lb-rank.lb-rank-1 { background:#fef9c3; color:#92400e; }
+.lb-rank.lb-rank-2 { background:#f1f5f9; color:#475569; }
+.lb-rank.lb-rank-3 { background:#fff7ed; color:#7c2d12; }
+[data-theme="dark"] .lb-rank.lb-rank-1 { background:rgba(254,249,195,.12); color:#fde68a; }
+[data-theme="dark"] .lb-rank.lb-rank-2 { background:rgba(241,245,249,.08); color:#94a3b8; }
+[data-theme="dark"] .lb-rank.lb-rank-3 { background:rgba(255,247,237,.08); color:#fdba74; }
 
-/* rank */
-.lb-rank { font-size:13px; font-weight:800; color:var(--niond-muted,#6b7d8a); text-align:center; }
-[data-theme="dark"] .lb-rank { color:var(--muted); }
-.lb-row.lb-top .lb-rank { color:#0f766e; font-size:15px; }
-[data-theme="dark"] .lb-row.lb-top .lb-rank { color:#2dd4bf; }
-
-/* rep cell — NO avatar in list, just name + campaign */
-.lb-rep-cell { display:flex; align-items:center; gap:10px; min-width:0; }
+/* rep cell — avatar + name stacked below */
+.lb-rep-cell { display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
 .lb-row-name { font-size:13px; font-weight:600; letter-spacing:-.01em; color:var(--niond-text,#0f1923); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 [data-theme="dark"] .lb-row-name { color:var(--text); }
-.lb-row.lb-top .lb-row-name { color:#0f1923; font-weight:700; }
-[data-theme="dark"] .lb-row.lb-top .lb-row-name { color:var(--text); }
+.lb-row.lb-top .lb-row-name { font-weight:700; }
 .lb-row-camp { font-size:11px; color:var(--niond-muted,#6b7d8a); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
 [data-theme="dark"] .lb-row-camp { color:var(--muted); }
 
 /* score */
-.lb-score { font-size:16px; font-weight:800; letter-spacing:-.02em; color:var(--niond-text,#0f1923); text-align:right; }
-[data-theme="dark"] .lb-score { color:var(--text); }
-.lb-row.lb-top .lb-score { color:#0f766e; font-size:18px; }
-[data-theme="dark"] .lb-row.lb-top .lb-score { color:#2dd4bf; }
+.lb-score { font-size:14px; font-weight:800; letter-spacing:-.02em; color:var(--niond-teal,#0d9488); flex-shrink:0; }
+[data-theme="dark"] .lb-score { color:#2dd4bf; }
 
 .lb-bar-cell { display:none; }
 
@@ -4063,8 +4079,9 @@ function lbRender(){
         const pct=Math.round((score/maxScore)*100);
         const initials=lbAvInitials(r.Agent);
         const medalClass=['lb-av-silver','lb-av-gold','lb-av-bronze'][pi];
+        const rankNum=[2,1,3][pi];
         return`<div class="lb-podium-card ${podClass[pi]}">
-          <span class="lb-p-rank-num">${podLabel[pi]}</span>
+          <div class="lb-p-rank-box">${rankNum}</div>
           <div class="lb-p-av ${medalClass}" style="${lbAvStyle(r.Agent)}">${initials}</div>
           <div class="lb-p-name">${esc(r.Agent)}</div>
           <div class="lb-p-camp">${esc(r.Campaign||'—')}</div>
@@ -4082,17 +4099,15 @@ function lbRender(){
         <span class="lb-section-title">${viewLabel}</span>
         <span class="lb-count-badge">${rows.length} reps</span>
       </div>
-      <div class="lb2-table-hdr">
-        <div class="lb2-th">#</div>
-        <div class="lb2-th">Representative</div>
-        <div class="lb2-th right">Score</div>
-      </div>
+      <div style="background:var(--niond-surface,#fff);border:1px solid var(--niond-border,#e8ecee);border-radius:12px;overflow:hidden;box-shadow:var(--niond-shadow);">
       ${rows.map((r,i)=>{
         const score=lbNum(r[lbView]);
+        const rankClass=i===0?'lb-rank-1':i===1?'lb-rank-2':i===2?'lb-rank-3':'';
+        const initials=lbAvInitials(r.Agent);
         return`<div class="lb-row ${i===0?'lb-top':''}">
-          <div class="lb-rank">${i+1}</div>
+          <div class="lb-rank ${rankClass}">${i+1}</div>
           <div class="lb-rep-cell">
-            <div class="lb-row-av" style="${lbAvStyle(r.Agent)}">${lbAvInitials(r.Agent)}</div>
+            <div class="lb-row-av" style="${lbAvStyle(r.Agent)}">${initials}</div>
             <div style="min-width:0;">
               <div class="lb-row-name">${esc(r.Agent)}</div>
               <div class="lb-row-camp">${esc(r.Campaign||'—')}</div>
@@ -4101,6 +4116,7 @@ function lbRender(){
           <div class="lb-score">${score.toLocaleString()}</div>
         </div>`;
       }).join('')}
+      </div>
     </div>`;
 
 
