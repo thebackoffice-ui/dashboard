@@ -2200,7 +2200,7 @@ async function pushCalendarEvent() {
 
   const groupId = isRecurring ? 'rg'+Date.now() : null;
   const newEvents = dates.map((d,i) => ({
-    id: 'ev'+Date.now()+i,
+    id: 'ev'+Date.now()+'_'+i,
     title, date:d, time:time||'', notes:notes||'', reminder:reminder||'', category:category||'personal',
     pushedAt: new Date().toISOString(),
     recurring: isRecurring,
