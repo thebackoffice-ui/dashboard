@@ -644,6 +644,22 @@ select.form-input { cursor: pointer; }
     </div>
 
     <div class="setup-card">
+      <h3>2. Connect Pay Reports</h3>
+      <p>The Rep Pay tab in <code>manager.html</code> reads pay data from your Google Sheet's <strong>Week Index</strong> tab. Paste the CSV URL for that tab below — managers will see their team's pay reports automatically once this is saved.</p>
+      <div class="steps">
+        <div class="step"><span>In your pay reports Sheet, open the <strong>Week Index</strong> tab</span></div>
+        <div class="step"><span>Copy the sheet ID from the URL bar — it's the long string between <code>/d/</code> and <code>/edit</code></span></div>
+        <div class="step"><span>Build the URL: <code>https://docs.google.com/spreadsheets/d/<strong>SHEET_ID</strong>/gviz/tq?tqx=out:csv&sheet=Week%20Index</code></span></div>
+        <div class="step"><span>Paste it below and click <strong>Save URL</strong></span></div>
+      </div>
+      <div class="url-row">
+        <input type="text" id="pay-index-url-input" placeholder="https://docs.google.com/spreadsheets/d/…/gviz/tq?tqx=out:csv&sheet=Week%20Index" />
+        <button class="save-btn" onclick="savePayIndexUrl()">Save URL</button>
+      </div>
+      <div id="pay-index-url-status" style="font-size:12px;color:var(--muted);margin-top:8px;font-family:monospace;"></div>
+    </div>
+
+    <div class="setup-card">
       <h3>Apps Script code</h3>
       <p>Copy this and paste into the Apps Script editor. <span id="apps-script-version-lbl" style="color:var(--accent);font-weight:600;"></span></p>
       <div style="position:relative;">
@@ -1364,6 +1380,9 @@ function checkAdminAuth() {
         document.getElementById('admin-main-wrap').style.display = 'block';
         const scriptInp = document.getElementById('script-url-input');
         if (scriptInp) { scriptInp.value = scriptUrl; document.getElementById('url-status').textContent = '✓ Script URL saved'; }
+        const payInp = document.getElementById('pay-index-url-input');
+        const savedPayUrl = localStorage.getItem('tt_pay_index_url') || '';
+        if (payInp && savedPayUrl) { payInp.value = savedPayUrl; document.getElementById('pay-index-url-status').textContent = '✓ Pay index URL saved'; }
         renderLinks();
         const calInp=document.getElementById('cal-date');
         if(calInp){const t=new Date();calInp.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}
@@ -1866,6 +1885,14 @@ function saveScriptUrl() {
   scriptUrl=v; localStorage.setItem('teamtracker_script_url',v);
   document.getElementById('url-status').textContent='✓ Saved — loading data…';
   loadAll();
+}
+
+function savePayIndexUrl() {
+  const v=document.getElementById('pay-index-url-input').value.trim();
+  if (!v) { showToast('Enter a URL first','error'); return; }
+  localStorage.setItem('tt_pay_index_url', v);
+  document.getElementById('pay-index-url-status').textContent='✓ Saved — managers will see pay reports on next load.';
+  showToast('Pay index URL saved ✓','success');
 }
 
 function copyScript(btn) {
