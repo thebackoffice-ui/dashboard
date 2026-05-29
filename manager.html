@@ -273,144 +273,173 @@
 
 /* ═══════════════════════════════
    REP PAY REPORTS TAB
+   Tokens: use --niond-* / --surface / --border / --accent exactly
+   as the rest of the dashboard does.
    ═══════════════════════════════ */
+
+/* ── Week selector (topbar) ── */
 .rp-week-sel-wrap{display:inline-flex;align-items:center;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:0 12px;height:30px;gap:5px;}
 .rp-week-sel{font-size:12px;font-weight:600;color:var(--accent);background:transparent;border:none;cursor:pointer;outline:none;font-family:var(--font);appearance:none;-webkit-appearance:none;padding:0;}
 .rp-week-badge{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);padding:4px 12px;border-radius:20px;}
 
-/* Team overview header */
-.rp-team-hero{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);padding:22px 22px 0;box-shadow:var(--niond-shadow);margin-bottom:16px;overflow:hidden;}
-[data-theme="dark"] .rp-team-hero{background:var(--surface);border-color:var(--border);}
-.rp-team-hero-body{margin-bottom:16px;}
-.rp-team-hero-sub{font-size:12px;color:var(--niond-muted);margin-top:2px;}
-.rp-team-name{font-size:22px;font-weight:800;color:var(--niond-text);letter-spacing:-.03em;margin-bottom:4px;}
-[data-theme="dark"] .rp-team-name{color:var(--text);}
-.rp-pay-big{font-size:40px;font-weight:700;letter-spacing:-2px;color:var(--niond-text);line-height:1;}
-[data-theme="dark"] .rp-pay-big{color:var(--text);}
-.rp-rate-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:10px;font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0;}
-.rp-rate-chip svg{width:14px;height:14px;flex-shrink:0;}
-.rp-rate-chip.good{background:#EAF3DE;color:#3B6D11;border:0.5px solid #C0DD97;}
-.rp-rate-chip.warn{background:#FAEEDA;color:#854F0B;border:0.5px solid #FAC775;}
-.rp-rate-chip.bad {background:#FCEBEB;color:#A32D2D;border:0.5px solid #F7C1C1;}
-[data-theme="dark"] .rp-rate-chip.good{background:rgba(99,153,34,.15);color:#86c140;border-color:rgba(99,153,34,.3);}
-[data-theme="dark"] .rp-rate-chip.warn{background:rgba(186,117,23,.15);color:#f59e0b;border-color:rgba(186,117,23,.3);}
-[data-theme="dark"] .rp-rate-chip.bad {background:rgba(220,38,38,.12);color:#f87171;border-color:rgba(220,38,38,.28);}
-.rp-dark-band{display:grid;grid-template-columns:repeat(3,1fr);background:var(--niond-text);margin-top:4px;}
-[data-theme="dark"] .rp-dark-band{background:#0a1a1a;}
-.rp-dark-band-stat{padding:12px 16px;text-align:center;}
-.rp-dark-band-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:4px;}
-.rp-dark-band-val{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.03em;}
-.rp-dark-band-val.rp-danger{color:#f87171;}
-
-/* Conv rate bar */
-.rp-conv-track{height:5px;background:var(--surface2);border-radius:999px;overflow:hidden;margin-top:12px;}
-.rp-conv-fill{height:100%;width:0;border-radius:999px;transition:width 1s cubic-bezier(.16,1,.3,1);}
-.rp-conv-fill.good{background:#639922;} .rp-conv-fill.warn{background:#BA7517;} .rp-conv-fill.bad{background:#E24B4A;}
-
-/* Agent leaderboard */
+/* ── Shared section label ── */
 .rp-sec-lbl{font-size:10px;font-weight:800;color:var(--niond-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
-.rp-agent-card{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);box-shadow:var(--niond-shadow);overflow:hidden;margin-bottom:16px;}
-[data-theme="dark"] .rp-agent-card{background:var(--surface);border-color:var(--border);}
+[data-theme="dark"] .rp-sec-lbl{color:var(--muted);}
+
+/* ── Shared card shell — matches nd-chart-card exactly ── */
+.rp-card{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);box-shadow:var(--niond-shadow);overflow:hidden;margin-bottom:16px;}
+[data-theme="dark"] .rp-card{background:var(--surface);border-color:var(--border);box-shadow:none;}
+.rp-card-hdr{padding:18px 22px 14px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--niond-border);}
+[data-theme="dark"] .rp-card-hdr{border-bottom-color:var(--border);}
+.rp-card-title{font-size:15px;font-weight:700;color:var(--niond-text);}
+[data-theme="dark"] .rp-card-title{color:var(--text);}
+.rp-card-sub{font-size:12px;color:var(--niond-muted);margin-top:2px;}
+[data-theme="dark"] .rp-card-sub{color:var(--muted);}
+.rp-card-body{padding:20px 22px;}
+
+/* ── Team stat grid — matches nd-stat ── */
+.rp-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.rp-stat{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);padding:18px 20px;box-shadow:var(--niond-shadow);display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s;}
+.rp-stat:hover{box-shadow:var(--niond-shadow-md);}
+[data-theme="dark"] .rp-stat{background:var(--surface);border-color:var(--border);box-shadow:none;}
+.rp-stat-icon{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rp-stat-icon svg{width:16px;height:16px;}
+.rp-stat-top{display:flex;align-items:center;justify-content:space-between;}
+.rp-stat-val{font-size:24px;font-weight:700;letter-spacing:-.03em;color:var(--niond-text);line-height:1;}
+[data-theme="dark"] .rp-stat-val{color:var(--text);}
+.rp-stat-lbl{font-size:12px;color:var(--niond-muted);font-weight:500;}
+[data-theme="dark"] .rp-stat-lbl{color:var(--muted);}
+.rp-stat-chip{font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;}
+.rp-stat-chip.good{background:var(--success-soft);color:var(--success);}
+.rp-stat-chip.warn{background:var(--warning-soft);color:var(--warning);}
+.rp-stat-chip.bad{background:var(--danger-soft);color:var(--danger);}
+
+/* ── Conv bar ── */
+.rp-conv-wrap{padding:0 22px 18px;}
+.rp-conv-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.rp-conv-label{font-size:12px;font-weight:600;color:var(--niond-muted);}
+[data-theme="dark"] .rp-conv-label{color:var(--muted);}
+.rp-conv-pct{font-size:12px;font-weight:700;color:var(--niond-text);}
+[data-theme="dark"] .rp-conv-pct{color:var(--text);}
+.rp-conv-track{height:5px;background:var(--surface2);border-radius:999px;overflow:hidden;}
+.rp-conv-fill{height:100%;width:0;border-radius:999px;transition:width 1s cubic-bezier(.16,1,.3,1);}
+.rp-conv-fill.good{background:var(--success);}
+.rp-conv-fill.warn{background:var(--warning);}
+.rp-conv-fill.bad{background:var(--danger);}
+
+/* ── Alert box ── */
+.rp-alert-box{margin:0 22px 18px;padding:10px 13px;border-radius:var(--rsm);font-size:12px;font-weight:500;line-height:1.55;display:flex;gap:8px;align-items:flex-start;}
+.rp-alert-box svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
+.rp-alert-box.good{background:var(--success-soft);color:var(--success);border:1px solid rgba(22,163,74,.2);}
+.rp-alert-box.warn{background:var(--warning-soft);color:var(--warning);border:1px solid rgba(217,119,6,.2);}
+.rp-alert-box.bad{background:var(--danger-soft);color:var(--danger);border:1px solid rgba(220,38,38,.2);}
+
+/* ── Agent leaderboard ── */
 .rp-search-wrap{position:relative;margin-bottom:12px;}
 .rp-search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;width:13px;height:13px;stroke:currentColor;stroke-width:1.5;fill:none;}
-.rp-search{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px 9px 34px;border-radius:var(--r);outline:none;transition:border-color .15s;}
+.rp-search{width:100%;background:var(--niond-surface);border:1px solid var(--niond-border);color:var(--niond-text);font-family:var(--font);font-size:13px;padding:9px 12px 9px 34px;border-radius:var(--niond-r);outline:none;transition:border-color .15s;}
+[data-theme="dark"] .rp-search{background:var(--surface);border-color:var(--border);color:var(--text);}
 .rp-search:focus{border-color:var(--accent);}
-.rp-agent-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--niond-border);cursor:pointer;transition:background .1s;}
+
+/* Agent rows — mirrors nd-lb-row */
+.rp-agent-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--niond-border);cursor:pointer;transition:background .1s;}
 [data-theme="dark"] .rp-agent-row{border-bottom-color:var(--border);}
 .rp-agent-row:last-child{border-bottom:none;}
 .rp-agent-row:hover{background:var(--niond-bg);}
 [data-theme="dark"] .rp-agent-row:hover{background:var(--surface2);}
-.rp-rank{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;background:var(--surface2);color:var(--muted);}
+.rp-rank{width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;background:var(--niond-bg);color:var(--niond-muted);}
+[data-theme="dark"] .rp-rank{background:var(--surface2);color:var(--muted);}
 .rp-rank.gold{background:#fef9c3;color:#92400e;}
-.rp-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+[data-theme="dark"] .rp-rank.gold{background:rgba(254,249,195,.1);color:#fde68a;}
+.rp-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
 .rp-agent-mid{flex:1;min-width:0;}
 .rp-agent-name{font-size:13px;font-weight:600;color:var(--niond-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 [data-theme="dark"] .rp-agent-name{color:var(--text);}
 .rp-agent-rate-row{display:flex;align-items:center;gap:8px;margin-top:3px;}
 .rp-rate-track{flex:1;max-width:80px;height:4px;background:var(--surface2);border-radius:999px;overflow:hidden;}
 .rp-rate-bar{height:100%;border-radius:999px;}
-.rp-agent-sub{font-size:11px;color:var(--muted);}
-.rp-agent-sub.warn-text{color:#854F0B;}[data-theme="dark"] .rp-agent-sub.warn-text{color:#f59e0b;}
-.rp-agent-sub.bad-text{color:#A32D2D;}[data-theme="dark"] .rp-agent-sub.bad-text{color:#f87171;}
-.rp-agent-pay{font-size:15px;font-weight:800;color:var(--accent);letter-spacing:-.03em;flex-shrink:0;}
-.rp-chev{color:var(--subtle);flex-shrink:0;}
-.rp-no-data{font-size:13px;color:var(--muted);padding:16px;}
+.rp-agent-sub{font-size:11px;color:var(--niond-muted);}
+[data-theme="dark"] .rp-agent-sub{color:var(--muted);}
+.rp-agent-sub.warn-text{color:var(--warning);}
+.rp-agent-sub.bad-text{color:var(--danger);}
+.rp-agent-pay{font-size:14px;font-weight:800;color:var(--niond-teal);letter-spacing:-.02em;flex-shrink:0;}
+[data-theme="dark"] .rp-agent-pay{color:#2dd4bf;}
+.rp-chev{color:var(--niond-subtle);flex-shrink:0;}
+[data-theme="dark"] .rp-chev{color:var(--subtle);}
 
-/* Individual rep report panel */
-.rp-back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 13px;border-radius:20px;cursor:pointer;margin-bottom:16px;transition:all .15s;}
-.rp-back-btn:hover{color:var(--text);border-color:var(--border);}
+/* ── Individual rep report ── */
+.rp-back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--niond-border);color:var(--niond-muted);font-family:var(--font);font-size:12px;padding:6px 13px;border-radius:20px;cursor:pointer;margin-bottom:16px;transition:all .15s;}
+[data-theme="dark"] .rp-back-btn{border-color:var(--border2);color:var(--muted);}
+.rp-back-btn:hover{color:var(--niond-text);border-color:var(--niond-border);}
+[data-theme="dark"] .rp-back-btn:hover{color:var(--text);}
 
-/* Rep hero card */
-.rp-rep-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:12px;box-shadow:var(--s1);}
-.rp-hero-name{font-size:24px;font-weight:700;letter-spacing:-.03em;color:var(--text);margin-bottom:14px;}
-.rp-pay-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px;}
-.rp-pay-label{font-size:10px;text-transform:uppercase;letter-spacing:.13em;color:var(--subtle);font-weight:600;margin-bottom:5px;}
-.rp-pay-amount{font-size:40px;line-height:1;font-weight:700;letter-spacing:-2px;color:var(--text);}
-.rp-hero-div{height:0.5px;background:var(--border);margin-bottom:12px;}
-.rp-conv-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
-.rp-conv-label{font-size:12px;font-weight:600;color:var(--muted);}
-.rp-conv-pct{font-size:12px;font-weight:700;color:var(--text);}
-.rp-alert-box{margin-top:12px;padding:10px 13px;border-radius:10px;font-size:12px;font-weight:500;line-height:1.55;display:flex;gap:8px;align-items:flex-start;}
-.rp-alert-box svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
-.rp-alert-box.good{background:#EAF3DE;color:#3B6D11;border:0.5px solid #C0DD97;}
-.rp-alert-box.warn{background:#FAEEDA;color:#854F0B;border:0.5px solid #FAC775;}
-.rp-alert-box.bad {background:#FCEBEB;color:#A32D2D;border:0.5px solid #F7C1C1;}
-[data-theme="dark"] .rp-alert-box.good{background:rgba(99,153,34,.15);color:#86c140;border-color:rgba(99,153,34,.3);}
-[data-theme="dark"] .rp-alert-box.warn{background:rgba(186,117,23,.15);color:#f59e0b;border-color:rgba(186,117,23,.3);}
-[data-theme="dark"] .rp-alert-box.bad {background:rgba(220,38,38,.12);color:#f87171;border-color:rgba(220,38,38,.28);}
+/* Rep hero — same card shell, two-col stat row inside */
+.rp-rep-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
 
-/* Perf card */
-.rp-perf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:var(--s1);}
-.rp-perf-type-bar{padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+/* Perf section — side by side on desktop */
+.rp-perf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:16px;}
+.rp-perf-type-bar{padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--niond-border);display:flex;align-items:center;gap:7px;}
+[data-theme="dark"] .rp-perf-type-bar{border-bottom-color:var(--border);}
 .rp-perf-type-bar svg{width:12px;height:12px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .rp-perf-type-name{font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--muted);}
-.rp-perf-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);}
+.rp-perf-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--niond-border);}
+[data-theme="dark"] .rp-perf-row{border-bottom-color:var(--border);}
 .rp-perf-row:last-child{border-bottom:none;}
-.rp-perf-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.rp-perf-icon.amb{background:#FAEEDA;color:#854F0B;}
-.rp-perf-icon.grn{background:#EAF3DE;color:#3B6D11;}
-.rp-perf-icon.red{background:#FCEBEB;color:#A32D2D;}
-[data-theme="dark"] .rp-perf-icon.amb{background:rgba(186,117,23,.18);color:#f59e0b;}
-[data-theme="dark"] .rp-perf-icon.grn{background:rgba(74,222,128,.12);color:#4ade80;}
-[data-theme="dark"] .rp-perf-icon.red{background:rgba(248,113,113,.12);color:#f87171;}
-.rp-perf-icon svg{width:15px;height:15px;}
+.rp-perf-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rp-perf-icon.amb{background:var(--warning-soft);color:var(--warning);}
+.rp-perf-icon.grn{background:var(--success-soft);color:var(--success);}
+.rp-perf-icon.red{background:var(--danger-soft);color:var(--danger);}
+.rp-perf-icon svg{width:14px;height:14px;}
 .rp-perf-mid{flex:1;min-width:0;}
-.rp-perf-name{font-size:13px;font-weight:600;color:var(--text);}
-.rp-perf-sub{font-size:11px;color:var(--muted);}
-.rp-perf-val{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
+.rp-perf-name{font-size:13px;font-weight:600;color:var(--niond-text);}
+[data-theme="dark"] .rp-perf-name{color:var(--text);}
+.rp-perf-sub{font-size:11px;color:var(--niond-muted);}
+[data-theme="dark"] .rp-perf-sub{color:var(--muted);}
+.rp-perf-val{font-size:18px;font-weight:700;color:var(--niond-text);letter-spacing:-.02em;}
+[data-theme="dark"] .rp-perf-val{color:var(--text);}
 
-/* Earnings grid */
-.rp-earn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
-.rp-earn-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--s1);}
-.rp-earn-box.deduct{background:#FCEBEB;border-color:#F7C1C1;}
-[data-theme="dark"] .rp-earn-box.deduct{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.25);}
+/* Earnings grid — 4-up on desktop */
+.rp-earn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.rp-earn-box{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);padding:16px 18px;box-shadow:var(--niond-shadow);}
+[data-theme="dark"] .rp-earn-box{background:var(--surface);border-color:var(--border);box-shadow:none;}
+.rp-earn-box.deduct{background:var(--danger-soft);border-color:rgba(220,38,38,.2);}
+[data-theme="dark"] .rp-earn-box.deduct{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.2);}
 .rp-earn-box.wide{grid-column:1/-1;}
-.rp-earn-label{font-size:10px;text-transform:uppercase;letter-spacing:.13em;color:var(--subtle);font-weight:600;margin-bottom:6px;}
-.rp-earn-value{font-size:22px;font-weight:700;letter-spacing:-.02em;color:var(--text);}
-.rp-earn-value.negative{color:#A32D2D;}
-[data-theme="dark"] .rp-earn-value.negative{color:#f87171;}
+.rp-earn-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--niond-muted);font-weight:700;margin-bottom:8px;}
+[data-theme="dark"] .rp-earn-label{color:var(--muted);}
+.rp-earn-value{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--niond-text);}
+[data-theme="dark"] .rp-earn-value{color:var(--text);}
+.rp-earn-value.negative{color:var(--danger);}
 
-/* Summary card */
-.rp-summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--s1);margin-bottom:12px;}
-.rp-summary-row{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border);}
+/* Summary card — matches existing rpt-summary style */
+.rp-summary-card{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);overflow:hidden;box-shadow:var(--niond-shadow);margin-bottom:16px;}
+[data-theme="dark"] .rp-summary-card{background:var(--surface);border-color:var(--border);box-shadow:none;}
+.rp-summary-row{display:flex;justify-content:space-between;align-items:center;padding:11px 18px;border-bottom:1px solid var(--niond-border);}
+[data-theme="dark"] .rp-summary-row{border-bottom-color:var(--border);}
 .rp-summary-row:last-child{border-bottom:none;}
 .rp-summary-row.total{background:var(--accent-soft);}
-.rp-summary-lbl{font-size:13px;color:var(--muted);}
+.rp-summary-lbl{font-size:13px;color:var(--niond-muted);}
+[data-theme="dark"] .rp-summary-lbl{color:var(--muted);}
 .rp-summary-row.total .rp-summary-lbl{color:var(--accent);font-weight:600;}
-.rp-summary-val{font-size:13px;font-weight:700;color:var(--text);}
-.rp-summary-row.total .rp-summary-val{font-size:18px;font-weight:800;color:var(--accent);}
+.rp-summary-val{font-size:13px;font-weight:700;color:var(--niond-text);}
+[data-theme="dark"] .rp-summary-val{color:var(--text);}
+.rp-summary-row.total .rp-summary-val{font-size:16px;font-weight:800;color:var(--accent);}
 
-/* History chart */
-.rp-history-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;box-shadow:var(--s1);display:none;}
+/* History chart — constrained, never taller than 120px chart area */
+.rp-history-card{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);padding:16px 20px;margin-bottom:16px;box-shadow:var(--niond-shadow);display:none;}
+[data-theme="dark"] .rp-history-card{background:var(--surface);border-color:var(--border);box-shadow:none;}
 
 /* Loading / empty states */
-.rp-spinner{width:22px;height:22px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite;}
-.rp-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:40px 0;justify-content:center;}
+.rp-spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite;}
+.rp-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:48px 0;justify-content:center;}
 .rp-empty{display:flex;flex-direction:column;align-items:center;padding:60px 0;gap:10px;}
 .rp-empty-icon{font-size:32px;}
-.rp-no-index{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;text-align:center;}
-.rp-no-index-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;}
-.rp-no-index-sub{font-size:13px;color:var(--muted);line-height:1.55;}
+.rp-no-index{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);padding:28px 24px;text-align:center;box-shadow:var(--niond-shadow);}
+[data-theme="dark"] .rp-no-index{background:var(--surface);border-color:var(--border);}
+.rp-no-index-title{font-size:15px;font-weight:700;color:var(--niond-text);margin-bottom:8px;}
+[data-theme="dark"] .rp-no-index-title{color:var(--text);}
+.rp-no-index-sub{font-size:13px;color:var(--niond-muted);line-height:1.6;max-width:480px;margin:0 auto;}
+[data-theme="dark"] .rp-no-index-sub{color:var(--muted);}
 .rp-no-index-sub code{background:var(--surface2);border:1px solid var(--border);padding:2px 7px;border-radius:5px;font-size:12px;font-family:'DM Mono',monospace;}
 
 /* ── Collaborative planner */
@@ -5470,13 +5499,17 @@ function rp_renderTeamView(){
   // Filter by Office column — must match the manager's ?name= URL param
   const data=allData.filter(d=>rp_clean(d['Office']).toLowerCase()===managerName.toLowerCase());
 
+  if(!data.length){
+    root.innerHTML=`<div class="rp-empty"><div class="rp-empty-icon">📭</div><strong style="color:var(--text);font-size:15px;">No data for your team</strong><span style="font-size:13px;color:var(--muted);">No rows found with Office = "${esc(managerName)}" in ${esc(rp_activeLabel)}</span></div>`;
+    return;
+  }
+
   const totalPay       =data.reduce((s,d)=>s+rp_num(d['Total Pay']),0);
   const totalSubmitted =data.reduce((s,d)=>s+rp_num(d['Submitted 1'])+rp_num(d['Submitted 2']),0);
   const totalPayable   =data.reduce((s,d)=>s+rp_num(d['Payable 1'])+rp_num(d['Payable 2']),0);
   const totalCancelled =totalSubmitted-totalPayable;
   const avgRate        =totalSubmitted>0?Math.round((totalPayable/totalSubmitted)*100):0;
   const rateState      =rp_rateClass(avgRate);
-  const rateIcon       =rateState==='good'?RP_SVG.thumbs:RP_SVG.alert;
 
   const sorted=[...data].sort((a,b)=>rp_num(b['Total Pay'])-rp_num(a['Total Pay']));
 
@@ -5499,48 +5532,75 @@ function rp_renderTeamView(){
           <span class="${subCls}">${rate}% · ${payable} payable</span>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
         <div class="rp-agent-pay">${rp_fmt(pay)}</div>
         <div class="rp-chev">${RP_SVG.chev}</div>
       </div>
     </div>`;
   }).join('');
 
-  const mgrDisplay=getMgrDisplay();
-
   root.innerHTML=`
-    <div class="rp-team-hero">
-      <div class="rp-team-hero-body">
-        <div class="rp-team-name">${esc(mgrDisplay)}'s Team</div>
-        <div class="rp-team-hero-sub">${esc(rp_activeLabel)} · ${data.length} agent${data.length!==1?'s':''}</div>
-        <div class="rp-pay-row" style="margin-top:16px;">
-          <div>
-            <div class="rp-pay-label">Total agent pay</div>
-            <div class="rp-pay-big" id="rp-total-pay">£0.00</div>
+    <div class="rp-stat-grid">
+      <div class="rp-stat">
+        <div class="rp-stat-top">
+          <div class="rp-stat-icon" style="background:var(--accent-soft);color:var(--accent);">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="12" rx="2"/><path d="M14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM2 9h16" stroke-linecap="round"/></svg>
           </div>
-          <div class="rp-rate-chip ${rateState}">${rateIcon} ${avgRate}% avg rate</div>
+          <span class="rp-stat-chip ${rateState}">${avgRate}%</span>
         </div>
-        <div class="rp-conv-track"><div class="rp-conv-fill ${rateState}" id="rp-conv-fill"></div></div>
+        <div class="rp-stat-val" id="rp-total-pay">£0</div>
+        <div class="rp-stat-lbl">Total agent pay</div>
       </div>
-      <div class="rp-dark-band">
-        <div class="rp-dark-band-stat"><div class="rp-dark-band-lbl">Submitted</div><div class="rp-dark-band-val">${totalSubmitted}</div></div>
-        <div class="rp-dark-band-stat"><div class="rp-dark-band-lbl">Payable</div><div class="rp-dark-band-val">${totalPayable}</div></div>
-        <div class="rp-dark-band-stat"><div class="rp-dark-band-lbl">Cancelled</div><div class="rp-dark-band-val${totalCancelled>0?' rp-danger':''}">${totalCancelled}</div></div>
+      <div class="rp-stat">
+        <div class="rp-stat-top">
+          <div class="rp-stat-icon" style="background:var(--warning-soft);color:var(--warning);">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+        </div>
+        <div class="rp-stat-val">${totalSubmitted}</div>
+        <div class="rp-stat-lbl">Submitted</div>
+      </div>
+      <div class="rp-stat">
+        <div class="rp-stat-top">
+          <div class="rp-stat-icon" style="background:var(--success-soft);color:var(--success);">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+        <div class="rp-stat-val">${totalPayable}</div>
+        <div class="rp-stat-lbl">Payable</div>
+      </div>
+      <div class="rp-stat">
+        <div class="rp-stat-top">
+          <div class="rp-stat-icon" style="background:var(--danger-soft);color:var(--danger);">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+        </div>
+        <div class="rp-stat-val${totalCancelled>0?' ' :''}" style="${totalCancelled>0?'color:var(--danger)':''}">${totalCancelled}</div>
+        <div class="rp-stat-lbl">Cancelled</div>
       </div>
     </div>
 
-    <div class="rp-sec-lbl">Agent leaderboard</div>
+    <div class="rp-card" style="margin-bottom:16px;">
+      <div class="rp-conv-wrap" style="padding-top:18px;">
+        <div class="rp-conv-header">
+          <span class="rp-conv-label">Team payable rate</span>
+          <span class="rp-conv-pct">${avgRate}%</span>
+        </div>
+        <div class="rp-conv-track"><div class="rp-conv-fill ${rateState}" id="rp-conv-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="nd-section-lbl">Agent leaderboard — ${data.length} agent${data.length!==1?'s':''}</div>
     <div class="rp-search-wrap">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input class="rp-search" id="rp-search" type="text" placeholder="Search agents…" oninput="rp_filterAgents()" autocomplete="off"/>
     </div>
-    <div class="rp-agent-card" id="rp-agent-list">${agentRows}</div>
+    <div class="rp-card" id="rp-agent-list">${agentRows}</div>
   `;
 
-  // Animate total pay
   requestAnimationFrame(()=>{
     setTimeout(()=>{
-      rp_countUp(document.getElementById('rp-total-pay'),totalPay,'£',2,700);
+      rp_countUp(document.getElementById('rp-total-pay'),totalPay,'£',0,700);
       const fill=document.getElementById('rp-conv-fill');
       if(fill)fill.style.width=avgRate+'%';
     },80);
@@ -5613,20 +5673,15 @@ function rp_renderRepReport(name){
       {key:'2',type:rp_clean(r['Type 2']),sub:rp_clean(r['Submitted 2']),pay:rp_clean(r['Payable 2']),can:rp_clean(r['Cancelled 2'])},
     ].filter(t=>t.type&&t.type!=='0');
     return types.map((t,ti)=>`
-      <div style="margin-bottom:12px;">
-        <div class="rp-sec-lbl" style="margin-bottom:8px;">${esc(t.type)} performance${multiCamp&&ti===0?` · <span style="opacity:.7;font-weight:500">${esc(label)}</span>`:''}</div>
-        <div class="rp-perf-card">
-          <div class="rp-perf-type-bar">${RP_SVG.tag}<span class="rp-perf-type-name">${esc(t.type)}</span></div>
-          <div class="rp-perf-row"><div class="rp-perf-icon amb">${RP_SVG.send}</div><div class="rp-perf-mid"><div class="rp-perf-name">Submitted</div><div class="rp-perf-sub">Total ${esc(t.type)} leads</div></div><div class="rp-perf-val">${esc(t.sub)}</div></div>
-          <div class="rp-perf-row"><div class="rp-perf-icon grn">${RP_SVG.check}</div><div class="rp-perf-mid"><div class="rp-perf-name">Payable</div><div class="rp-perf-sub">Approved for pay</div></div><div class="rp-perf-val">${esc(t.pay)}</div></div>
-          <div class="rp-perf-row"><div class="rp-perf-icon red">${RP_SVG.x}</div><div class="rp-perf-mid"><div class="rp-perf-name">Cancelled</div><div class="rp-perf-sub">Not payable this week</div></div><div class="rp-perf-val">${esc(t.can)}</div></div>
-        </div>
+      <div class="rp-card" style="margin-bottom:0;">
+        <div class="rp-perf-type-bar">${RP_SVG.tag}<span class="rp-perf-type-name">${esc(t.type)}${multiCamp&&ti===0?` · ${esc(label)}`:''}</span></div>
+        <div class="rp-perf-row"><div class="rp-perf-icon amb">${RP_SVG.send}</div><div class="rp-perf-mid"><div class="rp-perf-name">Submitted</div><div class="rp-perf-sub">Total ${esc(t.type)} leads</div></div><div class="rp-perf-val">${esc(t.sub)}</div></div>
+        <div class="rp-perf-row"><div class="rp-perf-icon grn">${RP_SVG.check}</div><div class="rp-perf-mid"><div class="rp-perf-name">Payable</div><div class="rp-perf-sub">Approved for pay</div></div><div class="rp-perf-val">${esc(t.pay)}</div></div>
+        <div class="rp-perf-row"><div class="rp-perf-icon red">${RP_SVG.x}</div><div class="rp-perf-mid"><div class="rp-perf-name">Cancelled</div><div class="rp-perf-sub">Not payable this week</div></div><div class="rp-perf-val">${esc(t.can)}</div></div>
       </div>`).join('');
   }
-
   const allPerfSections=rows.map((r,i)=>perfSection(r,i)).join('');
 
-  const earnIds=[];
   root.innerHTML=`
     <button class="rp-back-btn" onclick="rp_backToTeam()">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11L5 7l4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -5635,63 +5690,76 @@ function rp_renderRepReport(name){
 
     <div id="rp-history-chart" class="rp-history-card"></div>
 
-    <div class="rp-rep-hero">
-      <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:var(--surface2);border:0.5px solid var(--border);color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">
-        <span style="width:5px;height:5px;background:var(--accent);border-radius:50%;flex-shrink:0;"></span>${esc(officeVal)} Office
-      </div>
-      <div class="rp-hero-name">${esc(nameVal)}</div>
-      <div class="rp-pay-row">
+    <!-- Hero stat row -->
+    <div class="rp-card" style="margin-bottom:16px;">
+      <div class="rp-card-hdr">
         <div>
-          <div class="rp-pay-label">Total pay this week</div>
-          <div class="rp-pay-amount" id="rp-pay-hero">£0.00</div>
+          <div class="rp-card-title">${esc(nameVal)}</div>
+          <div class="rp-card-sub">${esc(officeVal)} Office · ${esc(rp_activeLabel)}</div>
         </div>
-        <div class="rp-rate-chip ${state}">${rateIcon} ${pct}% rate</div>
+        <span class="rp-stat-chip ${state}" style="font-size:12px;padding:5px 11px;">${rateIcon} ${pct}% rate</span>
       </div>
-      <div class="rp-hero-div"></div>
-      <div class="rp-conv-header"><span class="rp-conv-label">Payable conversion rate</span><span class="rp-conv-pct">${pct}%</span></div>
-      <div class="rp-conv-track"><div class="rp-conv-fill ${state}" id="rp-rep-conv-fill"></div></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--niond-border);" id="rp-rep-stat-row">
+        <div style="padding:16px 20px;border-right:1px solid var(--niond-border);">
+          <div class="rp-stat-lbl" style="margin-bottom:6px;">Total Pay</div>
+          <div class="rp-stat-val" id="rp-pay-hero" style="font-size:28px;">£0</div>
+        </div>
+        <div style="padding:16px 20px;border-right:1px solid var(--niond-border);">
+          <div class="rp-stat-lbl" style="margin-bottom:6px;">Payable</div>
+          <div class="rp-stat-val" style="font-size:28px;">${payableTotal}</div>
+        </div>
+        <div style="padding:16px 20px;">
+          <div class="rp-stat-lbl" style="margin-bottom:6px;">Cancelled</div>
+          <div class="rp-stat-val" style="font-size:28px;${cancelledTotal>0?'color:var(--danger);':''}">${cancelledTotal}</div>
+        </div>
+      </div>
+      <div class="rp-conv-wrap" style="padding-top:16px;">
+        <div class="rp-conv-header"><span class="rp-conv-label">Payable conversion rate</span><span class="rp-conv-pct">${pct}%</span></div>
+        <div class="rp-conv-track"><div class="rp-conv-fill ${state}" id="rp-rep-conv-fill"></div></div>
+      </div>
       <div class="rp-alert-box ${state}">${rateIcon}<span>${alertMsg}</span></div>
     </div>
 
-    ${allPerfSections}
+    <!-- Performance by campaign -->
+    <div class="nd-section-lbl">Performance breakdown</div>
+    <div class="rp-perf-grid" style="margin-bottom:16px;">${allPerfSections}</div>
 
-    <div class="rp-sec-lbl">Earnings breakdown</div>
+    <!-- Earnings -->
+    <div class="nd-section-lbl">Earnings breakdown</div>
     <div class="rp-earn-grid">
-      <div class="rp-earn-box${topUps<0?' deduct':''}"><div class="rp-earn-label">Top Ups</div><div class="rp-earn-value${topUps<0?' negative':''}" id="rp-earn-topups">£0.00</div></div>
-      <div class="rp-earn-box${tablet<0?' deduct':''}"><div class="rp-earn-label">Tablet</div><div class="rp-earn-value${tablet<0?' negative':''}" id="rp-earn-tablet">£0.00</div></div>
-      <div class="rp-earn-box${dwm<0?' deduct':''}"><div class="rp-earn-label">DWM Incentive</div><div class="rp-earn-value${dwm<0?' negative':''}" id="rp-earn-dwm">£0.00</div></div>
-      <div class="rp-earn-box${adj<0?' deduct':''}"><div class="rp-earn-label">Adjustment</div><div class="rp-earn-value${adj<0?' negative':''}" id="rp-earn-adj">£0.00</div></div>
-      ${hasOverride?`<div class="rp-earn-box wide${override<0?' deduct':''}"><div class="rp-earn-label">Override</div><div class="rp-earn-value${override<0?' negative':''}" id="rp-earn-override">£0.00</div></div>`:''}
+      <div class="rp-earn-box${topUps<0?' deduct':''}"><div class="rp-earn-label">Top Ups</div><div class="rp-earn-value${topUps<0?' negative':''}" id="rp-earn-topups">£0</div></div>
+      <div class="rp-earn-box${tablet<0?' deduct':''}"><div class="rp-earn-label">Tablet</div><div class="rp-earn-value${tablet<0?' negative':''}" id="rp-earn-tablet">£0</div></div>
+      <div class="rp-earn-box${dwm<0?' deduct':''}"><div class="rp-earn-label">DWM Incentive</div><div class="rp-earn-value${dwm<0?' negative':''}" id="rp-earn-dwm">£0</div></div>
+      <div class="rp-earn-box${adj<0?' deduct':''}"><div class="rp-earn-label">Adjustment</div><div class="rp-earn-value${adj<0?' negative':''}" id="rp-earn-adj">£0</div></div>
+      ${hasOverride?`<div class="rp-earn-box wide${override<0?' deduct':''}"><div class="rp-earn-label">Override</div><div class="rp-earn-value${override<0?' negative':''}" id="rp-earn-override">£0</div></div>`:''}
     </div>
 
-    <div class="rp-sec-lbl">Pay summary</div>
+    <!-- Pay summary -->
+    <div class="nd-section-lbl">Pay summary</div>
     <div class="rp-summary-card">
       <div class="rp-summary-row"><span class="rp-summary-lbl">Submitted total</span><span class="rp-summary-val">${submittedTotal}</span></div>
       <div class="rp-summary-row"><span class="rp-summary-lbl">Cancelled total</span><span class="rp-summary-val">${cancelledTotal}</span></div>
       <div class="rp-summary-row"><span class="rp-summary-lbl">Payable total</span><span class="rp-summary-val">${payableTotal}</span></div>
-      <div class="rp-summary-row total"><span class="rp-summary-lbl">Final pay</span><span class="rp-summary-val" id="rp-earn-final">£0.00</span></div>
+      <div class="rp-summary-row total"><span class="rp-summary-lbl">Final pay</span><span class="rp-summary-val" id="rp-earn-final">£0</span></div>
     </div>
-    <div style="font-size:11px;color:var(--muted);text-align:center;padding:8px 0 16px;">${esc(nameVal)} · ${esc(rp_activeLabel)}</div>
   `;
 
-  // Animate values
   requestAnimationFrame(()=>{
     setTimeout(()=>{
       const fill=document.getElementById('rp-rep-conv-fill');
       if(fill)fill.style.width=pct+'%';
-      rp_countUp(document.getElementById('rp-pay-hero'),totalPay,'£',2,700);
+      rp_countUp(document.getElementById('rp-pay-hero'),totalPay,'£',0,700);
       [
         ['rp-earn-topups',topUps],['rp-earn-tablet',tablet],
         ['rp-earn-dwm',dwm],['rp-earn-adj',adj],
         ...(hasOverride?[['rp-earn-override',override]]:[]),
         ['rp-earn-final',totalPay],
       ].forEach(([id,val],i)=>{
-        setTimeout(()=>rp_countUp(document.getElementById(id),val,'£',2,500),i*50);
+        setTimeout(()=>rp_countUp(document.getElementById(id),val,'£',0,500),i*50);
       });
     },80);
   });
 
-  // Load history chart asynchronously
   if(rp_weekIndex.length>=2&&!rp_historyLoaded){
     rp_historyLoaded=true;
     requestAnimationFrame(()=>rp_loadRepHistory(name));
@@ -5726,7 +5794,7 @@ async function rp_loadRepHistory(name){
   const found=points.filter(p=>p.found);
   if(found.length<2){el.style.display='none';return;}
 
-  const n=points.length,PAD_L=6,PAD_R=6,PAD_T=28,PAD_B=22,BAR_H=56,VW=320,VH=PAD_T+BAR_H+PAD_B;
+  const n=points.length,PAD_L=6,PAD_R=6,PAD_T=24,PAD_B=20,BAR_H=44,VW=480,VH=PAD_T+BAR_H+PAD_B;
   const slotW=(VW-PAD_L-PAD_R)/n;
   const barW=Math.min(28,Math.max(10,slotW*0.62));
   const maxPay=Math.max(...found.map(p=>p.pay),1);
