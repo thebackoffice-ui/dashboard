@@ -271,7 +271,149 @@
 }
 
 
-/* Collaborative planner */
+/* ═══════════════════════════════
+   REP PAY REPORTS TAB
+   ═══════════════════════════════ */
+.rp-week-sel-wrap{display:inline-flex;align-items:center;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:0 12px;height:30px;gap:5px;}
+.rp-week-sel{font-size:12px;font-weight:600;color:var(--accent);background:transparent;border:none;cursor:pointer;outline:none;font-family:var(--font);appearance:none;-webkit-appearance:none;padding:0;}
+.rp-week-badge{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);padding:4px 12px;border-radius:20px;}
+
+/* Team overview header */
+.rp-team-hero{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);padding:22px 22px 0;box-shadow:var(--niond-shadow);margin-bottom:16px;overflow:hidden;}
+[data-theme="dark"] .rp-team-hero{background:var(--surface);border-color:var(--border);}
+.rp-team-hero-body{margin-bottom:16px;}
+.rp-team-hero-sub{font-size:12px;color:var(--niond-muted);margin-top:2px;}
+.rp-team-name{font-size:22px;font-weight:800;color:var(--niond-text);letter-spacing:-.03em;margin-bottom:4px;}
+[data-theme="dark"] .rp-team-name{color:var(--text);}
+.rp-pay-big{font-size:40px;font-weight:700;letter-spacing:-2px;color:var(--niond-text);line-height:1;}
+[data-theme="dark"] .rp-pay-big{color:var(--text);}
+.rp-rate-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:10px;font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+.rp-rate-chip svg{width:14px;height:14px;flex-shrink:0;}
+.rp-rate-chip.good{background:#EAF3DE;color:#3B6D11;border:0.5px solid #C0DD97;}
+.rp-rate-chip.warn{background:#FAEEDA;color:#854F0B;border:0.5px solid #FAC775;}
+.rp-rate-chip.bad {background:#FCEBEB;color:#A32D2D;border:0.5px solid #F7C1C1;}
+[data-theme="dark"] .rp-rate-chip.good{background:rgba(99,153,34,.15);color:#86c140;border-color:rgba(99,153,34,.3);}
+[data-theme="dark"] .rp-rate-chip.warn{background:rgba(186,117,23,.15);color:#f59e0b;border-color:rgba(186,117,23,.3);}
+[data-theme="dark"] .rp-rate-chip.bad {background:rgba(220,38,38,.12);color:#f87171;border-color:rgba(220,38,38,.28);}
+.rp-dark-band{display:grid;grid-template-columns:repeat(3,1fr);background:var(--niond-text);margin-top:4px;}
+[data-theme="dark"] .rp-dark-band{background:#0a1a1a;}
+.rp-dark-band-stat{padding:12px 16px;text-align:center;}
+.rp-dark-band-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:4px;}
+.rp-dark-band-val{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.03em;}
+.rp-dark-band-val.rp-danger{color:#f87171;}
+
+/* Conv rate bar */
+.rp-conv-track{height:5px;background:var(--surface2);border-radius:999px;overflow:hidden;margin-top:12px;}
+.rp-conv-fill{height:100%;width:0;border-radius:999px;transition:width 1s cubic-bezier(.16,1,.3,1);}
+.rp-conv-fill.good{background:#639922;} .rp-conv-fill.warn{background:#BA7517;} .rp-conv-fill.bad{background:#E24B4A;}
+
+/* Agent leaderboard */
+.rp-sec-lbl{font-size:10px;font-weight:800;color:var(--niond-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.rp-agent-card{background:var(--niond-surface);border:1px solid var(--niond-border);border-radius:var(--niond-r);box-shadow:var(--niond-shadow);overflow:hidden;margin-bottom:16px;}
+[data-theme="dark"] .rp-agent-card{background:var(--surface);border-color:var(--border);}
+.rp-search-wrap{position:relative;margin-bottom:12px;}
+.rp-search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--subtle);pointer-events:none;width:13px;height:13px;stroke:currentColor;stroke-width:1.5;fill:none;}
+.rp-search{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px 9px 34px;border-radius:var(--r);outline:none;transition:border-color .15s;}
+.rp-search:focus{border-color:var(--accent);}
+.rp-agent-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--niond-border);cursor:pointer;transition:background .1s;}
+[data-theme="dark"] .rp-agent-row{border-bottom-color:var(--border);}
+.rp-agent-row:last-child{border-bottom:none;}
+.rp-agent-row:hover{background:var(--niond-bg);}
+[data-theme="dark"] .rp-agent-row:hover{background:var(--surface2);}
+.rp-rank{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;background:var(--surface2);color:var(--muted);}
+.rp-rank.gold{background:#fef9c3;color:#92400e;}
+.rp-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.rp-agent-mid{flex:1;min-width:0;}
+.rp-agent-name{font-size:13px;font-weight:600;color:var(--niond-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+[data-theme="dark"] .rp-agent-name{color:var(--text);}
+.rp-agent-rate-row{display:flex;align-items:center;gap:8px;margin-top:3px;}
+.rp-rate-track{flex:1;max-width:80px;height:4px;background:var(--surface2);border-radius:999px;overflow:hidden;}
+.rp-rate-bar{height:100%;border-radius:999px;}
+.rp-agent-sub{font-size:11px;color:var(--muted);}
+.rp-agent-sub.warn-text{color:#854F0B;}[data-theme="dark"] .rp-agent-sub.warn-text{color:#f59e0b;}
+.rp-agent-sub.bad-text{color:#A32D2D;}[data-theme="dark"] .rp-agent-sub.bad-text{color:#f87171;}
+.rp-agent-pay{font-size:15px;font-weight:800;color:var(--accent);letter-spacing:-.03em;flex-shrink:0;}
+.rp-chev{color:var(--subtle);flex-shrink:0;}
+.rp-no-data{font-size:13px;color:var(--muted);padding:16px;}
+
+/* Individual rep report panel */
+.rp-back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 13px;border-radius:20px;cursor:pointer;margin-bottom:16px;transition:all .15s;}
+.rp-back-btn:hover{color:var(--text);border-color:var(--border);}
+
+/* Rep hero card */
+.rp-rep-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:12px;box-shadow:var(--s1);}
+.rp-hero-name{font-size:24px;font-weight:700;letter-spacing:-.03em;color:var(--text);margin-bottom:14px;}
+.rp-pay-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.rp-pay-label{font-size:10px;text-transform:uppercase;letter-spacing:.13em;color:var(--subtle);font-weight:600;margin-bottom:5px;}
+.rp-pay-amount{font-size:40px;line-height:1;font-weight:700;letter-spacing:-2px;color:var(--text);}
+.rp-hero-div{height:0.5px;background:var(--border);margin-bottom:12px;}
+.rp-conv-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.rp-conv-label{font-size:12px;font-weight:600;color:var(--muted);}
+.rp-conv-pct{font-size:12px;font-weight:700;color:var(--text);}
+.rp-alert-box{margin-top:12px;padding:10px 13px;border-radius:10px;font-size:12px;font-weight:500;line-height:1.55;display:flex;gap:8px;align-items:flex-start;}
+.rp-alert-box svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
+.rp-alert-box.good{background:#EAF3DE;color:#3B6D11;border:0.5px solid #C0DD97;}
+.rp-alert-box.warn{background:#FAEEDA;color:#854F0B;border:0.5px solid #FAC775;}
+.rp-alert-box.bad {background:#FCEBEB;color:#A32D2D;border:0.5px solid #F7C1C1;}
+[data-theme="dark"] .rp-alert-box.good{background:rgba(99,153,34,.15);color:#86c140;border-color:rgba(99,153,34,.3);}
+[data-theme="dark"] .rp-alert-box.warn{background:rgba(186,117,23,.15);color:#f59e0b;border-color:rgba(186,117,23,.3);}
+[data-theme="dark"] .rp-alert-box.bad {background:rgba(220,38,38,.12);color:#f87171;border-color:rgba(220,38,38,.28);}
+
+/* Perf card */
+.rp-perf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:var(--s1);}
+.rp-perf-type-bar{padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.rp-perf-type-bar svg{width:12px;height:12px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.rp-perf-type-name{font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--muted);}
+.rp-perf-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);}
+.rp-perf-row:last-child{border-bottom:none;}
+.rp-perf-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rp-perf-icon.amb{background:#FAEEDA;color:#854F0B;}
+.rp-perf-icon.grn{background:#EAF3DE;color:#3B6D11;}
+.rp-perf-icon.red{background:#FCEBEB;color:#A32D2D;}
+[data-theme="dark"] .rp-perf-icon.amb{background:rgba(186,117,23,.18);color:#f59e0b;}
+[data-theme="dark"] .rp-perf-icon.grn{background:rgba(74,222,128,.12);color:#4ade80;}
+[data-theme="dark"] .rp-perf-icon.red{background:rgba(248,113,113,.12);color:#f87171;}
+.rp-perf-icon svg{width:15px;height:15px;}
+.rp-perf-mid{flex:1;min-width:0;}
+.rp-perf-name{font-size:13px;font-weight:600;color:var(--text);}
+.rp-perf-sub{font-size:11px;color:var(--muted);}
+.rp-perf-val{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
+
+/* Earnings grid */
+.rp-earn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.rp-earn-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--s1);}
+.rp-earn-box.deduct{background:#FCEBEB;border-color:#F7C1C1;}
+[data-theme="dark"] .rp-earn-box.deduct{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.25);}
+.rp-earn-box.wide{grid-column:1/-1;}
+.rp-earn-label{font-size:10px;text-transform:uppercase;letter-spacing:.13em;color:var(--subtle);font-weight:600;margin-bottom:6px;}
+.rp-earn-value{font-size:22px;font-weight:700;letter-spacing:-.02em;color:var(--text);}
+.rp-earn-value.negative{color:#A32D2D;}
+[data-theme="dark"] .rp-earn-value.negative{color:#f87171;}
+
+/* Summary card */
+.rp-summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--s1);margin-bottom:12px;}
+.rp-summary-row{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border);}
+.rp-summary-row:last-child{border-bottom:none;}
+.rp-summary-row.total{background:var(--accent-soft);}
+.rp-summary-lbl{font-size:13px;color:var(--muted);}
+.rp-summary-row.total .rp-summary-lbl{color:var(--accent);font-weight:600;}
+.rp-summary-val{font-size:13px;font-weight:700;color:var(--text);}
+.rp-summary-row.total .rp-summary-val{font-size:18px;font-weight:800;color:var(--accent);}
+
+/* History chart */
+.rp-history-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;box-shadow:var(--s1);display:none;}
+
+/* Loading / empty states */
+.rp-spinner{width:22px;height:22px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite;}
+.rp-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:40px 0;justify-content:center;}
+.rp-empty{display:flex;flex-direction:column;align-items:center;padding:60px 0;gap:10px;}
+.rp-empty-icon{font-size:32px;}
+.rp-no-index{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;text-align:center;}
+.rp-no-index-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.rp-no-index-sub{font-size:13px;color:var(--muted);line-height:1.55;}
+.rp-no-index-sub code{background:var(--surface2);border:1px solid var(--border);padding:2px 7px;border-radius:5px;font-size:12px;font-family:'DM Mono',monospace;}
+
+/* ── Collaborative planner */
 .dp-collab-bar{display:flex;align-items:center;gap:8px;padding:6px 16px;background:var(--accent-soft);border-bottom:1px solid var(--accent-border);font-size:11px;color:var(--accent);font-weight:600;}
 .dp-collab-avatars{display:flex;gap:-4px;}
 .dp-collab-avatar{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:2px solid var(--surface);margin-left:-4px;}
@@ -1309,6 +1451,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       <button class="nav-item" onclick="switchTab('map')" id="nav-map"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 4l6 2 6-2 6 2v13l-6-2-6 2-6-2z" stroke-linejoin="round"/><path d="M7 6v13M13 4v13" stroke-linecap="round"/></svg></span>Team Map</button>
       <button class="nav-item" onclick="switchTab('notifications')" id="nav-notifications"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 0 1 6 6c0 3.5 1.5 5 1.5 5h-15S4 11.5 4 8a6 6 0 0 1 6-6z" stroke-linejoin="round"/><path d="M8.5 17a1.5 1.5 0 0 0 3 0" stroke-linecap="round"/></svg></span>Notifications<span id="notif-badge" class="nav-badge" style="display:none;">0</span></button>
       <button class="nav-item" onclick="switchTab('notes')" id="nav-notes"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h10a1 1 0 0 1 1 1v10l-4 4H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke-linejoin="round"/><path d="M7 8h6M7 11h4" stroke-linecap="round"/></svg></span>Notes</button>
+      <button class="nav-item" onclick="switchTab('payrep')" id="nav-payrep"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="12" rx="2"/><path d="M14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM2 9h16" stroke-linecap="round"/></svg></span>Rep Pay</button>
       <button class="nav-item" onclick="switchTab('planner')" id="nav-planner"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14M8 8v9" stroke-linecap="round"/></svg></span>Daily Planner</button>
     </div>
     <div class="sidebar-footer">
@@ -1682,6 +1825,17 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- REP PAY REPORTS -->
+    <div class="tab-content" id="ptab-payrep">
+      <div class="topbar">
+        <span class="topbar-title">Rep Pay Reports</span>
+        <div class="topbar-right" id="rp-week-selector-wrap"></div>
+      </div>
+      <div class="page-scroll" id="rp-scroll">
+        <div id="rp-root" style="padding:20px 24px;"></div>
       </div>
     </div>
 
@@ -3758,7 +3912,7 @@ function clearMap(){if(!confirm('Clear the map?'))return;sp.nodes=[];sp.edges=[]
 async function saveMap(){const md=JSON.stringify({nodes:sp.nodes,edges:sp.edges});try{await api({action:'saveMap',manager:managerName,mapData:md});showToast('Map saved ✓','success');}catch(e){showToast('Failed to save map','error');}}
 
 // ── Tab switching ─────────────────────────────────────
-const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications','notes','planner'];
+const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications','notes','payrep','planner'];
 function switchTab(tab){
   TABS.forEach(id=>{
     const nav=document.getElementById(`nav-${id}`);
@@ -3775,6 +3929,7 @@ function switchTab(tab){
   if(tab==='reports'){setTimeout(rptPtcRenderChart,80);}
   if(tab==='notes'){notesRenderFolders();notesRenderList();}
   if(tab==='planner'){dpInit();} else { clearInterval(dpPollTimer); }
+  if(tab==='payrep'){rpInit();}
 }
 
 // ── LEADERBOARD ───────────────────────────────────────
@@ -5089,7 +5244,531 @@ async function dpSaveCurrentDay(){
 
 
 
-/* ── PDF Download ─────────────────────────── */
+/* ═══════════════════════════════════════════════════════
+   REP PAY REPORTS — embedded pay-report viewer
+   Reads from the same Week Index tab used by index.html
+   ═══════════════════════════════════════════════════════ */
+
+// ── Config — set this to your Week Index CSV URL ──
+// Same format as INDEX_SHEET_URL in index.html:
+//   https://docs.google.com/spreadsheets/d/.../gviz/tq?tqx=out:csv&sheet=Week%20Index
+const RP_INDEX_URL = localStorage.getItem('tt_pay_index_url') || '';
+
+// ── State ──
+let rp_weekIndex   = [];   // [{label, url}] newest first
+let rp_activeIdx   = 0;
+let rp_activeUrl   = '';
+let rp_activeLabel = '';
+let rp_csvRows     = null; // raw parsed CSV rows for current week
+let rp_csvHeaders  = null;
+let rp_initialized = false;
+let rp_loading     = false;
+let rp_repWeeksWithData = new Set();
+let rp_historyLoaded = false;
+let rp_view        = 'team'; // 'team' | 'rep'
+let rp_activeRep   = null;
+
+// ── Helpers ──
+function rp_clean(v){return(v==null||v==='')?'0':String(v).trim();}
+function rp_num(v){return parseFloat(rp_clean(v).replace(/[^0-9.-]/g,''))||0;}
+function rp_fmt(n){return'£'+Number(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function rp_initials(name){return(name||'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase();}
+function rp_avatarStyle(idx){
+  const palette=[
+    {bg:'#a7ffdb',color:'#007a4d'},{bg:'#b3d4ff',color:'#1140cc'},
+    {bg:'#d4b8ff',color:'#5b1fd6'},{bg:'#ffe0a0',color:'#b85c00'},
+    {bg:'#ffb8cc',color:'#c4002e'},{bg:'#c7f9f0',color:'#0f766e'},
+  ];
+  const c=palette[idx%palette.length];
+  return`background:${c.bg};color:${c.color};`;
+}
+function rp_rateClass(rate){return rate>=80?'good':rate>=60?'warn':'bad';}
+function rp_barColor(rate){return rate>=80?'#639922':rate>=60?'#BA7517':'#E24B4A';}
+
+const RP_SVG={
+  send:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  x:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  alert:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  thumbs:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>`,
+  tag:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`,
+  chev:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg>`,
+};
+
+// ── Count-up ──
+function rp_countUp(el,target,prefix,decimals,duration){
+  if(!el)return;
+  const neg=target<0,abs=Math.abs(target),start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/duration,1),e=p===1?1:1-Math.pow(2,-10*p);
+    el.textContent=(neg?'-':'')+prefix+(e*abs).toLocaleString('en-GB',{minimumFractionDigits:decimals,maximumFractionDigits:decimals});
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ── CSV parser ──
+function rp_parseCSV(text){
+  const rows=[];let row=[],current='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i],n=text[i+1];
+    if(c==='"'&&q&&n==='"'){current+='"';i++;}
+    else if(c==='"'){q=!q;}
+    else if(c===','&&!q){row.push(current);current='';}
+    else if((c==='\n'||c==='\r')&&!q){
+      if(current!==''||row.length){row.push(current);rows.push(row);}
+      row=[];current='';if(c==='\r'&&n==='\n')i++;
+    }else{current+=c;}
+  }
+  if(current!==''||row.length){row.push(current);rows.push(row);}
+  return rows;
+}
+
+// ── Week selector HTML ──
+function rp_weekSelectorHTML(){
+  if(!rp_weekIndex.length)return'';
+  if(rp_weekIndex.length===1)return`<span class="rp-week-badge">${esc(rp_activeLabel)}</span>`;
+  const opts=rp_weekIndex.map((w,i)=>`<option value="${i}"${i===rp_activeIdx?' selected':''}>${esc(w.label)}</option>`).join('');
+  return`<div class="rp-week-sel-wrap">
+    <select class="rp-week-sel" onchange="rp_switchWeek(this.value)">${opts}</select>
+    <svg viewBox="0 0 14 14" fill="none" style="width:9px;height:9px;flex-shrink:0;pointer-events:none;opacity:0.7"><path d="M2 4.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>`;
+}
+
+function rp_updateWeekSelector(){
+  const wrap=document.getElementById('rp-week-selector-wrap');
+  if(wrap)wrap.innerHTML=rp_weekSelectorHTML();
+}
+
+// ── Init ──
+async function rpInit(){
+  if(rp_loading)return;
+  // If week index is already loaded just re-render
+  if(rp_initialized&&rp_weekIndex.length){
+    rp_renderRoot();
+    rp_updateWeekSelector();
+    return;
+  }
+
+  const root=document.getElementById('rp-root');
+  if(!root)return;
+
+  // No index URL configured
+  if(!RP_INDEX_URL){
+    root.innerHTML=`<div class="rp-no-index">
+      <div class="rp-no-index-title">📊 Pay Reports not configured</div>
+      <div class="rp-no-index-sub">
+        To enable rep pay reports, set your Week Index URL in the admin Setup tab or run this once in the browser console:<br><br>
+        <code>localStorage.setItem('tt_pay_index_url', 'YOUR_INDEX_URL')</code><br><br>
+        The URL should be your Google Sheet's Week Index tab in CSV format:
+        <code>https://docs.google.com/spreadsheets/d/SHEET_ID/gviz/tq?tqx=out:csv&sheet=Week%20Index</code>
+      </div>
+    </div>`;
+    return;
+  }
+
+  rp_loading=true;
+  root.innerHTML=`<div class="rp-loading"><div class="rp-spinner"></div>Loading week index…</div>`;
+  document.getElementById('rp-week-selector-wrap').innerHTML='';
+
+  try{
+    const text=await(await fetch(RP_INDEX_URL)).text();
+    const rows=rp_parseCSV(text);
+    // Header row: Week | Sheet ID | URL
+    rp_weekIndex=rows.slice(1)
+      .map(r=>({label:(r[0]||'').trim(),url:(r[2]||'').trim()}))
+      .filter(r=>r.label&&r.url)
+      .reverse(); // newest first
+  }catch(e){
+    root.innerHTML=`<div class="rp-no-index">
+      <div class="rp-no-index-title">⚠ Could not load week index</div>
+      <div class="rp-no-index-sub">Check that RP_INDEX_URL is correct and the sheet is shared publicly.<br><br>Error: ${esc(String(e))}</div>
+    </div>`;
+    rp_loading=false;return;
+  }
+
+  if(!rp_weekIndex.length){
+    root.innerHTML=`<div class="rp-no-index"><div class="rp-no-index-title">📭 No weeks found</div><div class="rp-no-index-sub">The Week Index sheet appears to be empty.</div></div>`;
+    rp_loading=false;return;
+  }
+
+  rp_activeIdx=0;
+  rp_activeUrl=rp_weekIndex[0].url;
+  rp_activeLabel=rp_weekIndex[0].label;
+  rp_initialized=true;
+  rp_loading=false;
+
+  rp_updateWeekSelector();
+  await rp_loadWeek(rp_activeUrl);
+}
+
+async function rp_switchWeek(idx){
+  idx=parseInt(idx,10);
+  const entry=rp_weekIndex[idx];
+  if(!entry)return;
+  rp_activeIdx=idx;
+  rp_activeUrl=entry.url;
+  rp_activeLabel=entry.label;
+  rp_view='team';
+  rp_activeRep=null;
+  rp_historyLoaded=false;
+  await rp_loadWeek(rp_activeUrl);
+}
+
+async function rp_loadWeek(url){
+  const root=document.getElementById('rp-root');
+  if(!root)return;
+  root.innerHTML=`<div class="rp-loading"><div class="rp-spinner"></div>Loading ${esc(rp_activeLabel)}…</div>`;
+  try{
+    const text=await(await fetch(url)).text();
+    const rows=rp_parseCSV(text);
+    rp_csvHeaders=rows[0].map(h=>h.trim());
+    rp_csvRows=rows;
+  }catch(e){
+    root.innerHTML=`<div class="rp-no-index"><div class="rp-no-index-title">⚠ Failed to load data</div><div class="rp-no-index-sub">${esc(String(e))}</div></div>`;
+    return;
+  }
+  rp_renderRoot();
+}
+
+function rp_renderRoot(){
+  if(rp_view==='rep'&&rp_activeRep){
+    rp_renderRepReport(rp_activeRep);
+  }else{
+    rp_renderTeamView();
+  }
+}
+
+// ── Team / manager view ──
+function rp_renderTeamView(){
+  const root=document.getElementById('rp-root');
+  if(!root||!rp_csvRows||!rp_csvHeaders)return;
+
+  const headers=rp_csvHeaders;
+  const allData=rp_csvRows.slice(1).map(r=>{
+    const d={};headers.forEach((h,i)=>d[h]=r[i]);return d;
+  }).filter(d=>{
+    const name=rp_clean(d['Name']);
+    return name!=='0'&&name!=='';
+  });
+
+  if(!allData.length){
+    root.innerHTML=`<div class="rp-empty"><div class="rp-empty-icon">📭</div><strong style="color:var(--text);font-size:15px;">No data for ${esc(rp_activeLabel)}</strong><span style="font-size:13px;color:var(--muted);">No agents found in this week's sheet.</span></div>`;
+    return;
+  }
+
+  // Filter by Office column — must match the manager's ?name= URL param
+  const data=allData.filter(d=>rp_clean(d['Office']).toLowerCase()===managerName.toLowerCase());
+
+  const totalPay       =data.reduce((s,d)=>s+rp_num(d['Total Pay']),0);
+  const totalSubmitted =data.reduce((s,d)=>s+rp_num(d['Submitted 1'])+rp_num(d['Submitted 2']),0);
+  const totalPayable   =data.reduce((s,d)=>s+rp_num(d['Payable 1'])+rp_num(d['Payable 2']),0);
+  const totalCancelled =totalSubmitted-totalPayable;
+  const avgRate        =totalSubmitted>0?Math.round((totalPayable/totalSubmitted)*100):0;
+  const rateState      =rp_rateClass(avgRate);
+  const rateIcon       =rateState==='good'?RP_SVG.thumbs:RP_SVG.alert;
+
+  const sorted=[...data].sort((a,b)=>rp_num(b['Total Pay'])-rp_num(a['Total Pay']));
+
+  const agentRows=sorted.map((d,i)=>{
+    const name    =rp_clean(d['Name']);
+    const pay     =rp_num(d['Total Pay']);
+    const sub     =rp_num(d['Submitted 1'])+rp_num(d['Submitted 2']);
+    const payable =rp_num(d['Payable 1'])+rp_num(d['Payable 2']);
+    const rate    =sub>0?Math.round((payable/sub)*100):0;
+    const rs      =rp_rateClass(rate);
+    const barCol  =rp_barColor(rate);
+    const subCls  =rs==='warn'?'rp-agent-sub warn-text':rs==='bad'?'rp-agent-sub bad-text':'rp-agent-sub';
+    return`<div class="rp-agent-row" data-name="${esc(name.toLowerCase())}" onclick="rp_openRep(${esc(JSON.stringify(name))})">
+      <div class="rp-rank${i===0?' gold':''}">${i+1}</div>
+      <div class="rp-av" style="${rp_avatarStyle(i)}">${rp_initials(name)}</div>
+      <div class="rp-agent-mid">
+        <div class="rp-agent-name">${esc(name)}</div>
+        <div class="rp-agent-rate-row">
+          <div class="rp-rate-track"><div class="rp-rate-bar" style="width:${rate}%;background:${barCol}"></div></div>
+          <span class="${subCls}">${rate}% · ${payable} payable</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+        <div class="rp-agent-pay">${rp_fmt(pay)}</div>
+        <div class="rp-chev">${RP_SVG.chev}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const mgrDisplay=getMgrDisplay();
+
+  root.innerHTML=`
+    <div class="rp-team-hero">
+      <div class="rp-team-hero-body">
+        <div class="rp-team-name">${esc(mgrDisplay)}'s Team</div>
+        <div class="rp-team-hero-sub">${esc(rp_activeLabel)} · ${data.length} agent${data.length!==1?'s':''}</div>
+        <div class="rp-pay-row" style="margin-top:16px;">
+          <div>
+            <div class="rp-pay-label">Total agent pay</div>
+            <div class="rp-pay-big" id="rp-total-pay">£0.00</div>
+          </div>
+          <div class="rp-rate-chip ${rateState}">${rateIcon} ${avgRate}% avg rate</div>
+        </div>
+        <div class="rp-conv-track"><div class="rp-conv-fill ${rateState}" id="rp-conv-fill"></div></div>
+      </div>
+      <div class="rp-dark-band">
+        <div class="rp-dark-band-stat"><div class="rp-dark-band-lbl">Submitted</div><div class="rp-dark-band-val">${totalSubmitted}</div></div>
+        <div class="rp-dark-band-stat"><div class="rp-dark-band-lbl">Payable</div><div class="rp-dark-band-val">${totalPayable}</div></div>
+        <div class="rp-dark-band-stat"><div class="rp-dark-band-lbl">Cancelled</div><div class="rp-dark-band-val${totalCancelled>0?' rp-danger':''}">${totalCancelled}</div></div>
+      </div>
+    </div>
+
+    <div class="rp-sec-lbl">Agent leaderboard</div>
+    <div class="rp-search-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="rp-search" id="rp-search" type="text" placeholder="Search agents…" oninput="rp_filterAgents()" autocomplete="off"/>
+    </div>
+    <div class="rp-agent-card" id="rp-agent-list">${agentRows}</div>
+  `;
+
+  // Animate total pay
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      rp_countUp(document.getElementById('rp-total-pay'),totalPay,'£',2,700);
+      const fill=document.getElementById('rp-conv-fill');
+      if(fill)fill.style.width=avgRate+'%';
+    },80);
+  });
+}
+
+function rp_filterAgents(){
+  const q=(document.getElementById('rp-search')?.value||'').toLowerCase();
+  document.querySelectorAll('.rp-agent-row').forEach(el=>{
+    el.style.display=(el.dataset.name||'').includes(q)?'flex':'none';
+  });
+}
+
+// ── Open individual rep ──
+function rp_openRep(name){
+  rp_view='rep';
+  rp_activeRep=name;
+  rp_historyLoaded=false;
+  rp_renderRepReport(name);
+  const scroll=document.getElementById('rp-scroll');
+  if(scroll)scroll.scrollTop=0;
+}
+
+function rp_renderRepReport(name){
+  const root=document.getElementById('rp-root');
+  if(!root||!rp_csvRows||!rp_csvHeaders)return;
+
+  const headers=rp_csvHeaders;
+  const matchingRows=rp_csvRows.slice(1)
+    .filter(r=>r[0]?.trim().toLowerCase()===name.trim().toLowerCase())
+    .map(r=>{const d={};headers.forEach((h,i)=>d[h]=r[i]);return d;});
+
+  if(!matchingRows.length){
+    root.innerHTML=`<button class="rp-back-btn" onclick="rp_backToTeam()">← Back to team</button>
+      <div class="rp-empty"><div class="rp-empty-icon">📭</div>
+        <strong style="color:var(--text);font-size:15px;">No data for ${esc(name)}</strong>
+        <span style="font-size:13px;color:var(--muted);">No rows found in ${esc(rp_activeLabel)}</span>
+      </div>`;
+    return;
+  }
+
+  const rows=matchingRows;
+  const primaryRow=rows[0];
+  const nameVal    =rp_clean(primaryRow['Name']);
+  const officeVal  =rp_clean(primaryRow['Office'])||'—';
+  const multiCamp  =rows.length>1;
+
+  const totalPay      =rows.reduce((s,r)=>s+rp_num(r['Total Pay']),0);
+  const topUps        =rows.reduce((s,r)=>s+rp_num(r['Top Ups']),0);
+  const tablet        =rows.reduce((s,r)=>s+rp_num(r['Tablet']),0);
+  const dwm           =rows.reduce((s,r)=>s+rp_num(r['DWM Incentive']),0);
+  const adj           =rows.reduce((s,r)=>s+rp_num(r['Adjustment']),0);
+  const override      =rows.reduce((s,r)=>s+rp_num(r['Override']),0);
+  const hasOverride   =override!==0;
+  const submittedTotal=rows.reduce((s,r)=>s+rp_num(r['Submitted 1'])+rp_num(r['Submitted 2']),0);
+  const payableTotal  =rows.reduce((s,r)=>s+rp_num(r['Payable 1'])+rp_num(r['Payable 2']),0);
+  const cancelledTotal=submittedTotal-payableTotal;
+  const pct           =submittedTotal>0?Math.round((payableTotal/submittedTotal)*100):0;
+  const state         =rp_rateClass(pct);
+  const rateIcon      =state==='good'?RP_SVG.thumbs:RP_SVG.alert;
+  const alertMsg      =state==='good'?'Strong week — payable rate is above target. Keep it up.'
+                      :state==='warn'?'Getting there, but room to improve. Focus on lead quality this week.'
+                      :'Below target. Review cancelled leads and approach this week.';
+
+  // Build perf sections per campaign
+  function perfSection(r,idx){
+    const label=multiCamp?`Campaign ${idx+1}`:'';
+    const types=[
+      {key:'1',type:rp_clean(r['Type 1']),sub:rp_clean(r['Submitted 1']),pay:rp_clean(r['Payable 1']),can:rp_clean(r['Cancelled 1'])},
+      {key:'2',type:rp_clean(r['Type 2']),sub:rp_clean(r['Submitted 2']),pay:rp_clean(r['Payable 2']),can:rp_clean(r['Cancelled 2'])},
+    ].filter(t=>t.type&&t.type!=='0');
+    return types.map((t,ti)=>`
+      <div style="margin-bottom:12px;">
+        <div class="rp-sec-lbl" style="margin-bottom:8px;">${esc(t.type)} performance${multiCamp&&ti===0?` · <span style="opacity:.7;font-weight:500">${esc(label)}</span>`:''}</div>
+        <div class="rp-perf-card">
+          <div class="rp-perf-type-bar">${RP_SVG.tag}<span class="rp-perf-type-name">${esc(t.type)}</span></div>
+          <div class="rp-perf-row"><div class="rp-perf-icon amb">${RP_SVG.send}</div><div class="rp-perf-mid"><div class="rp-perf-name">Submitted</div><div class="rp-perf-sub">Total ${esc(t.type)} leads</div></div><div class="rp-perf-val">${esc(t.sub)}</div></div>
+          <div class="rp-perf-row"><div class="rp-perf-icon grn">${RP_SVG.check}</div><div class="rp-perf-mid"><div class="rp-perf-name">Payable</div><div class="rp-perf-sub">Approved for pay</div></div><div class="rp-perf-val">${esc(t.pay)}</div></div>
+          <div class="rp-perf-row"><div class="rp-perf-icon red">${RP_SVG.x}</div><div class="rp-perf-mid"><div class="rp-perf-name">Cancelled</div><div class="rp-perf-sub">Not payable this week</div></div><div class="rp-perf-val">${esc(t.can)}</div></div>
+        </div>
+      </div>`).join('');
+  }
+
+  const allPerfSections=rows.map((r,i)=>perfSection(r,i)).join('');
+
+  const earnIds=[];
+  root.innerHTML=`
+    <button class="rp-back-btn" onclick="rp_backToTeam()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11L5 7l4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to team
+    </button>
+
+    <div id="rp-history-chart" class="rp-history-card"></div>
+
+    <div class="rp-rep-hero">
+      <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:var(--surface2);border:0.5px solid var(--border);color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">
+        <span style="width:5px;height:5px;background:var(--accent);border-radius:50%;flex-shrink:0;"></span>${esc(officeVal)} Office
+      </div>
+      <div class="rp-hero-name">${esc(nameVal)}</div>
+      <div class="rp-pay-row">
+        <div>
+          <div class="rp-pay-label">Total pay this week</div>
+          <div class="rp-pay-amount" id="rp-pay-hero">£0.00</div>
+        </div>
+        <div class="rp-rate-chip ${state}">${rateIcon} ${pct}% rate</div>
+      </div>
+      <div class="rp-hero-div"></div>
+      <div class="rp-conv-header"><span class="rp-conv-label">Payable conversion rate</span><span class="rp-conv-pct">${pct}%</span></div>
+      <div class="rp-conv-track"><div class="rp-conv-fill ${state}" id="rp-rep-conv-fill"></div></div>
+      <div class="rp-alert-box ${state}">${rateIcon}<span>${alertMsg}</span></div>
+    </div>
+
+    ${allPerfSections}
+
+    <div class="rp-sec-lbl">Earnings breakdown</div>
+    <div class="rp-earn-grid">
+      <div class="rp-earn-box${topUps<0?' deduct':''}"><div class="rp-earn-label">Top Ups</div><div class="rp-earn-value${topUps<0?' negative':''}" id="rp-earn-topups">£0.00</div></div>
+      <div class="rp-earn-box${tablet<0?' deduct':''}"><div class="rp-earn-label">Tablet</div><div class="rp-earn-value${tablet<0?' negative':''}" id="rp-earn-tablet">£0.00</div></div>
+      <div class="rp-earn-box${dwm<0?' deduct':''}"><div class="rp-earn-label">DWM Incentive</div><div class="rp-earn-value${dwm<0?' negative':''}" id="rp-earn-dwm">£0.00</div></div>
+      <div class="rp-earn-box${adj<0?' deduct':''}"><div class="rp-earn-label">Adjustment</div><div class="rp-earn-value${adj<0?' negative':''}" id="rp-earn-adj">£0.00</div></div>
+      ${hasOverride?`<div class="rp-earn-box wide${override<0?' deduct':''}"><div class="rp-earn-label">Override</div><div class="rp-earn-value${override<0?' negative':''}" id="rp-earn-override">£0.00</div></div>`:''}
+    </div>
+
+    <div class="rp-sec-lbl">Pay summary</div>
+    <div class="rp-summary-card">
+      <div class="rp-summary-row"><span class="rp-summary-lbl">Submitted total</span><span class="rp-summary-val">${submittedTotal}</span></div>
+      <div class="rp-summary-row"><span class="rp-summary-lbl">Cancelled total</span><span class="rp-summary-val">${cancelledTotal}</span></div>
+      <div class="rp-summary-row"><span class="rp-summary-lbl">Payable total</span><span class="rp-summary-val">${payableTotal}</span></div>
+      <div class="rp-summary-row total"><span class="rp-summary-lbl">Final pay</span><span class="rp-summary-val" id="rp-earn-final">£0.00</span></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;padding:8px 0 16px;">${esc(nameVal)} · ${esc(rp_activeLabel)}</div>
+  `;
+
+  // Animate values
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      const fill=document.getElementById('rp-rep-conv-fill');
+      if(fill)fill.style.width=pct+'%';
+      rp_countUp(document.getElementById('rp-pay-hero'),totalPay,'£',2,700);
+      [
+        ['rp-earn-topups',topUps],['rp-earn-tablet',tablet],
+        ['rp-earn-dwm',dwm],['rp-earn-adj',adj],
+        ...(hasOverride?[['rp-earn-override',override]]:[]),
+        ['rp-earn-final',totalPay],
+      ].forEach(([id,val],i)=>{
+        setTimeout(()=>rp_countUp(document.getElementById(id),val,'£',2,500),i*50);
+      });
+    },80);
+  });
+
+  // Load history chart asynchronously
+  if(rp_weekIndex.length>=2&&!rp_historyLoaded){
+    rp_historyLoaded=true;
+    requestAnimationFrame(()=>rp_loadRepHistory(name));
+  }
+}
+
+// ── Earnings history chart ──
+async function rp_loadRepHistory(name){
+  const el=document.getElementById('rp-history-chart');
+  if(!el)return;
+  el.innerHTML=`<div class="rp-loading" style="padding:16px 0;"><div class="rp-spinner"></div><span style="font-size:12px;color:var(--muted);">Loading history…</span></div>`;
+  el.style.display='block';
+
+  const results=await Promise.allSettled(
+    rp_weekIndex.map(async(w,i)=>{
+      try{
+        const text=await(await fetch(w.url)).text();
+        const rows=rp_parseCSV(text);
+        const headers=rows[0].map(h=>h.trim());
+        const match=rows.slice(1).find(r=>r[0]?.trim().toLowerCase()===name.trim().toLowerCase());
+        if(!match)return{label:w.label,pay:0,found:false,idx:i};
+        const d={};headers.forEach((h,j)=>d[h]=match[j]);
+        return{label:w.label,pay:rp_num(d['Total Pay']),found:true,idx:i};
+      }catch{return{label:w.label,pay:0,found:false,idx:i};}
+    })
+  );
+
+  const points=results
+    .map((r,i)=>r.status==='fulfilled'?{...r.value,weekIdx:i}:{pay:0,found:false,weekIdx:i,label:rp_weekIndex[i]?.label||''})
+    .reverse(); // oldest first for chart
+
+  const found=points.filter(p=>p.found);
+  if(found.length<2){el.style.display='none';return;}
+
+  const n=points.length,PAD_L=6,PAD_R=6,PAD_T=28,PAD_B=22,BAR_H=56,VW=320,VH=PAD_T+BAR_H+PAD_B;
+  const slotW=(VW-PAD_L-PAD_R)/n;
+  const barW=Math.min(28,Math.max(10,slotW*0.62));
+  const maxPay=Math.max(...found.map(p=>p.pay),1);
+  const activeWeekIdx=rp_weekIndex.length-1-rp_activeIdx;
+
+  const bars=points.map((p,i)=>{
+    const cx=PAD_L+slotW*i+slotW/2;
+    const bh=p.found?Math.max(5,(p.pay/maxPay)*BAR_H):5;
+    const by=PAD_T+(BAR_H-bh);
+    const isActive=p.weekIdx===activeWeekIdx;
+    const fill=!p.found?'var(--border2)':isActive?'#0f766e':'rgba(15,118,110,.35)';
+    const valTxt=p.found?(p.pay>=1000?'\xa3'+(p.pay/1000).toFixed(1)+'k':'\xa3'+Math.round(p.pay)):'';
+    const shortLbl=p.label.replace(/w\/c\s*/i,'').replace(/\s*\d{4}$/,'').trim();
+    const isDk=document.documentElement.getAttribute('data-theme')==='dark';
+    const lblCol=isDk?'#6b8a8a':'#94a3b8';
+    const activeLblCol=isDk?'#2dd4bf':'#0f766e';
+    return`<g>
+      <rect x="${cx-barW/2}" y="${by}" width="${barW}" height="${bh}" rx="3.5" fill="${fill}"/>
+      ${p.found?`<text x="${cx}" y="${PAD_T-6}" text-anchor="middle" font-size="8" font-weight="${isActive?'700':'500'}" fill="${isActive?activeLblCol:lblCol}" font-family="DM Sans,sans-serif">${valTxt}</text>`:''}
+      <text x="${cx}" y="${VH-3}" text-anchor="middle" font-size="7.5" font-weight="${isActive?'700':'400'}" fill="${isActive?activeLblCol:lblCol}" font-family="DM Sans,sans-serif">${shortLbl}</text>
+    </g>`;
+  }).join('');
+
+  const total=found.reduce((s,p)=>s+p.pay,0);
+  const avg=total/found.length;
+  const last=found[found.length-1].pay;
+  const prev=found.length>=2?found[found.length-2].pay:null;
+  const diff=prev!==null?last-prev:0;
+  const trendUp=diff>=0;
+
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--subtle);">Earnings history</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:11px;font-weight:600;color:var(--muted);">Avg ${rp_fmt(avg)}</span>
+        ${prev!==null?`<span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:${trendUp?'#EAF3DE':'#FCEBEB'};color:${trendUp?'#3B6D11':'#A32D2D'};border:0.5px solid ${trendUp?'#C0DD97':'#F7C1C1'};">${trendUp?'▲':'▼'} ${rp_fmt(Math.abs(diff))}</span>`:''}
+      </div>
+    </div>
+    <svg width="100%" viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet" style="overflow:visible;display:block;">${bars}</svg>`;
+  el.style.display='block';
+}
+
+function rp_backToTeam(){
+  rp_view='team';
+  rp_activeRep=null;
+  rp_historyLoaded=false;
+  rp_renderTeamView();
+  const scroll=document.getElementById('rp-scroll');
+  if(scroll)scroll.scrollTop=0;
+}
+
+
 async function dpDownloadPDF(){
   // Flush current edits first
   dpFlushCurrentDay();
