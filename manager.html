@@ -5527,9 +5527,37 @@ function rp_renderRoot(){
 }
 
 // ── Roster match helper ──
+// Normalises both sides: collapse whitespace, strip punctuation, lowercase
+function rp_normName(s){
+  return (s||'').trim().toLowerCase()
+    .replace(/\s+/g,' ')          // collapse multiple spaces
+    .replace(/[''`]/g,"'")        // normalise apostrophes
+    .replace(/[-–—]/g,'-');       // normalise dashes
+}
 function rp_matchRoster(csvName){
-  const n=(csvName||'').trim().toLowerCase();
-  return roster.find(r=>!r.leaver&&(r.name||'').trim().toLowerCase()===n)||null;
+  const n=rp_normName(csvName);
+  if(!n)return null;
+  // 1. Exact normalised match (handles extra spaces, case, apostrophe variants)
+  let m=roster.find(r=>!r.leaver&&rp_normName(r.name)===n);
+  if(m)return m;
+  // 2. First + last name match (ignores middle names / initials in either source)
+  const csvParts=n.split(' ').filter(Boolean);
+  if(csvParts.length>=2){
+    const csvFirst=csvParts[0], csvLast=csvParts[csvParts.length-1];
+    m=roster.find(r=>{
+      if(r.leaver)return false;
+      const rp=rp_normName(r.name).split(' ').filter(Boolean);
+      return rp.length>=2&&rp[0]===csvFirst&&rp[rp.length-1]===csvLast;
+    });
+    if(m)return m;
+  }
+  // 3. Contains match — roster name is a substring of CSV name or vice versa
+  m=roster.find(r=>{
+    if(r.leaver)return false;
+    const rn=rp_normName(r.name);
+    return rn&&(n.includes(rn)||rn.includes(n));
+  });
+  return m||null;
 }
 
 // ── Team / manager view ──
