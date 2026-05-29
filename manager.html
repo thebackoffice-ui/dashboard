@@ -5610,7 +5610,7 @@ function rp_renderTeamView(){
     const rRep    =rp_matchRoster(name);
     const pos     =rRep?rRep.position||'':'';
     const posTag  =pos?`<span class="pos-tag ${posClass(pos)}" style="font-size:10px;padding:2px 7px;">${esc(pos)}</span>`
-                      :`<span style="font-size:10px;color:var(--muted);font-style:italic;">not on roster</span>`;
+                      :rRep?'':`<span style="font-size:10px;color:var(--muted);font-style:italic;">not on roster</span>`;
     return`<div class="rp-agent-row" data-name="${esc(name.toLowerCase())}" onclick="rp_openRep(${esc(JSON.stringify(name))})">
       <div class="rp-rank${i===0?' gold':''}">${i+1}</div>
       <div class="rp-av" style="${avStyle(name,pos)}">${rp_initials(name)}</div>
