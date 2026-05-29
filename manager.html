@@ -146,10 +146,9 @@
 .rp-av,
 .lb-row-av,
 .lb-p-av {
-  border-width: 2px !important;
   font-weight: 700 !important;
-  filter: saturate(1.2);
-  box-shadow: 0 2px 8px rgba(0,0,0,.10) !important;
+  filter: saturate(1.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08) !important;
 }
 
 .map-node,
@@ -182,7 +181,6 @@
 .mini-map-bubble.pos-Trainee {
   background: var(--pos-trainee-bg) !important;
   color: var(--pos-trainee-color) !important;
-  border: 2px solid var(--pos-trainee-border) !important;
 }
 
 /* ── Solo: vivid amber/orange ── */
@@ -208,7 +206,6 @@
 .mini-map-bubble.pos-Solo {
   background: var(--pos-solo-bg) !important;
   color: var(--pos-solo-color) !important;
-  border: 2px solid var(--pos-solo-border) !important;
 }
 
 /* ── Leader: vivid royal blue ── */
@@ -234,7 +231,6 @@
 .mini-map-bubble.pos-Leader {
   background: var(--pos-leader-bg) !important;
   color: var(--pos-leader-color) !important;
-  border: 2px solid var(--pos-leader-border) !important;
 }
 
 /* ── Core: vivid violet/purple ── */
@@ -260,7 +256,6 @@
 .mini-map-bubble.pos-Core {
   background: var(--pos-core-bg) !important;
   color: var(--pos-core-color) !important;
-  border: 2px solid var(--pos-core-border) !important;
 }
 
 /* ── Junior / Junior Partner: vivid hot pink/rose ── */
@@ -306,7 +301,6 @@
 .mini-map-bubble.pos-JuniorPartner {
   background: var(--pos-junior-bg) !important;
   color: var(--pos-junior-color) !important;
-  border: 2px solid var(--pos-junior-border) !important;
 }
 
 
@@ -2142,21 +2136,22 @@ function posClass(pos){
   const k=posKey(pos);
   return k?`pos-colour-${k}`:'';
 }
-/* Returns inline style for an avatar — always vibrant, based on position if known else name-hash */
+/* Returns inline style for an avatar — position colour if known, white if not */
 function avStyle(name,pos){
   const palette=[
-    {bg:'#a7ffdb',color:'#007a4d',border:'#00c97a'},
-    {bg:'#b3d4ff',color:'#1140cc',border:'#1d50ff'},
-    {bg:'#d4b8ff',color:'#5b1fd6',border:'#6e2ff0'},
-    {bg:'#ffe0a0',color:'#b85c00',border:'#f08000'},
-    {bg:'#ffb8cc',color:'#c4002e',border:'#f0004d'},
+    {bg:'#a7ffdb',color:'#007a4d'},
+    {bg:'#b3d4ff',color:'#1140cc'},
+    {bg:'#d4b8ff',color:'#5b1fd6'},
+    {bg:'#ffe0a0',color:'#b85c00'},
+    {bg:'#ffb8cc',color:'#c4002e'},
   ];
   const posMap={Trainee:0,Solo:3,Leader:1,Core:2,Junior:4};
   const k=posKey(pos);
-  let c;
-  if(k&&posMap[k]!==undefined){c=palette[posMap[k]];}
-  else{let h=0;for(const ch of String(name||''))h=(h*31+ch.charCodeAt(0))&0xffff;c=palette[h%palette.length];}
-  return`background:${c.bg};color:${c.color};border:2px solid ${c.border};`;
+  if(k&&posMap[k]!==undefined){
+    const c=palette[posMap[k]];
+    return`background:${c.bg};color:${c.color};border:none;`;
+  }
+  return'background:#ffffff;color:#6b7d8a;border:none;box-shadow:none;';
 }
 
 // ── State ──────────────────────────────────────────────
@@ -5357,7 +5352,7 @@ function rp_avatarStyle(name){
   ];
   let h=0;for(const c of String(name||''))h=(h*31+c.charCodeAt(0))&0xffff;
   const c=palette[h%palette.length];
-  return`background:${c.bg};color:${c.color};border:2px solid ${c.border};`;
+  return`background:${c.bg};color:${c.color};border:none;`;
 }
 function rp_posClass(name){
   const rep=roster.find(r=>(r.name||'').trim().toLowerCase()===(name||'').trim().toLowerCase());
