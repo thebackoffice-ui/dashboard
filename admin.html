@@ -319,6 +319,8 @@ select.form-input { cursor: pointer; }
     <button class="tab-btn" onclick="switchTab('reviews')">Weekly Reviews</button>
     <button class="tab-btn" onclick="switchTab('notifications')">Notifications</button>
     <button class="tab-btn" onclick="switchTab('planner')">Planner Groups</button>
+    <button class="tab-btn" onclick="switchTab('clients')">Clients &amp; Campaigns</button>
+    <button class="tab-btn" onclick="switchTab('mgrprofiles')">Manager Profiles</button>
     <button class="tab-btn" onclick="switchTab('setup')">Setup</button>
     <button class="tab-btn" onclick="switchTab('audit')">Audit Log</button>
   </div>
@@ -756,6 +758,68 @@ select.form-input { cursor: pointer; }
     </div>
   </div>
 
+  <!-- CLIENTS & CAMPAIGNS -->
+  <div class="tab-panel" id="tab-clients">
+
+    <div class="setup-card">
+      <h3>Register a new client</h3>
+      <p>Add a client with a campaign type (Doors or Venues). The combined name (e.g. <strong>Scottish Power Doors</strong>) is used when assigning to managers.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+        <div>
+          <div class="form-lbl" style="margin-bottom:5px;">Client name</div>
+          <input type="text" id="cl-client-name" class="form-input" placeholder="e.g. Scottish Power" />
+        </div>
+        <div>
+          <div class="form-lbl" style="margin-bottom:5px;">Campaign type</div>
+          <select id="cl-campaign-type" class="form-input">
+            <option value="Doors">Doors</option>
+            <option value="Venues">Venues</option>
+          </select>
+        </div>
+        <div style="grid-column:span 2;">
+          <div class="form-lbl" style="margin-bottom:5px;">Logo</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="cl-logo-preview" style="width:56px;height:56px;border-radius:8px;background:var(--surface2);border:1px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🏢</div>
+            <label style="cursor:pointer;background:var(--surface);border:1px dashed var(--border2);color:var(--muted);font-size:12px;font-weight:500;padding:7px 14px;border-radius:var(--radius-sm);transition:all .15s;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'">
+              🖼 Upload logo
+              <input type="file" accept="image/*" onchange="clPreviewLogo(this)" style="display:none;" id="cl-logo-input" />
+            </label>
+            <span id="cl-logo-name" style="font-size:11px;color:var(--muted);"></span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:14px;">
+        <button onclick="clSaveClient()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:9px 20px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Save client</button>
+        <span id="cl-save-status" style="font-size:12px;color:var(--muted);font-family:monospace;"></span>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <h3 style="margin-bottom:0;">Registered clients</h3>
+        <button onclick="clLoadClients()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);cursor:pointer;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">↻ Refresh</button>
+      </div>
+      <p>All registered clients. Click × to remove (does not unassign from managers).</p>
+      <div id="cl-client-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+        <div style="color:var(--muted);font-size:13px;">Loading…</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MANAGER PROFILES -->
+  <div class="tab-panel" id="tab-mgrprofiles">
+
+    <div class="setup-card">
+      <h3>Manager profiles</h3>
+      <p>Set city location, campaign assignments, phone number, start date, weekly target, and a bio for each manager. Managers can also view and edit this from their own dashboard.</p>
+      <div id="mgr-profiles-list" style="display:flex;flex-direction:column;gap:16px;margin-top:8px;">
+        <div style="color:var(--muted);font-size:13px;"><span class="spinner"></span> Loading…</div>
+      </div>
+    </div>
+
+  </div>
+
 </main>
 
 </div><!-- /admin-main-wrap -->
@@ -844,7 +908,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ── Apps Script source ─────────────────────────────────
-const APPS_SCRIPT_VERSION = '2.5.0';
+const APPS_SCRIPT_VERSION = '2.6.0';
 const APPS_SCRIPT = `// The Back Office — Google Apps Script v${APPS_SCRIPT_VERSION}
 // Extensions > Apps Script > paste > Deploy as Web App (Anyone)
 
@@ -1205,6 +1269,73 @@ function doPost(e) {
     const sh=getOrCreate('planner_groups',['groupId','groupName','members','updatedAt']);
     const rows=sh.getDataRange().getValues().slice(1).filter(r=>r[0]);
     result={groups:rows.map(r=>({id:String(r[0]),name:String(r[1]),members:r[2]?String(r[2]).split(',').filter(Boolean):[]}))};
+
+  } else if (data.action === 'saveClient') {
+    // Save a new registered client; optionally upload logo to Drive
+    const sh=getOrCreate('clients',['id','clientName','campaign','fullName','logoUrl','createdAt']);
+    const c=data.client||{};
+    let logoUrl='';
+    if(c.logoData&&c.logoData.startsWith('data:')){
+      try{
+        const mime=c.logoData.split(';')[0].split(':')[1];
+        const b64=c.logoData.split(',')[1];
+        const bytes=Utilities.base64Decode(b64);
+        const blob=Utilities.newBlob(bytes,mime,(c.clientName||'logo')+'_logo');
+        const folder=getPicFolder();
+        const file=folder.createFile(blob);
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);
+        logoUrl='https://drive.google.com/uc?id='+file.getId();
+      }catch(e){logoUrl='';}
+    }
+    sh.appendRow([c.id,c.clientName,c.campaign,c.fullName,logoUrl,new Date().toISOString()]);
+    result={ok:true,logoUrl};
+
+  } else if (data.action === 'getClients') {
+    const sh=getOrCreate('clients',['id','clientName','campaign','fullName','logoUrl','createdAt']);
+    const rows=sh.getDataRange().getValues().slice(1).filter(r=>r[0]);
+    result={clients:rows.map(r=>({id:String(r[0]),clientName:String(r[1]),campaign:String(r[2]),fullName:String(r[3]),logoUrl:String(r[4]||'')}))};
+
+  } else if (data.action === 'deleteClient') {
+    const sh=getOrCreate('clients',['id','clientName','campaign','fullName','logoUrl','createdAt']);
+    const rows=sh.getDataRange().getValues();
+    for(let i=rows.length-1;i>=1;i--){if(String(rows[i][0])===String(data.id)){sh.deleteRow(i+1);break;}}
+    result={ok:true};
+
+  } else if (data.action === 'saveManagerProfile') {
+    // Save profile fields for a manager: city, phone, startDate, weeklyTarget, bio, campaigns[]
+    const sh=getOrCreate('manager_profiles',['manager','city','phone','startDate','weeklyTarget','bio','campaigns','updatedAt']);
+    const m=String(data.manager||'').toLowerCase();
+    const p=data.profile||{};
+    const campaignsStr=(p.campaigns||[]).join(',');
+    const rows=sh.getDataRange().getValues();
+    let found=false;
+    for(let i=1;i<rows.length;i++){
+      if(String(rows[i][0]).toLowerCase()===m){
+        sh.getRange(i+1,2,1,7).setValues([[p.city||'',p.phone||'',p.startDate||'',p.weeklyTarget||'',p.bio||'',campaignsStr,new Date().toISOString()]]);
+        found=true;break;
+      }
+    }
+    if(!found)sh.appendRow([m,p.city||'',p.phone||'',p.startDate||'',p.weeklyTarget||'',p.bio||'',campaignsStr,new Date().toISOString()]);
+    result={ok:true};
+
+  } else if (data.action === 'getManagerProfile') {
+    const sh=getOrCreate('manager_profiles',['manager','city','phone','startDate','weeklyTarget','bio','campaigns','updatedAt']);
+    const m=String(data.manager||'').toLowerCase();
+    const rows=sh.getDataRange().getValues().slice(1).filter(r=>r[0]);
+    const row=rows.find(r=>String(r[0]).toLowerCase()===m);
+    if(row){
+      result={profile:{city:String(row[1]||''),phone:String(row[2]||''),startDate:row[3]?safeDate(row[3]):'',weeklyTarget:String(row[4]||''),bio:String(row[5]||''),campaigns:row[6]?String(row[6]).split(',').filter(Boolean):[]}};
+    }else{result={profile:{}};}
+
+  } else if (data.action === 'getManagerProfiles') {
+    // Returns all manager profiles as a map { managerName: profile }
+    const sh=getOrCreate('manager_profiles',['manager','city','phone','startDate','weeklyTarget','bio','campaigns','updatedAt']);
+    const rows=sh.getDataRange().getValues().slice(1).filter(r=>r[0]);
+    const profiles={};
+    rows.forEach(r=>{
+      profiles[String(r[0]).toLowerCase()]={city:String(r[1]||''),phone:String(r[2]||''),startDate:r[3]?safeDate(r[3]):'',weeklyTarget:String(r[4]||''),bio:String(r[5]||''),campaigns:r[6]?String(r[6]).split(',').filter(Boolean):[]};
+    });
+    result={profiles};
 
   } else if (data.action === 'getDpSharing') {
     const gsh=getOrCreate('planner_groups',['groupId','groupName','members','updatedAt']);
@@ -1929,7 +2060,7 @@ function copyLink(url,btn) {
 
 // ── Tabs ───────────────────────────────────────────────
 function switchTab(tab) {
-  const tabNames = ['overview','people','upload','calendar','reviews','notifications','planner','setup','audit'];
+  const tabNames = ['overview','people','upload','calendar','reviews','notifications','planner','clients','mgrprofiles','setup','audit'];
   document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', tabNames[i] === tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`));
 
@@ -1971,6 +2102,9 @@ function switchTab(tab) {
       pgRender();
     }
   }
+
+  if (tab === 'clients') { clLoadClients(); }
+  if (tab === 'mgrprofiles') { mgrProfilesLoad(); }
 
   if (tab === 'audit') { loadAuditLog(); }
 
@@ -2969,6 +3103,247 @@ async function pgSave() {
   } catch(e) { showToast('Failed to save groups', 'error'); }
 }
 
-</script>
+/* ══════════════════════════════════════════
+   CLIENTS & CAMPAIGNS
+══════════════════════════════════════════ */
+
+let allClients = [];   // [{id, clientName, campaign, logoUrl, fullName}]
+let _clLogoData = '';  // base64 of logo being uploaded
+
+function clPreviewLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 1*1024*1024) { showToast('Logo too large — max 1MB', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    _clLogoData = e.target.result;
+    const preview = document.getElementById('cl-logo-preview');
+    preview.innerHTML = `<img src="${_clLogoData}" style="width:100%;height:100%;object-fit:contain;border-radius:6px;"/>`;
+    document.getElementById('cl-logo-name').textContent = file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function clSaveClient() {
+  const clientName = document.getElementById('cl-client-name').value.trim();
+  const campaign = document.getElementById('cl-campaign-type').value;
+  const status = document.getElementById('cl-save-status');
+  if (!clientName) { showToast('Enter a client name', 'error'); return; }
+  const fullName = clientName + ' ' + campaign;
+  const client = {
+    id: 'cl_' + Date.now(),
+    clientName,
+    campaign,
+    fullName,
+    logoData: _clLogoData || '',
+    logoUrl: ''
+  };
+  status.textContent = 'Saving…';
+  try {
+    const res = await api({action: 'saveClient', client});
+    if (res && res.logoUrl) client.logoUrl = res.logoUrl;
+    client.logoData = ''; // clear base64 after save
+    allClients.push(client);
+    renderClientList();
+    // reset form
+    document.getElementById('cl-client-name').value = '';
+    document.getElementById('cl-campaign-type').value = 'Doors';
+    document.getElementById('cl-logo-preview').innerHTML = '🏢';
+    document.getElementById('cl-logo-name').textContent = '';
+    _clLogoData = '';
+    const inp = document.getElementById('cl-logo-input');
+    if (inp) inp.value = '';
+    status.textContent = '✓ Saved';
+    setTimeout(() => status.textContent = '', 3000);
+    showToast('Client saved ✓', 'success');
+    // Re-render manager profiles if loaded
+    renderMgrProfilesCampaignDropdowns();
+  } catch(e) { status.textContent = ''; showToast('Failed to save client', 'error'); }
+}
+
+async function clLoadClients() {
+  const list = document.getElementById('cl-client-list');
+  if (!list) return;
+  list.innerHTML = '<div class="loading-state"><span class="spinner"></span>Loading…</div>';
+  try {
+    const res = await api({action: 'getClients'});
+    allClients = (res && res.clients) || [];
+    renderClientList();
+  } catch(e) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;">Could not load clients.</div>';
+  }
+}
+
+function renderClientList() {
+  const list = document.getElementById('cl-client-list');
+  if (!list) return;
+  if (!allClients.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;">No clients registered yet.</div>';
+    return;
+  }
+  list.innerHTML = allClients.map(c => {
+    const imgHtml = c.logoUrl
+      ? `<img src="${esc(c.logoUrl)}" style="width:40px;height:40px;object-fit:contain;border-radius:6px;border:1px solid var(--border);background:#fff;" />`
+      : `<div style="width:40px;height:40px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;">🏢</div>`;
+    const campStyle = c.campaign === 'Doors'
+      ? 'background:#ffe0a0;color:#b85c00;border-color:#f08000;'
+      : 'background:#b3d4ff;color:#1140cc;border-color:#1d50ff;';
+    return `<div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;">
+      ${imgHtml}
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:600;">${esc(c.clientName)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+          <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid;${campStyle}">${esc(c.campaign)}</span>
+          <span style="margin-left:8px;font-weight:600;color:var(--text);">${esc(c.fullName)}</span>
+        </div>
+      </div>
+      <button onclick="clDeleteClient('${esc(c.id)}')" style="background:none;border:1px solid var(--border2);color:var(--muted);font-size:13px;padding:5px 10px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;" onmouseover="this.style.color='var(--danger)';this.style.borderColor='var(--danger)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border2)'">×</button>
+    </div>`;
+  }).join('');
+}
+
+async function clDeleteClient(id) {
+  if (!confirm('Remove this client? Will not unassign from managers.')) return;
+  allClients = allClients.filter(c => c.id !== id);
+  renderClientList();
+  renderMgrProfilesCampaignDropdowns();
+  try { await api({action: 'deleteClient', id}); } catch(e) {}
+}
+
+/* ══════════════════════════════════════════
+   MANAGER PROFILES (admin side)
+══════════════════════════════════════════ */
+
+let mgrProfiles = {}; // { managerName: { city, campaigns:[], phone, startDate, target, bio } }
+
+async function mgrProfilesLoad() {
+  const list = document.getElementById('mgr-profiles-list');
+  if (!list) return;
+  list.innerHTML = '<div class="loading-state"><span class="spinner"></span>Loading…</div>';
+  // Load clients too if not loaded
+  if (!allClients.length) {
+    try { const res = await api({action:'getClients'}); allClients = (res&&res.clients)||[]; } catch(e) {}
+  }
+  try {
+    const res = await api({action: 'getManagerProfiles'});
+    mgrProfiles = (res && res.profiles) || {};
+  } catch(e) { mgrProfiles = {}; }
+  renderMgrProfiles();
+}
+
+function renderMgrProfiles() {
+  const list = document.getElementById('mgr-profiles-list');
+  if (!list) return;
+  if (!managers.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;">No managers added yet. Go to Setup to add managers first.</div>';
+    return;
+  }
+  list.innerHTML = managers.map(m => {
+    const dn = m.charAt(0).toUpperCase() + m.slice(1);
+    const p = mgrProfiles[m] || {};
+    const assignedCampaigns = p.campaigns || [];
+    const picSrc = allProfilePics[m];
+    const avatarHtml = picSrc
+      ? `<img src="${picSrc}" style="width:40px;height:40px;border-radius:10px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;" />`
+      : `<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent-dark),var(--accent));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;">${dn.charAt(0)}</div>`;
+
+    // Campaign checkboxes
+    const campCheckboxes = allClients.length
+      ? allClients.map(c => {
+          const checked = assignedCampaigns.includes(c.id) ? 'checked' : '';
+          const imgTag = c.logoUrl ? `<img src="${esc(c.logoUrl)}" style="width:16px;height:16px;object-fit:contain;border-radius:3px;vertical-align:middle;margin-right:4px;" />` : '';
+          return `<label style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:pointer;background:var(--surface);border:1px solid var(--border);user-select:none;transition:all .12s;" class="cl-check-wrap" id="clw-${esc(m)}-${esc(c.id)}">
+            <input type="checkbox" ${checked} data-mgr="${esc(m)}" data-cl="${esc(c.id)}" onchange="mgrToggleCampaign('${esc(m)}','${esc(c.id)}',this.checked)" style="accent-color:var(--accent);cursor:pointer;" />
+            ${imgTag}${esc(c.fullName)}
+          </label>`;
+        }).join('')
+      : '<span style="font-size:12px;color:var(--muted);">No clients yet — register clients above first.</span>';
+
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        ${avatarHtml}
+        <div style="font-size:15px;font-weight:700;text-transform:capitalize;">${esc(dn)}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <div class="form-lbl" style="margin-bottom:4px;">City</div>
+          <input type="text" id="mgrp-city-${esc(m)}" class="form-input" value="${esc(p.city||'')}" placeholder="e.g. Glasgow" oninput="mgrProfileDirty('${esc(m)}')" />
+        </div>
+        <div>
+          <div class="form-lbl" style="margin-bottom:4px;">Phone</div>
+          <input type="text" id="mgrp-phone-${esc(m)}" class="form-input" value="${esc(p.phone||'')}" placeholder="e.g. 07700 900000" oninput="mgrProfileDirty('${esc(m)}')" />
+        </div>
+        <div>
+          <div class="form-lbl" style="margin-bottom:4px;">Start date</div>
+          <input type="date" id="mgrp-start-${esc(m)}" class="form-input" value="${esc(p.startDate||'')}" oninput="mgrProfileDirty('${esc(m)}')" />
+        </div>
+        <div>
+          <div class="form-lbl" style="margin-bottom:4px;">Weekly target (£)</div>
+          <input type="number" id="mgrp-target-${esc(m)}" class="form-input" value="${esc(p.weeklyTarget||'')}" placeholder="e.g. 5000" min="0" step="100" oninput="mgrProfileDirty('${esc(m)}')" />
+        </div>
+        <div style="grid-column:span 2;">
+          <div class="form-lbl" style="margin-bottom:4px;">Bio / motto</div>
+          <input type="text" id="mgrp-bio-${esc(m)}" class="form-input" value="${esc(p.bio||'')}" placeholder="A short bio or team motto…" oninput="mgrProfileDirty('${esc(m)}')" />
+        </div>
+      </div>
+      <div class="form-lbl" style="margin-bottom:6px;">Campaigns assigned</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;" id="clchecks-${esc(m)}">${campCheckboxes}</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="mgrProfileSave('${esc(m)}')" id="mgrp-save-${esc(m)}" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:500;padding:7px 16px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Save profile</button>
+        <span id="mgrp-status-${esc(m)}" style="font-size:11px;color:var(--muted);font-family:monospace;"></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMgrProfilesCampaignDropdowns() {
+  if (!document.getElementById('tab-mgrprofiles').classList.contains('active')) return;
+  renderMgrProfiles();
+}
+
+function mgrProfileDirty(m) {
+  const st = document.getElementById('mgrp-status-' + m);
+  if (st) st.textContent = '(unsaved)';
+}
+
+function mgrToggleCampaign(m, clId, checked) {
+  if (!mgrProfiles[m]) mgrProfiles[m] = {};
+  if (!mgrProfiles[m].campaigns) mgrProfiles[m].campaigns = [];
+  if (checked && !mgrProfiles[m].campaigns.includes(clId)) {
+    mgrProfiles[m].campaigns.push(clId);
+  } else {
+    mgrProfiles[m].campaigns = mgrProfiles[m].campaigns.filter(x => x !== clId);
+  }
+  // Update visual style
+  const wrap = document.getElementById(`clw-${m}-${clId}`);
+  if (wrap) {
+    if (checked) { wrap.style.background='var(--accent)'; wrap.style.color='#fff'; wrap.style.borderColor='var(--accent)'; }
+    else { wrap.style.background='var(--surface)'; wrap.style.color=''; wrap.style.borderColor='var(--border)'; }
+  }
+  mgrProfileDirty(m);
+}
+
+async function mgrProfileSave(m) {
+  const city = (document.getElementById('mgrp-city-' + m)||{}).value || '';
+  const phone = (document.getElementById('mgrp-phone-' + m)||{}).value || '';
+  const startDate = (document.getElementById('mgrp-start-' + m)||{}).value || '';
+  const weeklyTarget = (document.getElementById('mgrp-target-' + m)||{}).value || '';
+  const bio = (document.getElementById('mgrp-bio-' + m)||{}).value || '';
+  const campaigns = (mgrProfiles[m] && mgrProfiles[m].campaigns) || [];
+  const profile = { city, phone, startDate, weeklyTarget, bio, campaigns };
+  mgrProfiles[m] = profile;
+  const st = document.getElementById('mgrp-status-' + m);
+  if (st) st.textContent = 'Saving…';
+  try {
+    await api({action: 'saveManagerProfile', manager: m, profile});
+    if (st) { st.textContent = '✓ Saved'; setTimeout(() => { if(st) st.textContent=''; }, 3000); }
+    showToast(`${m} profile saved ✓`, 'success');
+  } catch(e) {
+    if (st) st.textContent = 'Save failed';
+    showToast('Failed to save profile', 'error');
+  }
+}
+
+
 </body>
 </html>

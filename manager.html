@@ -1581,6 +1581,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       <div class="nav-group-label"></div>
       <button class="nav-item" onclick="switchTab('reports')" id="nav-reports"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="11" width="3" height="6" rx="1"/><rect x="8.5" y="7" width="3" height="10" rx="1"/><rect x="14" y="3" width="3" height="14" rx="1"/></svg></span>Reports</button>
       <button class="nav-item" onclick="switchTab('notifications')" id="nav-notifications"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 0 1 6 6c0 3.5 1.5 5 1.5 5h-15S4 11.5 4 8a6 6 0 0 1 6-6z" stroke-linejoin="round"/><path d="M8.5 17a1.5 1.5 0 0 0 3 0" stroke-linecap="round"/></svg></span>Notifications<span id="notif-badge" class="nav-badge" style="display:none;">0</span></button>
+      <button class="nav-item" onclick="switchTab('profile')" id="nav-profile"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="7" r="3"/><path d="M4 17a7 7 0 0 1 12 0" stroke-linecap="round"/></svg></span>My Profile</button>
     </div>
     <div class="sidebar-footer">
       <button class="theme-toggle" onclick="toggleTheme()"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 13A7 7 0 1 1 7 3a5 5 0 0 0 10 10z" stroke-linejoin="round"/></svg><span id="theme-lbl">Dark mode</span></button>
@@ -1847,6 +1848,89 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
           <div style="color:var(--muted);font-size:13px;text-align:center;padding:40px;">Loading notifications…</div>
         </div>
       </div>
+    </div>
+
+    <!-- MY PROFILE -->
+    <div class="tab-content" id="ptab-profile">
+      <div class="topbar">
+        <span class="topbar-title">My Profile</span>
+        <div class="topbar-right">
+          <button onclick="profileSave()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:7px 16px;border-radius:20px;cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Save changes</button>
+          <span id="profile-save-status" style="font-size:11px;color:var(--muted);margin-left:4px;"></span>
+        </div>
+      </div>
+      <div class="page-scroll"><div class="page-wrap" style="max-width:720px;">
+
+        <!-- Profile header card -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;box-shadow:var(--niond-shadow);margin-bottom:16px;display:flex;align-items:flex-start;gap:20px;">
+          <div style="position:relative;flex-shrink:0;">
+            <div class="sidebar-avatar" id="profile-big-avatar" style="width:72px;height:72px;border-radius:16px;font-size:26px;font-weight:800;"></div>
+            <label style="position:absolute;bottom:-6px;right:-6px;width:24px;height:24px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;" title="Change photo" for="profile-pic-input2">✎</label>
+            <input type="file" id="profile-pic-input2" accept="image/*" style="display:none;" onchange="handleProfilePic(this)" />
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:20px;font-weight:700;text-transform:capitalize;margin-bottom:4px;" id="profile-name-display">—</div>
+            <div id="profile-tenure-badge" style="font-size:12px;color:var(--muted);margin-bottom:8px;"></div>
+            <div id="profile-campaigns-display" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+          </div>
+        </div>
+
+        <!-- Info fields -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;box-shadow:var(--niond-shadow);margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;">Profile details</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:5px;">City</label>
+              <input type="text" id="profile-city" class="field-input" placeholder="e.g. Glasgow" oninput="profileDirty()" />
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:5px;">Phone</label>
+              <input type="text" id="profile-phone" class="field-input" placeholder="e.g. 07700 900000" oninput="profileDirty()" />
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:5px;">Start date</label>
+              <input type="date" id="profile-start-date" class="field-input" oninput="profileDirty()" />
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:5px;">Weekly target (£)</label>
+              <input type="number" id="profile-weekly-target" class="field-input" placeholder="e.g. 5000" min="0" step="100" oninput="profileDirty()" />
+            </div>
+            <div style="grid-column:span 2;">
+              <label style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:5px;">Bio / team motto</label>
+              <input type="text" id="profile-bio" class="field-input" placeholder="e.g. Work hard, stay humble." oninput="profileDirty()" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Campaigns card (read-only assigned by admin, view only) -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;box-shadow:var(--niond-shadow);margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Assigned campaigns</div>
+          <div id="profile-campaigns-list" style="display:flex;flex-wrap:wrap;gap:8px;">
+            <div style="font-size:12px;color:var(--muted);">Loading…</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px;">Campaigns are assigned by your admin. Contact them to update.</div>
+        </div>
+
+        <!-- Stats card (computed) -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;box-shadow:var(--niond-shadow);margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Quick stats</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;" id="profile-stats-grid">
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center;">
+              <div style="font-size:22px;font-weight:800;letter-spacing:-.03em;" id="pstat-reps">—</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;">Active reps</div>
+            </div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center;">
+              <div style="font-size:22px;font-weight:800;letter-spacing:-.03em;" id="pstat-tenure">—</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;">Months tenure</div>
+            </div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center;">
+              <div style="font-size:22px;font-weight:800;letter-spacing:-.03em;" id="pstat-target">—</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;">Weekly target</div>
+            </div>
+          </div>
+        </div>
+
+      </div></div>
     </div>
 
     <!-- PAY TREND -->
@@ -2277,6 +2361,7 @@ function avStyle(name,pos){
 
 // ── State ──────────────────────────────────────────────
 let roster=[],weekLeavers=new Set(),allReports=[],weekSubmitted=false,calEvents=[],announcement=null,notes='',lastWeekCount=0,ackDone=false,savedReviews=[],allPayData=[],managerNotifs=[];
+let _myProfile=null,_myClients=[];
 
 async function loadAll(){
   const unwrap=r=>r.status==='fulfilled'?r.value:{};
@@ -2293,10 +2378,12 @@ async function loadAll(){
       api({action:'getPayData',manager:managerName}),
       api({action:'getProfilePic',manager:managerName}),
       api({action:'getManagerReviews',manager:managerName}),
-      api({action:'getNotifications',manager:managerName})
+      api({action:'getNotifications',manager:managerName}),
+      api({action:'getManagerProfile',manager:managerName}),
+      api({action:'getClients'})
     ]);
     settled.forEach((r,i)=>{if(r.status==='rejected')console.warn('loadAll action',i,'failed:',r.reason);});
-    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes,pdRes,picRes,revRes,notifRes]=settled.map(unwrap);
+    const[rRes,sRes,mRes,rpRes,calRes,annRes,notesRes,prevRes,pdRes,picRes,revRes,notifRes,profRes,clRes]=settled.map(unwrap);
     if(rRes.roster)roster=rRes.roster;
     if(sRes.rows&&sRes.rows.length){weekSubmitted=true;document.getElementById('banner-done').style.display='block';weekLeavers=new Set(sRes.rows.filter(r=>r.leaver).map(r=>r.id).filter(Boolean));}
     if(mRes.mapData){try{const d=JSON.parse(mRes.mapData);sp.nodes=d.nodes||[];sp.edges=d.edges||[];}catch(e){}}
@@ -2314,6 +2401,8 @@ async function loadAll(){
     }
     if(revRes.reviews)savedReviews=revRes.reviews;
     if(notifRes.notifications)managerNotifs=notifRes.notifications;
+    if(profRes.profile){ _myProfile=profRes.profile; }
+    if(clRes.clients){ _myClients=clRes.clients; }
     updateNotifBadge();
     renderAll();
   }catch(e){console.error('loadAll fatal:',e);renderAll();}
@@ -2323,8 +2412,37 @@ function renderAll(){
   // Hydrate scorecard notes from roster (stored in rep.managerNotes by saveRep)
   roster.forEach(r=>{if(r.managerNotes&&r.managerNotes.length)repNotes[r.id]=r.managerNotes;});
   renderHome();renderReps();renderWeekly();renderReports();renderCalendar();refreshAddLeaderDropdown();
+  updateSidebarProfile();
 }
 function getMgrDisplay(){return rawName.trim().charAt(0).toUpperCase()+rawName.trim().slice(1);}
+
+function updateSidebarProfile(){
+  if(!_myProfile) return;
+  const weekEl = document.getElementById('sb-week');
+  if(!weekEl) return;
+  const parts = [];
+  if(_myProfile.city) parts.push('📍 '+_myProfile.city);
+  parts.push(formatWeek(weekKey));
+  // Show assigned campaign names in sidebar if any
+  const assignedIds = _myProfile.campaigns || [];
+  const assignedNames = (_myClients||[]).filter(c=>assignedIds.includes(c.id)).map(c=>c.fullName);
+  if(assignedNames.length){
+    const existing = document.getElementById('sb-campaigns');
+    let el = existing;
+    if(!el){
+      el = document.createElement('div');
+      el.id = 'sb-campaigns';
+      el.style.cssText = 'font-size:10px;color:#6b9090;margin-top:3px;line-height:1.4;display:flex;flex-wrap:wrap;gap:3px;';
+      weekEl.parentNode.insertBefore(el, weekEl.nextSibling);
+    }
+    el.innerHTML = assignedNames.map(n=>`<span style="display:inline-block;font-size:9.5px;font-weight:600;padding:1px 7px;border-radius:10px;background:rgba(15,118,110,.1);color:#0f766e;border:1px solid rgba(15,118,110,.2);">${esc(n)}</span>`).join('');
+  }
+  weekEl.textContent = parts[0] || formatWeek(weekKey);
+  // If city was the first part, show week too
+  if(parts.length > 1){
+    weekEl.title = parts[1];
+  }
+}
 
 // ── HOME ──────────────────────────────────────────────
 const SVG={
@@ -4458,7 +4576,7 @@ function epSetAttach(val){
 }
 
 // ── Tab switching ─────────────────────────────────────
-const TABS=['home','reps','weekly','reports','review','events','calendar','leaderboard','map','notifications','notes','payrep','planner'];
+const TABS=['home','reps','weekly','reports','review','events','calendar','leaderboard','map','notifications','notes','payrep','planner','profile'];
 function switchTab(tab){
   TABS.forEach(id=>{
     const nav=document.getElementById(`nav-${id}`);
@@ -4477,6 +4595,7 @@ function switchTab(tab){
   if(tab==='notes'){notesRenderFolders();notesRenderList();}
   if(tab==='planner'){dpInit();} else { clearInterval(dpPollTimer); }
   if(tab==='payrep'){rpInit();}
+  if(tab==='profile'){profileLoad();}
 }
 
 // ── LEADERBOARD ───────────────────────────────────────
@@ -6557,6 +6676,146 @@ textarea,input{background:white!important;border-color:#e5e7eb!important;}
   win.onload = ()=>{ win.focus(); win.print(); };
 }
 
-</script>
+/* ══════════════════════════════════════════
+   MY PROFILE TAB
+══════════════════════════════════════════ */
+
+let _myProfile = null;         // loaded profile object
+let _myClients = [];           // all registered clients from backend
+let _profileDirty = false;
+
+async function profileLoad() {
+  // Load my profile data and registered clients in parallel
+  try {
+    const [profRes, clRes] = await Promise.all([
+      api({action:'getManagerProfile', manager:managerName}).catch(()=>({})),
+      api({action:'getClients'}).catch(()=>({}))
+    ]);
+    _myProfile = (profRes && profRes.profile) || {};
+    _myClients = (clRes && clRes.clients) || [];
+  } catch(e) {
+    _myProfile = {};
+    _myClients = [];
+  }
+  profileRender();
+}
+
+function profileRender() {
+  const p = _myProfile || {};
+  const dn = rawName.trim().charAt(0).toUpperCase() + rawName.trim().slice(1);
+
+  // Update big avatar to match sidebar
+  const sbAv = document.getElementById('sb-avatar');
+  const bigAv = document.getElementById('profile-big-avatar');
+  if (bigAv && sbAv) bigAv.innerHTML = sbAv.innerHTML || dn.charAt(0);
+
+  const nameEl = document.getElementById('profile-name-display');
+  if (nameEl) nameEl.textContent = dn;
+
+  // Tenure
+  let tenureMonths = 0;
+  if (p.startDate) {
+    const sd = new Date(p.startDate);
+    const now = new Date();
+    tenureMonths = Math.max(0, (now.getFullYear() - sd.getFullYear()) * 12 + (now.getMonth() - sd.getMonth()));
+  }
+  const tenureEl = document.getElementById('profile-tenure-badge');
+  if (tenureEl) {
+    if (p.startDate) {
+      const yrs = Math.floor(tenureMonths / 12);
+      const mos = tenureMonths % 12;
+      const parts = [];
+      if (yrs) parts.push(yrs + (yrs===1?' year':' years'));
+      if (mos) parts.push(mos + (mos===1?' month':' months'));
+      tenureEl.textContent = parts.length ? '🗓 ' + parts.join(' ') + ' with the team' : '🗓 Started this month';
+      tenureEl.style.display = '';
+    } else { tenureEl.textContent = ''; tenureEl.style.display = 'none'; }
+  }
+
+  // Fill form fields
+  const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  setVal('profile-city', p.city);
+  setVal('profile-phone', p.phone);
+  setVal('profile-start-date', p.startDate);
+  setVal('profile-weekly-target', p.weeklyTarget);
+  setVal('profile-bio', p.bio);
+
+  // Campaigns (assigned by admin — read from profile.campaigns which are client IDs)
+  const assignedIds = p.campaigns || [];
+  const assignedClients = _myClients.filter(c => assignedIds.includes(c.id));
+  const campListEl = document.getElementById('profile-campaigns-list');
+  const campDispEl = document.getElementById('profile-campaigns-display');
+  if (campListEl) {
+    if (!assignedClients.length) {
+      campListEl.innerHTML = '<span style="font-size:12px;color:var(--muted);">No campaigns assigned yet.</span>';
+    } else {
+      campListEl.innerHTML = assignedClients.map(c => {
+        const imgTag = c.logoUrl ? `<img src="${esc(c.logoUrl)}" style="width:22px;height:22px;object-fit:contain;border-radius:4px;margin-right:6px;" />` : '';
+        const campStyle = c.campaign === 'Doors' ? 'background:#ffe0a0;color:#b85c00;border-color:#f08000;' : 'background:#b3d4ff;color:#1140cc;border-color:#1d50ff;';
+        return `<div style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);font-size:13px;font-weight:600;">
+          ${imgTag}
+          <span>${esc(c.clientName)}</span>
+          <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid;${campStyle}">${esc(c.campaign)}</span>
+        </div>`;
+      }).join('');
+    }
+  }
+  if (campDispEl) {
+    campDispEl.innerHTML = assignedClients.map(c => {
+      const imgTag = c.logoUrl ? `<img src="${esc(c.logoUrl)}" style="width:18px;height:18px;object-fit:contain;border-radius:3px;" />` : '';
+      return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);">${imgTag}${esc(c.fullName)}</span>`;
+    }).join('');
+  }
+
+  // Quick stats
+  const activeReps = roster.filter(r => !r.leaver).length;
+  const setQ = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setQ('pstat-reps', activeReps);
+  setQ('pstat-tenure', tenureMonths || '—');
+  setQ('pstat-target', p.weeklyTarget ? '£' + Number(p.weeklyTarget).toLocaleString('en-GB') : '—');
+
+  // Bio in header
+  if (p.city) {
+    const nameEl2 = document.getElementById('profile-name-display');
+    if (nameEl2) nameEl2.title = p.city;
+  }
+
+  _profileDirty = false;
+  const st = document.getElementById('profile-save-status');
+  if (st) st.textContent = '';
+}
+
+function profileDirty() {
+  _profileDirty = true;
+  const st = document.getElementById('profile-save-status');
+  if (st) st.textContent = '(unsaved)';
+}
+
+async function profileSave() {
+  const g = id => (document.getElementById(id)||{}).value || '';
+  const profile = {
+    city: g('profile-city'),
+    phone: g('profile-phone'),
+    startDate: g('profile-start-date'),
+    weeklyTarget: g('profile-weekly-target'),
+    bio: g('profile-bio'),
+    campaigns: (_myProfile && _myProfile.campaigns) || []  // preserve admin-assigned campaigns
+  };
+  _myProfile = profile;
+  const st = document.getElementById('profile-save-status');
+  if (st) st.textContent = 'Saving…';
+  try {
+    await api({action:'saveManagerProfile', manager:managerName, profile});
+    _profileDirty = false;
+    if (st) { st.textContent = '✓ Saved'; setTimeout(() => { if(st) st.textContent=''; }, 3000); }
+    showToast('Profile saved ✓', 'success');
+    profileRender(); // re-render to update tenure badge etc.
+  } catch(e) {
+    if (st) st.textContent = 'Save failed';
+    showToast('Could not save profile', 'error');
+  }
+}
+
+
 </body>
 </html>
