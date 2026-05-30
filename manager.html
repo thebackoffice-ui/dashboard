@@ -1571,6 +1571,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
       <div class="nav-group-label"></div>
       <button class="nav-item" onclick="switchTab('weekly')" id="nav-weekly"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="12" height="15" rx="2"/><path d="M8 7h4M8 10h4M8 13h2" stroke-linecap="round"/></svg></span>Weekly Update<span id="weekly-badge" class="nav-badge" style="display:none;">!</span></button>
       <button class="nav-item" onclick="switchTab('review')" id="nav-review"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H6a1 1 0 0 0-1 1v13l5-3 5 3V4a1 1 0 0 0-1-1z" stroke-linejoin="round"/></svg></span>Weekly Review</button>
+      <button class="nav-item" onclick="switchTab('events')" id="nav-events"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Event Planner</button>
       <button class="nav-item" onclick="switchTab('planner')" id="nav-planner"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14M8 8v9" stroke-linecap="round"/></svg></span>Daily Planner</button>
 
       <div class="nav-group-label"></div>
@@ -1992,6 +1993,46 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(applyPositionClasses
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- EVENT PLANNER -->
+    <div class="tab-content" id="ptab-events">
+      <div class="topbar"><span class="topbar-title">Event Planner</span><div class="topbar-right"><span class="week-pill" id="ep-week-pill">—</span></div></div>
+      <div class="page-scroll"><div class="page-wrap">
+
+        <!-- Avg wire card -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:20px;box-shadow:var(--niond-shadow);">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Average wire per sale</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Used to calculate breakeven across all your events. Update it any time — saved to your account.</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="position:relative;display:flex;align-items:center;">
+              <span style="position:absolute;left:10px;font-size:14px;font-weight:600;color:var(--muted);">£</span>
+              <input id="ep-avg-wire" type="number" min="0" step="0.01" placeholder="e.g. 85"
+                style="padding:9px 12px 9px 26px;border:1px solid var(--border2);border-radius:var(--rsm);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;width:130px;outline:none;"
+                oninput="epSaveWire();epRecalc()"/>
+            </div>
+            <span id="ep-wire-saved" style="font-size:12px;color:#16a34a;display:none;">✓ Saved</span>
+          </div>
+        </div>
+
+        <!-- Events list -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="sec-lbl" style="margin-bottom:0;">This week's events</div>
+          <button onclick="epAddRow()" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">+ Add event</button>
+        </div>
+
+        <div id="ep-events-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
+
+        <!-- Breakeven summary -->
+        <div id="ep-breakeven" style="display:none;margin-bottom:16px;"></div>
+
+        <!-- Save button -->
+        <div style="padding-top:16px;border-top:1px solid var(--border);">
+          <button onclick="epSave()" id="ep-save-btn" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:500;padding:12px;border-radius:var(--r);cursor:pointer;width:100%;transition:opacity .15s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Save event plan for this week</button>
+          <div id="ep-save-status" style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px;min-height:18px;"></div>
+        </div>
+
+      </div></div>
     </div>
 
   </div><!-- /content-area -->
@@ -3579,34 +3620,7 @@ function renderReviewForm(){
   <div class="wr-section">
     <div class="wr-section-hdr"><div class="wr-num">10</div><span>Campaign &amp; Event Expenses</span></div>
     <div class="wr-section-body">
-      <div class="wr-label">Your campaign</div>
-      <select class="wr-input" id="wr-campaign" onchange="checkVenueCampaign(this.value)" style="margin-bottom:14px;">
-        <option value="">Select campaign…</option>
-        <option value="SP Venues">SP Venues</option>
-        <option value="SP Doors">SP Doors</option>
-        <option value="Charity Venues">Charity Venues</option>
-        <option value="Charity Doors">Charity Doors</option>
-        <option value="Other">Other</option>
-      </select>
-      <div id="wr-expenses-section" style="display:none;">
-        <div class="wr-label">Would you like to log event expenses for the upcoming week?</div>
-        <div class="wr-toggle-group" style="margin-bottom:14px;">
-          <button class="wr-toggle" id="wr-exp-yes" onclick="setExpenses(true)">Yes</button>
-          <button class="wr-toggle active" id="wr-exp-no" onclick="setExpenses(false)">No</button>
-        </div>
-        <div id="wr-expenses-detail" style="display:none;">
-          <div style="display:grid;grid-template-columns:1fr 1fr 28px;gap:6px;margin-bottom:6px;">
-            <div style="font-size:10px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:.05em;">Event name</div>
-            <div style="font-size:10px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:.05em;">Cost (£)</div>
-            <div></div>
-          </div>
-          <div id="wr-expenses-list"></div>
-          <button class="wr-add-link" onclick="addExpenseRow()">+ Add event</button>
-          <div class="wr-label" style="margin-top:14px;">Average wire per sale (£)</div>
-          <input class="wr-input" id="wr-avgWire" type="number" min="0" step="0.01" placeholder="e.g. 85" style="max-width:200px;" oninput="recalcBreakeven()"/>
-          <div id="wr-breakeven-summary" style="margin-top:10px;"></div>
-        </div>
-      </div>
+      <div id="wr-ep-attach-wrap"></div>
     </div>
   </div>
 
@@ -3616,7 +3630,8 @@ function renderReviewForm(){
   </div>
   `;
 
-  renderConvRows();renderNetworkRows();renderNetGoalRows();renderExpenseRows();
+  renderConvRows();renderNetworkRows();renderNetGoalRows();
+  renderEPAttach();
   setField(true);
   // Auto-capture map preview after a short delay
   setTimeout(captureMapPreview,400);
@@ -3841,8 +3856,8 @@ async function submitReview(){
     networks:wrNetworks.filter(n=>n.name),
     netGoals:wrNetGoals.filter(n=>n.name),
     additionalNotes:g('wr-additionalNotes'),
-    expenses:reviewExpensesEnabled?wrExpenses.filter(e=>e.name):[],
-    avgWire:reviewExpensesEnabled?g('wr-avgWire'):'',
+    expenses:epAttachEnabled?epEvents.filter(e=>e.name):[],
+    avgWire:epAttachEnabled&&epAvgWire?String(epAvgWire):'',
     mapSnapshot:wrMapSnapshot,
     mapData:JSON.stringify({nodes:sp.nodes,edges:sp.edges})
   };
@@ -4274,7 +4289,176 @@ function clearMap(){if(!confirm('Clear the map?'))return;sp.nodes=[];sp.edges=[]
 async function saveMap(){const md=JSON.stringify({nodes:sp.nodes,edges:sp.edges});try{await api({action:'saveMap',manager:managerName,mapData:md});showToast('Map saved ✓','success');}catch(e){showToast('Failed to save map','error');}}
 
 // ── Tab switching ─────────────────────────────────────
-const TABS=['home','reps','weekly','reports','review','calendar','leaderboard','map','notifications','notes','payrep','planner'];
+// ── EVENT PLANNER ─────────────────────────────────────
+let epEvents=[];
+let epAvgWire=0;
+let epAttachEnabled=false;
+
+const EP_WIRE_KEY=()=>`tt_ep_wire_${managerName}`;
+const EP_EVENTS_KEY=()=>`tt_ep_events_${managerName}_${weekKey}`;
+
+function epInit(){
+  const w=localStorage.getItem(EP_WIRE_KEY());
+  epAvgWire=w?parseFloat(w):0;
+  const saved=localStorage.getItem(EP_EVENTS_KEY());
+  if(saved){try{epEvents=JSON.parse(saved);}catch(e){epEvents=[];}}
+  else{epEvents=[];}
+  if(!epEvents.length)epEvents=[{name:'',cost:''},{name:'',cost:''},{name:'',cost:''}];
+  const wp=document.getElementById('ep-week-pill');
+  if(wp)wp.textContent=formatWeek(weekKey);
+  const wi=document.getElementById('ep-avg-wire');
+  if(wi&&epAvgWire)wi.value=epAvgWire;
+  epRenderRows();
+  epRecalc();
+}
+
+function epSaveWire(){
+  const wi=document.getElementById('ep-avg-wire');
+  epAvgWire=parseFloat(wi?.value)||0;
+  if(epAvgWire)localStorage.setItem(EP_WIRE_KEY(),epAvgWire);
+  const savedEl=document.getElementById('ep-wire-saved');
+  if(savedEl){savedEl.style.display='';setTimeout(()=>{savedEl.style.display='none';},2000);}
+}
+
+function epRenderRows(){
+  const el=document.getElementById('ep-events-list');
+  if(!el)return;
+  el.innerHTML=epEvents.map((e,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 130px 36px;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;box-shadow:var(--niond-shadow);">
+      <input type="text" placeholder="Event name (e.g. Westfield Venue)" value="${esc(e.name)}"
+        style="border:none;background:transparent;color:var(--text);font-family:var(--font);font-size:13px;font-weight:500;outline:none;width:100%;"
+        oninput="epEvents[${i}].name=this.value;epRecalc()"/>
+      <div style="position:relative;display:flex;align-items:center;">
+        <span style="position:absolute;left:8px;font-size:12px;color:var(--muted);pointer-events:none;">£</span>
+        <input type="number" min="0" step="0.01" placeholder="0.00" value="${e.cost||''}"
+          style="padding:6px 8px 6px 20px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:13px;width:100%;outline:none;box-sizing:border-box;"
+          oninput="epEvents[${i}].cost=this.value;epRecalc()"/>
+      </div>
+      <button onclick="epRemoveRow(${i})" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;line-height:1;transition:color .12s;" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='var(--muted)'">×</button>
+    </div>`).join('');
+}
+
+function epAddRow(){epEvents.push({name:'',cost:''});epRenderRows();epRecalc();}
+function epRemoveRow(i){epEvents.splice(i,1);epRenderRows();epRecalc();}
+
+function epRecalc(){
+  const el=document.getElementById('ep-breakeven');
+  if(!el)return;
+  const filled=epEvents.filter(e=>e.name||e.cost);
+  const totalCost=epEvents.reduce((s,e)=>s+(parseFloat(e.cost)||0),0);
+  if(!filled.length||!totalCost){el.style.display='none';return;}
+  el.style.display='';
+
+  const wire=epAvgWire||(parseFloat(document.getElementById('ep-avg-wire')?.value)||0);
+  const hasWire=wire>0;
+
+  let html=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--niond-shadow);">`;
+  html+=`<div style="padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:13px;font-weight:700;color:var(--text);">Breakeven Analysis</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text);">Total cost: £${totalCost.toFixed(2)}</div>
+  </div>`;
+
+  const eventRows=epEvents.filter(e=>(e.name||e.cost)&&(parseFloat(e.cost)||0)>0);
+  if(eventRows.length){
+    html+=`<div style="padding:12px 16px;display:flex;flex-direction:column;gap:9px;">`;
+    eventRows.forEach(e=>{
+      const cost=parseFloat(e.cost)||0;
+      const salesNeeded=hasWire&&cost?Math.ceil(cost/wire):null;
+      html+=`<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(e.name||'Unnamed event')}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <span style="font-size:12px;color:var(--muted);">£${cost.toFixed(2)}</span>
+          ${salesNeeded!==null?`<span style="font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 9px;border-radius:20px;white-space:nowrap;">${salesNeeded} sale${salesNeeded!==1?'s':''} to profit</span>`:''}
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  if(hasWire&&totalCost){
+    const totalSales=Math.ceil(totalCost/wire);
+    const perDay=(totalCost/(wire*5));
+    html+=`<div style="padding:14px 16px;background:var(--accent-soft);border-top:1px solid var(--accent-border);display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-.03em;">${totalSales}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">total sales to break even</div>
+      </div>
+      <div style="text-align:center;border-left:1px solid var(--accent-border);">
+        <div style="font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-.03em;">${perDay.toFixed(1)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">sales/day (5-day week)</div>
+      </div>
+    </div>`;
+  } else if(!hasWire){
+    html+=`<div style="padding:11px 16px;background:rgba(217,119,6,.06);border-top:1px solid rgba(217,119,6,.15);">
+      <div style="font-size:12px;color:#b45309;font-weight:600;">↑ Enter your average wire per sale above to see how many sales you need</div>
+    </div>`;
+  }
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
+function epSave(){
+  const btn=document.getElementById('ep-save-btn');
+  const status=document.getElementById('ep-save-status');
+  const filled=epEvents.filter(e=>e.name||e.cost);
+  if(!filled.length){showToast('Add at least one event first','error');return;}
+  btn.disabled=true;btn.textContent='Saving…';
+  localStorage.setItem(EP_EVENTS_KEY(),JSON.stringify(epEvents));
+  setTimeout(()=>{
+    btn.disabled=false;btn.textContent='Save event plan for this week';
+    if(status){status.textContent='✓ Saved for '+formatWeek(weekKey);setTimeout(()=>{status.textContent='';},4000);}
+    showToast('Event plan saved ✓','success');
+  },350);
+}
+
+function renderEPAttach(){
+  const wrap=document.getElementById('wr-ep-attach-wrap');
+  if(!wrap)return;
+  const saved=localStorage.getItem(EP_EVENTS_KEY());
+  let events=[];
+  if(saved){try{events=JSON.parse(saved).filter(e=>e.name||e.cost);}catch(e){}}
+  const wire=parseFloat(localStorage.getItem(EP_WIRE_KEY())||0);
+
+  if(events.length){
+    const totalCost=events.reduce((s,e)=>s+(parseFloat(e.cost)||0),0);
+    const totalSales=wire&&totalCost?Math.ceil(totalCost/wire):null;
+    wrap.innerHTML=`
+      <div style="background:rgba(22,163,74,.06);border:1px solid rgba(22,163,74,.2);border-radius:var(--r);padding:13px 15px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+          <span style="font-size:14px;">✓</span>
+          <div style="font-size:13px;font-weight:700;color:#16a34a;">Event plan ready for ${formatWeek(weekKey)}</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);">${events.length} event${events.length!==1?'s':''} · £${totalCost.toFixed(2)} total${totalSales?' · <strong>'+totalSales+' sales</strong> to break even':''}</div>
+      </div>
+      <div class="wr-label">Include this week's event plan in your review?</div>
+      <div class="wr-toggle-group">
+        <button class="wr-toggle active" id="wr-ep-yes" onclick="epSetAttach(true)">Yes, include it</button>
+        <button class="wr-toggle" id="wr-ep-no" onclick="epSetAttach(false)">Submit without</button>
+      </div>`;
+    epAttachEnabled=true;
+    epEvents=JSON.parse(saved);
+    epAvgWire=wire;
+  } else {
+    wrap.innerHTML=`
+      <div style="background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.18);border-radius:var(--r);padding:13px 15px;">
+        <div style="font-size:13px;font-weight:700;color:#b45309;margin-bottom:4px;">No event plan saved for this week</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:11px;">Head to the Event Planner tab to log your events and costs first, then come back to attach it — or submit without it.</div>
+        <button onclick="switchTab('events')" style="background:var(--accent);border:none;color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:7px 16px;border-radius:20px;cursor:pointer;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Go to Event Planner →</button>
+      </div>`;
+    epAttachEnabled=false;
+    epEvents=[];
+    epAvgWire=0;
+  }
+}
+
+function epSetAttach(val){
+  epAttachEnabled=val;
+  document.getElementById('wr-ep-yes')?.classList.toggle('active',val);
+  document.getElementById('wr-ep-no')?.classList.toggle('active',!val);
+}
+
+// ── Tab switching ─────────────────────────────────────
+const TABS=['home','reps','weekly','reports','review','events','calendar','leaderboard','map','notifications','notes','payrep','planner'];
 function switchTab(tab){
   TABS.forEach(id=>{
     const nav=document.getElementById(`nav-${id}`);
@@ -4282,6 +4466,7 @@ function switchTab(tab){
     if(nav)nav.classList.toggle('active',id===tab);
     if(panel)panel.classList.toggle('active',id===tab);
   });
+  if(tab==='events'){epInit();}
   if(tab==='map'){setTimeout(()=>{initMapPan();if(sp.nodes.length===0)rebuildMap();else{renderSpider();renderLegend();}applyTransform();},50);}
   if(tab==='home'&&typeof wireByWeekGlobal!=='undefined'){requestAnimationFrame(()=>drawProdChart(wireByWeekGlobal));}
   if(tab==='calendar')renderCalendar();
